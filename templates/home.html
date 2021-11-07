@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+    <meta charset="UTF-8">
+    <title>Bench Coach</title>
+</head>
+<h1>Bench Coach</h1>
+{% for page in pages %}
+<li><a style="text-transform:capitalize;" href="{% url page %}">{{ page }} </a></li>
+{% endfor %}
+<body>
+
+</body>
+</html>

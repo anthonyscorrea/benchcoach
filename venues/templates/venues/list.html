@@ -1,0 +1,13 @@
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<Title>Venues</Title>
+<h1>Venues</h1>
+<ol>
+{% for venue in venues %}
+    <li>
+    {{ venue.name }}
+    </li>
+{% endfor %}
+</ol>
