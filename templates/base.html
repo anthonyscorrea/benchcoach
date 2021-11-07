@@ -10,8 +10,14 @@
 
 <body>
 
-<nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand h1" style="text-transform: uppercase" href="{% url 'home' %}">⚾️ Bench Coach</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href={% url 'home' %}>⚾️ Bench Coach</a>
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="{% url 'schedule' %}">Schedule</a>
+        <a class="nav-item nav-link" href="{% url 'players list' %}">Players</a>
+      <a class="nav-item nav-link" href="{% url 'teams list' %}">Teams</a>
+      <a class="nav-item nav-link" href="{% url 'venues list' %}">Venues</a>
+    </div>
 </nav>
 
 <div id="content" class="container">
