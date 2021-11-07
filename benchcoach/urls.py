@@ -21,7 +21,7 @@ from django.conf import settings
 from .views import welcome
 
 urlpatterns = [
-    path('', welcome),
+    path('', welcome, name="home"),
     path('admin/', admin.site.urls),
     path('events/', include('events.urls')),
     path('teams/', include('teams.urls')),

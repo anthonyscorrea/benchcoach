@@ -6,4 +6,4 @@ def root(request):
 
 def list(request):
     teams = Team.objects.all()
-    return render(request, 'teams/list.html', {'teams': teams})
+    return render(request, 'list.html', {'title': "Teams", 'items': [f"{team.name}" for team in teams]})

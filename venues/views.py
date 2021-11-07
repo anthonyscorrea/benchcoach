@@ -6,4 +6,4 @@ def root(request):
 
 def list(request):
     venues = Venue.objects.all()
-    return render(request, 'venues/list.html', {'venues': venues})
+    return render(request, 'list.html', {'title': "Venues", 'items': [f"{venue.name}" for venue in venues]})

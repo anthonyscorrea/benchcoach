@@ -1,15 +1,19 @@
-{% load bootstrap5 %}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
 
-<Title>Schedule</Title>
-<h1>Schedule</h1>
-<ol>
+{% extends 'base.html' %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+<ol class="list-group">
 {% for event in events %}
-    <li>
+    <li class="list-group-item">
             {{ event.away_team.name }} vs. {{ event.home_team.name }} <br>
             {{ event.start|date:"l, F j, Y g:i A" }} <br>
             {{ event.venue.name }}
     </li>
 {% endfor %}
 </ol>
+
+{% endblock %}

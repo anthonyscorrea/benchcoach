@@ -6,4 +6,4 @@ def root(request):
 
 def schedule(request):
     events = Event.objects.all()
-    return render(request, 'events/schedule.html', {'events': events})
+    return render(request, 'events/schedule.html', {'title':'Schedule', 'events': events})
