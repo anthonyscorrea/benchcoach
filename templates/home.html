@@ -3,7 +3,8 @@
 {% block title %}Bench Coach Home{% endblock %}
 
 {% block content %}
-
+<h1>Home</h1>
+    List of pages:
 {% for page in pages %}
 <li><a style="text-transform:capitalize;" href="{% url page %}">{{ page }} </a></li>
 {% endfor %}
