@@ -11,7 +11,9 @@
     <li class="list-group-item">
             {{ event.away_team.name }} vs. {{ event.home_team.name }} <br>
             {{ event.start|date:"l, F j, Y g:i A" }} <br>
-            {{ event.venue.name }}
+            {{ event.venue.name }} <br>
+    <a class="btn btn-primary btn-sm" href="#" role="button">Edit Event Details</a>
+    <a class="btn btn-primary btn-sm" href="#" role="button">Edit Lineup</a>
     </li>
 {% endfor %}
 </ol>
