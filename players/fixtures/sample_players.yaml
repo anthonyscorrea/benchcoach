@@ -5,7 +5,6 @@
     last_name: Tosser
     jersey_number: 1
     team: 1
-    team: 1
 - model: players.player
   pk: 2
   fields:
