@@ -1,9 +1,4 @@
-
-{% extends 'base.html' %}
-
-{% block title %} {{ title }} {% endblock %}
-
-{% block content %}
+{% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}{% block content %}
 
 <h1>{{ title }}</h1>
 <ol class="list-group">
@@ -13,7 +8,7 @@
             {{ event.start|date:"l, F j, Y g:i A" }} <br>
             {{ event.venue.name }} <br>
     <a class="btn btn-primary btn-sm" href="{% url 'edit event' event.id%}" role="button">Edit Event Details</a>
-    <a class="btn btn-primary btn-sm" href="#" role="button">Edit Lineup</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'edit lineup' event.id%}" role="button">Edit Lineup</a>
     </li>
 {% endfor %}
 </ol>

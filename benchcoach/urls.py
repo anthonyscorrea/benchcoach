@@ -26,5 +26,6 @@ urlpatterns = [
     path('events/', include('events.urls')),
     path('teams/', include('teams.urls')),
     path('venues/', include('venues.urls')),
-    path('players/', include('players.urls'))
+    path('players/', include('players.urls')),
+    path('lineups/', include('lineups.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
