@@ -25,7 +25,7 @@ def edit(request, id=0):
             # ...
             # redirect to a new URL:
             new_event, did_create = Event.objects.update_or_create(pk=id, defaults=form.cleaned_data)
-            return render(request, 'success.html', {'call_back':'players list'})
+            return render(request, 'success.html', {'call_back':'schedule'})
 
     # if a GET (or any other method) we'll create a blank form
     else:
