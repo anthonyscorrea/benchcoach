@@ -1,4 +1,4 @@
-{% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}
+{% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}{% load crispy_forms_tags %}
 
 {% block content %}
     <h1>{{ title }}</h1>
@@ -8,11 +8,26 @@
     <div class="container">
         <div class="row">
             <div class="col-6">
-                <ul class="list-group">
-                    {% for li in lineup %}
-                        <li class="list-group-item">{{ l_i }}</li>
+{#                <ul class="list-group">#}
+            <form action="#" method="post">
+                {% csrf_token %}
+                    {% for pos in positionings_formset %}
+                        <div class="list-group-item">
+                            <div class="row">
+                                <div class="col-3">
+                                    {{ pos.order }}
+                                </div>
+                                <div class="col-6">
+                                    {{ pos.player }}
+                                </div>
+                                <div class="col-3">
+                                    {{ pos.position }}
+                                </div>
+                            </div>
+                        </div>
                     {% endfor %}
-                </ul>
+                <input type="submit" value="Submit">
+            </form>
             </div>
 
             <div class="col-6">
