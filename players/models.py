@@ -1,9 +1,11 @@
 from django.db import models
+from teams.models import Team
 
 class Player(models.Model):
    first_name = models.CharField(max_length=200)
    last_name = models.CharField(max_length=200)
    jersey_number = models.IntegerField()
+   team = models.ForeignKey(Team, null=True, on_delete=models.CASCADE)
 
    def __str__(self):
       return f"{self.last_name}, {self.first_name}"
