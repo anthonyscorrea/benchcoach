@@ -10,17 +10,22 @@ def list(request):
     teams = Team.objects.all()
     return render(request, 'list.html', {'title': "Teams", 'items': [(team.id, f"{team.name}") for team in teams], 'edit_url_name':'edit team'})
 
-def edit(request, id=None):
+def edit(request, id=0):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = TeamForm(request.POST)
+        if id:
+            instance = get_object_or_404(Team, id=id)
+            form = TeamForm(request.POST or None, instance=instance)
+        else:
+            form = TeamForm(request.POST or None)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            return HttpResponse(str(form.cleaned_data))
+            new_team, did_create = Team.objects.update_or_create(pk=id, defaults=form.cleaned_data)
+            return render(request, 'success.html', {'call_back':'teams list'})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -30,4 +35,4 @@ def edit(request, id=None):
         else:
             form = TeamForm
 
-    return render(request, 'venues/edit.html', {'form': form, 'id':id})
+    return render(request, 'edit.html', {'form': form, 'id': id, 'call_back':'edit team'})

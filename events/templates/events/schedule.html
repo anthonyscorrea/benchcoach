@@ -12,7 +12,7 @@
             {{ event.away_team.name }} vs. {{ event.home_team.name }} <br>
             {{ event.start|date:"l, F j, Y g:i A" }} <br>
             {{ event.venue.name }} <br>
-    <a class="btn btn-primary btn-sm" href="#" role="button">Edit Event Details</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'edit event' event.id%}" role="button">Edit Event Details</a>
     <a class="btn btn-primary btn-sm" href="#" role="button">Edit Lineup</a>
     </li>
 {% endfor %}
