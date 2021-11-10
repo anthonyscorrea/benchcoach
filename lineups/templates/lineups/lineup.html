@@ -1,0 +1,28 @@
+{% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    {{ event.away_team.name }} vs. {{ event.home_team.name }} <br>
+    {{ event.start|date:"l, F j, Y g:i A" }} <br>
+    {{ event.venue.name }} <br>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <ul class="list-group">
+                    {% for li in lineup %}
+                        <li class="list-group-item">{{ l_i }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-6">
+                <ul class="list-group">
+                    {% for player in players %}
+                        <li class="list-group-item">{{ player.first_name }} {{ player.last_name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
