@@ -10,7 +10,12 @@ def root(request):
 def list(request):
     players = Player.objects.all()
     return render(request, 'list.html', {'title': "Players",
-                                         'items': [(player.id, f"{player.first_name} {player.last_name}") for player in players],
+                                         'items': [
+                                             {'id':player.id,
+                                              'title':f"{player.first_name} {player.last_name}",
+                                              'subtitle':f"{player.jersey_number}"
+                                              }
+                                             for player in players],
                                          'edit_url_name': 'edit player'})
 
 def edit(request, id=0):

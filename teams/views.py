@@ -8,7 +8,13 @@ def root(request):
 
 def list(request):
     teams = Team.objects.all()
-    return render(request, 'list.html', {'title': "Teams", 'items': [(team.id, f"{team.name}") for team in teams], 'edit_url_name':'edit team'})
+    return render(request, 'list.html', {'title': "Players",
+                                         'items': [
+                                             {'id':team.id,
+                                              'title':f"{team.name}"
+                                              }
+                                             for team in teams],
+                                         'edit_url_name': 'edit team'})
 
 def edit(request, id=0):
     # if this is a POST request we need to process the form data

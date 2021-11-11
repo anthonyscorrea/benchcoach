@@ -7,8 +7,9 @@
 <ol class="list-group">
 {% for item in items %}
     <li class="list-group-item">
-    <h5>{{ item.1 }}</h5>
-        <a class="btn btn-primary btn-sm" href="{% url edit_url_name item.0%}" role="button">Edit</a>
+        <span class="fs-5 fw-bold">{{ item.title }}</span> <span class="fs-6">{{ item.subtitle }}</span>
+        <br>
+        <a class="btn btn-primary btn-sm" href="{% url edit_url_name item.id%}" role="button">Edit</a>
     </li>
 {% endfor %}
 </ol>
