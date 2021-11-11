@@ -4,7 +4,7 @@
 <ol class="list-group">
 {% for event in events %}
     <li class="list-group-item fs-6">
-        <span class="fs-5 fw-bold">{{ event.away_team.name }} vs. {{ event.home_team.name }}</span> <br>
+        <span class="fs-5 fw-bold" style="text-transform: uppercase">{{ event.away_team.name }} vs. {{ event.home_team.name }}</span> <br>
             {{ event.start|date:"l, F j, Y g:i A" }} <br>
             {{ event.venue.name }} <br>
     <a class="btn btn-primary btn-sm" href="{% url 'edit event' event.id%}" role="button">Edit Event Details</a>
