@@ -3,10 +3,12 @@
 
 {% block content %}
 
-<head>
-    <meta http-equiv="refresh" content="2;url={%  url call_back %}" />
-</head>
+    <head>
 
-<span class="text-success">Success!</span> <span class="text-muted">Redirecting...</span>
+            <meta http-equiv="refresh" content="2;url={{ call_back_url }}" />
+
+    </head>
+
+    <span class="text-success">Success!</span> <span class="text-muted">Redirecting...</span>
 
 {% endblock %}

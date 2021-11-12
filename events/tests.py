@@ -1,112 +1,80 @@
-from django.test import TestCase
-from events.models import Player, Event, Availability, Team, Positioning
-import datetime
-import pytz
-# Create your tests here.
+from django.test import TestCase, Client
+from django.test.utils import setup_test_environment
+from django.urls import reverse
+from .models import Event
+from datetime import datetime
+FIXTURES = ['blaseball']
 
-class BenchcoachTestCase(TestCase):
-    def setUp(self):
-        for first_name, last_name, jersey_number in [
-            ("Rush", "Valenzuela", 1),
-            ("Baby", "Triumphant", 2)
-        ]:
-            Player.objects.create(first_name=first_name, last_name=last_name, jersey_number=jersey_number)
+class TestEventModel(TestCase):
+    fixtures = FIXTURES
 
-        for name in ["Firefighters", "Garages"]:
-            Team.objects.create(name=name)
+    def test_query_event(self):
+        """
+        Return the desired event
+        """
+        event = Event.objects.get(id=1)
+        self.assertEqual("Chicago Firefighters", event.away_team.name)
+        self.assertEqual("Dallas Steaks", event.home_team.name)
+        self.assertEqual('George Fourman Stadium', event.venue.name)
+        self.assertEqual(datetime(
+            year=2020,
+            month=8,
+            day=24,
+            hour=16,
+            minute=0,
+            second=1), event.start)
 
-        for start, home_team_id, away_team_id in [
-            (datetime.datetime(2020, 1, 2, 12, 0), 1, 2), # id = 1
-            (datetime.datetime(2020, 1, 3, 12, 0), 2, 1), # id = 2
-            (datetime.datetime(2020, 1, 4, 12, 0), 2, 1) # id = 3
-        ]:
-            Event.objects.create(start=start, home_team_id=home_team_id, away_team_id=away_team_id)
+class TestEventViews(TestCase):
+    fixtures = FIXTURES
 
-        for event_id in [
-            1
-        ]:
-            for player_id, available in [
-                (1,"Yes"),
-                (2,"No")
-            ]:
-                Availability.objects.create(event_id=event_id, player_id=player_id, available=available)
+    def test_event_list(self):
+        response = self.client.get(reverse('schedule'))
+        self.assertEqual(200, response.status_code)
 
-        for event_id in [
-            1
-        ]:
-            for player_id, position in [
-                (1, "C"),
-                (2, "1B")
-            ]:
-                Positioning.objects.create(event_id=event_id, player_id=player_id, position=position)
+    def test_event_edit(self):
+        response = self.client.get(reverse('edit event', args=[2]))
+        self.assertEqual(200, response.status_code)
 
-        for event_id in [
-            2
-        ]:
-            for player_id, available in [
-                (1,"Yes"),
-                (2,"Yes")
-            ]:
-                Availability.objects.create(event_id=event_id, player_id=player_id, available=available)
+        # create new event
+        new_event_data = {
+            'home_team': 23,
+            'away_team': 24,
+            'start':datetime(
+                year=2021,
+                month=1,
+                day=1,
+                hour=9,
+                minute=0,
+                second=0),
+            'venue':19
+        }
 
-        for event_id in [
-            3
-        ]:
-            for player_id, available in [
-                (1,"No"),
-                (2,"No")
-            ]:
-                Availability.objects.create(event_id=event_id, player_id=player_id, available=available)
-        pass
+        response = self.client.post(reverse('edit event', args=[0]), data=new_event_data)
+        self.assertEqual(201, response.status_code)
+        new_event = Event.objects.get(id=response.context['id'])
+        self.assertEqual(new_event_data['home_team'], new_event.home_team.id)
+        self.assertEqual(new_event_data['away_team'], new_event.away_team_id)
+        self.assertEqual(new_event_data['start'], new_event.start)
 
-
-    def test_player(self):
-        """Test that player works"""
-        player_1 = Player.objects.get(first_name="Rush")
-        player_2 = Player.objects.get(first_name="Baby")
-        self.assertEqual(str(player_1), f"Valenzuela, Rush")
-        self.assertEqual(str(player_2), f"Triumphant, Baby")
-        pass
-
-    def test_event(self):
-        event = Event.objects.get(pk=1)
-        self.assertEqual(event.start.year, 2020)
-        self.assertEqual(event.start.month, 1)
-        self.assertEqual(event.start.day, 2)
-        self.assertEqual(event.start.hour, 12)
-        self.assertEqual(event.start.minute, 0)
-        self.assertEqual(event.home_team.name, "Firefighters")
-        self.assertEqual(event.away_team.name, "Garages")
-
-    def test_availability(self):
-        availability_1 = Availability.objects.get(event_id=1, player_id=1)
-        availability_2 = Availability.objects.get(event_id=1, player_id=2)
-
-        self.assertEqual(availability_1.available, "Yes")
-        self.assertEqual(availability_2.available, "No")
-        pass
-
-    def test_positioning(self):
-        positioning_1 = Positioning.objects.get(event_id=1, player_id=1)
-        positioning_2 = Positioning.objects.get(event_id=1, player_id=2)
-        # positing_1
-        pass
-
-    def test_combine_info(self):
-        event = Event.objects.get(pk=1)
-        event_id = 1
-        player_query = Player.objects.all()
-        positioning_query = Positioning.objects.filter(event=event).select_related('player')
-        availability_query = Availability.objects.filter(event=event).select_related('player')
-        player_event_info = []
-
-        for player in player_query:
-            player_event_info.append(
-                {
-                    "player":player,
-                    "positioning":positioning_query.get(player_id=player.id),
-                    "availability":availability_query.get(player_id=player.id)
+        # modify event
+        modified_event_data = {
+                    'home_team': 23,
+                    'away_team': 24,
+                    'start':datetime(
+                        year=2021,
+                        month=1,
+                        day=1,
+                        hour=9,
+                        minute=0,
+                        second=0),
+                    'venue':19
                 }
-            )
+        response = self.client.post(reverse('edit event', args=[1]), data=modified_event_data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.context['id'])
+        modified_event = Event.objects.get(id=response.context['id'])
 
-        pass
+        self.assertEqual(modified_event_data['home_team'], modified_event.home_team.id)
+        self.assertEqual(modified_event_data['away_team'], modified_event.away_team.id)
+        self.assertEqual(modified_event_data['start'], modified_event.start)
+        self.assertEqual(modified_event_data['venue'], modified_event.venue.id)

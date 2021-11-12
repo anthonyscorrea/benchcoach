@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from django.urls import reverse
 from .models import Event
 from .forms import EventForm
 from django.http import HttpResponse
@@ -24,8 +26,11 @@ def edit(request, id=0):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
+            if id == 0: id = None
             new_event, did_create = Event.objects.update_or_create(pk=id, defaults=form.cleaned_data)
-            return render(request, 'success.html', {'call_back':'schedule'})
+            return render(request, 'success.html', {'call_back':reverse('schedule'),'id':new_event.id}, status=201 if did_create else 200)
+        else:
+            return HttpResponse(status=400)
 
     # if a GET (or any other method) we'll create a blank form
     else:
