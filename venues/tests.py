@@ -1,12 +1,9 @@
-from django.test import TestCase, Client
-from django.test.utils import setup_test_environment
+from django.test import TestCase
 from django.urls import reverse
 from .models import Venue
 
-FIXTURES = ['sample_venues.yaml']
-
 class TestVenueModel(TestCase):
-    fixtures = FIXTURES
+    fixtures = ['blaseball']
 
     def test_query_venue(self):
         """
@@ -16,7 +13,7 @@ class TestVenueModel(TestCase):
         self.assertEqual(venue.name, "Chesapeake Racetrack and Ballpark")
 
 class TestVenueViews(TestCase):
-    fixtures = FIXTURES
+    fixtures = ['blaseball']
 
     def test_venue_list(self):
         response = self.client.get(reverse('venues list'))

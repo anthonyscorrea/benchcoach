@@ -1,9 +1,8 @@
 from django.test import TestCase, Client
-from django.test.utils import setup_test_environment
 from django.urls import reverse
 from .models import Player
 
-FIXTURES = ['sample_players.yaml', 'sample_teams.yaml']
+FIXTURES = ['blaseball']
 
 class TestPlayerModel(TestCase):
     fixtures = FIXTURES
@@ -30,15 +29,30 @@ class TestPlayerViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # create new player
-        response = self.client.post(reverse('edit player', args=[0]), data={'name': "A new player"})
+        new_player_data = {
+            'first_name': "A new player first name",
+            'last_name': "A new player last name",
+            'jersey_number':99,
+            'team':1
+        }
+
+        response = self.client.post(reverse('edit player', args=[0]), data=new_player_data)
         self.assertEqual(201, response.status_code)
         new_player = Player.objects.get(id=response.context['id'])
-        self.assertEqual('A new player', new_player.name)
+        self.assertEqual(new_player_data['first_name'], new_player.first_name)
+        self.assertEqual(new_player_data['last_name'], new_player.last_name)
 
         # modify player
-        response = self.client.post(reverse('edit player', args=[1]), data={'name': "A different player name"})
+        modified_player_data = {
+            'first_name': "A changed player first name",
+            'last_name': "A changed player last name",
+            'jersey_number': 99,
+            'team': 1
+        }
+        response = self.client.post(reverse('edit player', args=[1]), data=modified_player_data)
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.context['id'])
         modified_player = Player.objects.get(id=response.context['id'])
-        self.assertEqual('A different player name', modified_player.name)
+        self.assertEqual(modified_player_data['first_name'], modified_player.first_name)
+        self.assertEqual(modified_player_data['last_name'], modified_player.last_name)
 
