@@ -18,9 +18,9 @@ class TestVenueViews(TestCase):
     def test_venue_list(self):
         response = self.client.get(reverse('venues list'))
         self.assertEqual(response.status_code, 200)
-        self.assertIn((1, 'Chesapeake Racetrack and Ballpark'), response.context['items'])
-        self.assertIn((2, 'Tokyo Fitness Center'), response.context['items'])
-        self.assertIn((25, 'ILB Historical Preservation Site'), response.context['items'])
+        self.assertIn({'id':1, 'title':'Chesapeake Racetrack and Ballpark'}, response.context['items'])
+        self.assertIn({'id':2, 'title':'Tokyo Fitness Center'}, response.context['items'])
+        self.assertIn({'id':25, 'title':'ILB Historical Preservation Site'}, response.context['items'])
 
     def test_venue_edit(self):
         response = self.client.get(reverse('edit venue', args=[1]))

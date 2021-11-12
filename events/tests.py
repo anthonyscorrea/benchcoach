@@ -13,8 +13,8 @@ class TestEventModel(TestCase):
         Return the desired event
         """
         event = Event.objects.get(id=1)
-        self.assertEqual("Chicago Firefighters", event.away_event.name)
-        self.assertEqual("Dallas Steaks", event.home_event.name)
+        self.assertEqual("Chicago Firefighters", event.away_team.name)
+        self.assertEqual("Dallas Steaks", event.home_team.name)
         self.assertEqual('George Fourman Stadium', event.venue.name)
         self.assertEqual(datetime(
             year=2020,

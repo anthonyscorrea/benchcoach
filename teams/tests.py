@@ -11,7 +11,7 @@ class TestTeamModel(TestCase):
         Return the desired team
         """
         team = Team.objects.get(id=1)
-        self.assertEqual(team.name, "Chesapeake Racetrack and Ballpark")
+        self.assertEqual(team.name, "Chicago Firefighters")
 
 class TestTeamViews(TestCase):
     fixtures = ['blaseball']
@@ -19,9 +19,9 @@ class TestTeamViews(TestCase):
     def test_team_list(self):
         response = self.client.get(reverse('teams list'))
         self.assertEqual(response.status_code, 200)
-        self.assertIn((1, 'Chesapeake Racetrack and Ballpark'), response.context['items'])
-        self.assertIn((2, 'Tokyo Fitness Center'), response.context['items'])
-        self.assertIn((25, 'ILB Historical Preservation Site'), response.context['items'])
+        self.assertIn({'id':1, 'title':'Chicago Firefighters'}, response.context['items'])
+        self.assertIn({'id':2, 'title':'Boston Flowers'}, response.context['items'])
+        self.assertIn({'id':24, 'title':'Baltimore Crabs'}, response.context['items'])
 
     def test_team_edit(self):
         response = self.client.get(reverse('edit team', args=[1]))
