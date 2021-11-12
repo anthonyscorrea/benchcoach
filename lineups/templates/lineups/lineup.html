@@ -11,16 +11,26 @@
 {#                <ul class="list-group">#}
             <form action="{%  url 'edit lineup' id=event.id%}" method="post">
 
-                {% csrf_token %}
-                    {{ positionings_formset.management_form }}
-                    {% for pos in positionings_formset %}
-                        <div class="input-group mb-1">
-                            {{ pos.id }}
-                            {{ pos.order }}
-                            {{ pos.player }}
-                            {{ pos.position }}
-                        </div>
+{#                {% csrf_token %}#}
+{#                    {{ positionings_formset.management_form }}#}
+{#                    {% for pos in positionings_formset %}#}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Player</th>
+                        <th scope="col">Position</th>
+                    </tr>
+                    </thead>
+                    {% for form in positionings_formset %}
+                        <tr>
+                            <th scope="row">{{ form.order }}</th>
+                            <td>{{ form.player }}</td>
+                            <td>{{ form.position }}</td>
+                        </tr>
                     {% endfor %}
+                </table>
+{#                    {% endfor %}#}
                 <input type="submit" value="Submit">
             </form>
             </div>
