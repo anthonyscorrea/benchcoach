@@ -1,0 +1,149 @@
+[
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Winnemac Park"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Southwest Park"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Taft HS"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Maywood Park"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Altgeld"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Maine South"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Walther Christian Academy"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Grosche"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Clemente"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Northeastern University"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Proviso East"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Columbus Park"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Ridgewood HS"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Mount Carmel HS"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Kroc Center"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Simeon"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Proviso West HS"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Jane Addams Park"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Ozinga"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "Lemont High School"
+  }
+  },
+  {
+    "model": "venues.venue",
+    "pk": null,
+    "fields": {
+    "name": "K's Dugout"
+  }
+  }
+]
