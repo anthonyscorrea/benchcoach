@@ -1,0 +1,38 @@
+{% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}{% load crispy_forms_tags %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    {{ event.away_team.name }} vs. {{ event.home_team.name }} <br>
+    {{ event.start|date:"l, F j, Y g:i A" }} <br>
+    {{ event.venue.name }} <br>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+{#                <ul class="list-group">#}
+            <form action="{%  url 'edit lineup' id=event.id%}" method="post">
+
+                {% csrf_token %}
+                    {{ positionings_formset.management_form }}
+                    {% for pos in positionings_formset %}
+                        <div class="input-group mb-1">
+                            {{ pos.id }}
+                            {{ pos.order }}
+                            {{ pos.player }}
+                            {{ pos.position }}
+                        </div>
+                    {% endfor %}
+                <input type="submit" value="Submit">
+            </form>
+            </div>
+
+            <div class="col-6">
+                <ul class="list-group">
+                    {% for player in players %}
+                        <li class="list-group-item">{{ player.first_name }} {{ player.last_name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

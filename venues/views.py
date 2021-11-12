@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from .models import Venue
 from .forms import VenueForm
 
@@ -8,7 +8,13 @@ def root(request):
 
 def list(request):
     venues = Venue.objects.all()
-    return render(request, 'list.html', {'title': "Venues", 'items': [(venue.id, f"{venue.name}") for venue in venues], 'edit_url_name': 'edit venue'})
+    return render(request, 'list.html', {'title': "Venues",
+                                         'items': [
+                                             {'id':venue.id,
+                                              'title':f"{venue.name}"
+                                              }
+                                             for venue in venues],
+                                         'edit_url_name': 'edit venue'})
 
 
 def edit(request, id=0):
@@ -26,7 +32,8 @@ def edit(request, id=0):
             # ...
             # redirect to a new URL:
             new_venue, did_create = Venue.objects.update_or_create(pk=id, defaults=form.cleaned_data)
-            return render(request, 'success.html', {'call_back':'players list'})
+            return render(request, 'success.html', {'call_back':'players list','id':new_venue.id}, status=201 if did_create else 200)
+        return HttpResponseBadRequest()
 
     # if a GET (or any other method) we'll create a blank form
     else:
