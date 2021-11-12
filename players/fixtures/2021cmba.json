@@ -1,0 +1,227 @@
+[
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Tony",
+    "jersey_number": 13,
+    "last_name": "Correa"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Tim",
+    "jersey_number": 8,
+    "last_name": "Riggenbach"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Thomas",
+    "jersey_number": 44,
+    "last_name": "Feazelle"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Philip",
+    "jersey_number": 25,
+    "last_name": "Oweimrin"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Phil",
+    "jersey_number": 21,
+    "last_name": "Zelenka"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Nick",
+    "jersey_number": 23,
+    "last_name": "Schmidt"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Mike",
+    "jersey_number": 28,
+    "last_name": "DiCola"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Max",
+    "jersey_number": 99,
+    "last_name": "Kiefer"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Matthew",
+    "jersey_number": 5,
+    "last_name": "Steffens"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Matt",
+    "jersey_number": 6,
+    "last_name": "Burch"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Jules",
+    "jersey_number": 34,
+    "last_name": "Cantor"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "John",
+    "jersey_number": 34,
+    "last_name": "Lundgren"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Joe",
+    "jersey_number": 17,
+    "last_name": "Malafronte"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Hans",
+    "jersey_number": 18,
+    "last_name": "Hetrick"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Greg",
+    "jersey_number": 19,
+    "last_name": "Sells"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Garrett",
+    "jersey_number": 17,
+    "last_name": "Eddy"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Cole",
+    "jersey_number": 24,
+    "last_name": "Thompson"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Brian",
+    "jersey_number": 2,
+    "last_name": "Lehman"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Brent",
+    "jersey_number": 27,
+    "last_name": "Fukushima"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Brandon",
+    "jersey_number": 3,
+    "last_name": "Jessee"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Brad",
+    "jersey_number": 15,
+    "last_name": "Halperin"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Arron",
+    "jersey_number": 11,
+    "last_name": "Kruse"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Amanda",
+    "jersey_number": 41,
+    "last_name": "Mordacq"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Alec",
+    "jersey_number": 14,
+    "last_name": "Reinke"
+  }
+  },
+  {
+    "model": "players.player",
+    "pk": null,
+    "fields": {
+    "first_name": "Adrien",
+    "jersey_number": 45,
+    "last_name": "Kelly"
+  }
+  }
+]
