@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from django.urls import reverse
 from .forms import TeamForm
 from .models import Team
 
@@ -31,7 +32,7 @@ def edit(request, id=0):
             # ...
             # redirect to a new URL:
             new_team, did_create = Team.objects.update_or_create(pk=id, defaults=form.cleaned_data)
-            return render(request, 'success.html', {'call_back':'teams list'})
+            return render(request, 'success.html', {'call_back_url':reverse('teams list'), 'id':new_team.id},status=201 if did_create else 200)
 
     # if a GET (or any other method) we'll create a blank form
     else:
