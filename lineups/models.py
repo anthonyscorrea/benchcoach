@@ -2,6 +2,7 @@ from django.db import models
 from players.models import Player
 from events.models import Event
 # Create your models here.
+
 class Positioning(models.Model):
    player = models.ForeignKey(Player, on_delete=models.CASCADE)
    event = models.ForeignKey(Event, on_delete=models.CASCADE)

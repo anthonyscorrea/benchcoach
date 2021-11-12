@@ -14,18 +14,11 @@
                 {% csrf_token %}
                     {{ positionings_formset.management_form }}
                     {% for pos in positionings_formset %}
-                        <div class="list-group-item">
-                            <div class="row">
-                                <div class="col-3">
-                                    {{ pos.order }}
-                                </div>
-                                <div class="col-6">
-                                    {{ pos.player }}
-                                </div>
-                                <div class="col-3">
-                                    {{ pos.position }}
-                                </div>
-                            </div>
+                        <div class="input-group mb-1">
+                            {{ pos.id }}
+                            {{ pos.order }}
+                            {{ pos.player }}
+                            {{ pos.position }}
                         </div>
                     {% endfor %}
                 <input type="submit" value="Submit">

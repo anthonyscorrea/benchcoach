@@ -18,13 +18,16 @@ def edit(request, id):
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
-                new_event, did_create = Positioning.objects.update_or_create(player_id=form['player'].data, event_id=id, defaults=form.cleaned_data)
-                print (form.cleaned_data)
+                form.cleaned_data.pop('id') #FIXME this is a workaround, not sure why it is necessary
+                new_positioning, did_create = Positioning.objects.update_or_create(id=form['id'].data, defaults=form.cleaned_data)
             # return render(request, 'success.html', {'call_back':'schedule'})
     event = Event.objects.get(id=id)
     players = Player.objects.all()
     qset = Positioning.objects.filter(event_id=id, order__isnull = False)
     formset = PositioningFormSet(queryset=qset)
+    for form in formset:
+        for field in form.fields:
+            field
     return render(request, 'lineups/lineup.html', {'title': 'Lineup',
                                                    'event': event,
                                                    'players': players,
