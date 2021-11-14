@@ -3,28 +3,16 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.urls import reverse
 from .models import Venue
 from .forms import VenueForm
+from lib.views import BenchcoachListView
 
 def root(request):
     return redirect('/venues/list')
 
-def list(request):
-    items = Venue.objects.all()
-    context = {
-        'title': "Venues",
-        'items': [
-            {'id': item.id,
-             'title': f"{item.name}",
-             'buttons': [
-                 {
-                     'label': 'Edit',
-                     'href': reverse('edit venue', args=[item.id])
-                 }
-             ]
-             }
-            for item in items]
-    }
-    return render(request, 'list.html', context)
-
+class VenueListView(BenchcoachListView):
+    Model = Venue
+    edit_url = 'edit venue'
+    list_url = 'venues list'
+    page_title = "Venues"
 
 def edit(request, id=0):
     # if this is a POST request we need to process the form data

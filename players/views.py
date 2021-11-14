@@ -1,32 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic.list import ListView
 from django.http import HttpResponse
 from django.urls import reverse
 from .models import Player
 from .forms import PlayerForm
+from lib.views import BenchcoachListView
 
 # Create your views here.
+
+class PlayerListView(BenchcoachListView):
+    Model = Player
+    edit_url = 'edit player'
+    list_url = 'players list'
+    page_title = "Players"
+    title_strf = "{first_name} {last_name}"
+    subtitle_strf = "#{jersey_number}"
+
 def root(request):
     return redirect('/players/list')
-
-def list(request):
-    items = Player.objects.all()
-    context = {
-        'title': "Players",
-         'items': [
-             {'id': item.id,
-              'title': f"{item.first_name} {item.last_name}",
-              'subtitle': f"{item.jersey_number}",
-              'buttons': [
-                  {
-                      'label': 'Edit',
-                      'href': reverse('edit player', args=[item.id])
-                  }
-              ]
-              }
-             for item in items]
-    }
-
-    return render(request, 'list.html', context)
 
 def edit(request, id=0):
     # if this is a POST request we need to process the form data

@@ -1,55 +1,51 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+from django.db import models
 from django.http import HttpResponse
 from django.urls import reverse
 from .models import Event
 from .forms import EventForm
 from django.http import HttpResponse
+from lib.views import BenchcoachListView
+
+class EventsListView(BenchcoachListView):
+    Model = Event
+    edit_url = 'edit player'
+    list_url = 'players list'
+    page_title = "Players"
+    title_strf = '{item.away_team.name} vs. {item.home_team.name}'
+    body_strf = "{item.start:%a, %b %-d, %-I:%M %p},\n{item.venue.name}"
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        for item in context['items']:
+            item['buttons'].append(
+                {
+                    'label': 'Edit Lineup',
+                    'href': reverse('edit lineup', args=[item['id']])
+                }
+            )
+        return context
 
 def root(request):
     return redirect('/events/schedule')
 
-def list(request):
-    events = Event.objects.all()
-    context = {
-        'title': "Events",
-        'items': [
-            {
-                'id': event.id,
-                'title': f'{event.away_team.name} vs. {event.home_team.name}',
-                'body':f'{event.start:%a, %b %-d, %-I:%M %p},\n{event.venue.name}',
-                'buttons':[
-                    {
-                        'label':'Edit',
-                        'href':reverse('edit event', args=[event.id])
-                    },
-                    {
-                        'label': 'Edit Lineup',
-                        'href': reverse('edit lineup', args=[event.id])
-                    }
-                ]
-            }
-            for event in events
-        ]
-    }
-    return render(request, 'list.html', context)
-
 def edit(request, id=0):
+    Form = EventForm
+    Model = Event
+    call_back = reverse('events list')
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         if id:
-            instance = get_object_or_404(Event, id=id)
-            form = EventForm(request.POST or None, instance=instance)
+            instance = get_object_or_404(Model, id=id)
+            form = Form(request.POST or None, instance=instance)
         else:
-            form = EventForm(request.POST or None)
-        # check whether it's valid:
+            form = Form(request.POST or None)
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
             if id == 0: id = None
-            new_event, did_create = Event.objects.update_or_create(pk=id, defaults=form.cleaned_data)
-            return render(request, 'success.html', {'call_back':reverse('schedule'),'id':new_event.id}, status=201 if did_create else 200)
+            new_item, did_create = Model.objects.update_or_create(pk=id, defaults=form.cleaned_data)
+            return render(request, 'success.html', {'call_back':call_back,'id':new_item.id}, status=201 if did_create else 200)
         else:
             return HttpResponse(status=400)
 
@@ -57,8 +53,8 @@ def edit(request, id=0):
     else:
         if id:
             instance = get_object_or_404(Event, id=id)
-            form = EventForm(request.POST or None, instance=instance)
+            form = Form(request.POST or None, instance=instance)
         else:
-            form = EventForm
+            form = Form
 
     return render(request, 'edit.html', {'form': form, 'id': id, 'call_back': 'edit event'})

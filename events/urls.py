@@ -6,7 +6,7 @@ from . import views
 
 urlpatterns = [
     path('', views.root, name="root"),
-    path('list', views.list, name="events list"),
+    path('list', views.EventsListView.as_view(), name="events list"),
     path('edit/<int:id>', views.edit, name="edit event"),
     path('edit', views.edit, name="edit event"),
     path('edit', views.edit, name="edit event")

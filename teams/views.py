@@ -3,28 +3,16 @@ from django.http import HttpResponse
 from django.urls import reverse
 from .forms import TeamForm
 from .models import Team
+from lib.views import BenchcoachListView
 
 def root(request):
-    return redirect('/teams/list')
+    return redirect(reverse('venues list'))
 
-def list(request):
-    items = Team.objects.all()
-    context = {
-
-        'title': "Teams",
-         'items': [
-             {'id': item.id,
-              'title': f"{item.name}",
-              'buttons': [
-                  {
-                      'label': 'Edit',
-                      'href': reverse('edit team', args=[item.id])
-                  }
-              ]
-              }
-             for item in items]
-    }
-    return render(request, 'list.html', context)
+class TeamsListView(BenchcoachListView):
+    Model = Team
+    edit_url = 'edit venue'
+    list_url = 'venues list'
+    page_title = "Venues"
 
 def edit(request, id=0):
     # if this is a POST request we need to process the form data
