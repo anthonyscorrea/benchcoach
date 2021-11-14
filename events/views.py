@@ -8,9 +8,30 @@ from django.http import HttpResponse
 def root(request):
     return redirect('/events/schedule')
 
-def schedule(request):
+def list(request):
     events = Event.objects.all()
-    return render(request, 'events/schedule.html', {'title':'Schedule', 'events': events})
+    context = {
+        'title': "Events",
+        'items': [
+            {
+                'id': event.id,
+                'title': f'{event.away_team.name} vs. {event.home_team.name}',
+                'body':f'{event.start:%a, %b %-d, %-I:%M %p},\n{event.venue.name}',
+                'buttons':[
+                    {
+                        'label':'Edit',
+                        'href':reverse('edit event', args=[event.id])
+                    },
+                    {
+                        'label': 'Edit Lineup',
+                        'href': reverse('edit lineup', args=[event.id])
+                    }
+                ]
+            }
+            for event in events
+        ]
+    }
+    return render(request, 'list.html', context)
 
 def edit(request, id=0):
     # if this is a POST request we need to process the form data

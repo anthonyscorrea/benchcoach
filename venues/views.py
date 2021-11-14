@@ -8,14 +8,22 @@ def root(request):
     return redirect('/venues/list')
 
 def list(request):
-    venues = Venue.objects.all()
-    return render(request, 'list.html', {'title': "Venues",
-                                         'items': [
-                                             {'id':venue.id,
-                                              'title':f"{venue.name}"
-                                              }
-                                             for venue in venues],
-                                         'edit_url_name': 'edit venue'})
+    items = Venue.objects.all()
+    context = {
+        'title': "Venues",
+        'items': [
+            {'id': item.id,
+             'title': f"{item.name}",
+             'buttons': [
+                 {
+                     'label': 'Edit',
+                     'href': reverse('edit venue', args=[item.id])
+                 }
+             ]
+             }
+            for item in items]
+    }
+    return render(request, 'list.html', context)
 
 
 def edit(request, id=0):

@@ -9,15 +9,24 @@ def root(request):
     return redirect('/players/list')
 
 def list(request):
-    players = Player.objects.all()
-    return render(request, 'list.html', {'title': "Players",
-                                         'items': [
-                                             {'id':player.id,
-                                              'title':f"{player.first_name} {player.last_name}",
-                                              'subtitle':f"{player.jersey_number}"
-                                              }
-                                             for player in players],
-                                         'edit_url_name': 'edit player'})
+    items = Player.objects.all()
+    context = {
+        'title': "Players",
+         'items': [
+             {'id': item.id,
+              'title': f"{item.first_name} {item.last_name}",
+              'subtitle': f"{item.jersey_number}",
+              'buttons': [
+                  {
+                      'label': 'Edit',
+                      'href': reverse('edit player', args=[item.id])
+                  }
+              ]
+              }
+             for item in items]
+    }
+
+    return render(request, 'list.html', context)
 
 def edit(request, id=0):
     # if this is a POST request we need to process the form data
