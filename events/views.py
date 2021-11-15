@@ -13,7 +13,7 @@ class EventsListView(BenchcoachListView):
     list_url = 'events list'
     page_title = "Events"
     title_strf = '{item.away_team} vs. {item.home_team}'
-    body_strf = "{item.start:%a, %b %-d, %-I:%M %p},\n{item.venue.name}"
+    body_strf = "{item.start:%a, %b %-d, %-I:%M %p},\n{item.venue}"
 
     def get_context_data(self):
         context = super().get_context_data()
