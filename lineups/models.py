@@ -24,3 +24,26 @@ class Positioning(models.Model):
 
    class Meta:
       unique_together = ('player', 'event',)
+
+class Availability(models.Model):
+   YES = 2
+   MAYBE = 1
+   NO = 0
+   UNKNOWN = -1
+
+   event = models.ForeignKey(Event, on_delete=models.CASCADE)
+   player = models.ForeignKey(Player, on_delete=models.CASCADE)
+   choices = [
+      (YES, 'Yes'),
+      (NO, 'No'),
+      (MAYBE, 'Maybe'),
+      (UNKNOWN, 'Unknown')
+   ]
+   available = models.IntegerField(choices=choices, default=UNKNOWN)
+
+   def __str__(self):
+      return f"{self.event}; {self.player}; {self.available}"
+
+   class Meta:
+      unique_together = ('event', 'player',)
+      verbose_name_plural = "availabilities"

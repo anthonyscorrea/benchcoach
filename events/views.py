@@ -1,43 +1,33 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from django.urls import reverse
 from .models import Event
 from .forms import EventForm
-from django.http import HttpResponse
+from lib.views import BenchcoachListView, BenchcoachEditView
 
 def root(request):
-    return redirect('/events/schedule')
+    return redirect(reverse('events list'))
 
-def schedule(request):
-    events = Event.objects.all()
-    return render(request, 'events/schedule.html', {'title':'Schedule', 'events': events})
+class EventsListView(BenchcoachListView):
+    Model = Event
+    edit_url = 'edit event'
+    list_url = 'events list'
+    page_title = "Events"
+    title_strf = '{item.away_team} vs. {item.home_team}'
+    body_strf = "{item.start:%a, %b %-d, %-I:%M %p},\n{item.venue}"
 
-def edit(request, id=0):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        if id:
-            instance = get_object_or_404(Event, id=id)
-            form = EventForm(request.POST or None, instance=instance)
-        else:
-            form = EventForm(request.POST or None)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            if id == 0: id = None
-            new_event, did_create = Event.objects.update_or_create(pk=id, defaults=form.cleaned_data)
-            return render(request, 'success.html', {'call_back':reverse('schedule'),'id':new_event.id}, status=201 if did_create else 200)
-        else:
-            return HttpResponse(status=400)
+    def get_context_data(self):
+        context = super().get_context_data()
+        for item in context['items']:
+            item['buttons'].append(
+                {
+                    'label': 'Edit Lineup',
+                    'href': reverse('edit lineup', args=[item['id']])
+                }
+            )
+        return context
 
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        if id:
-            instance = get_object_or_404(Event, id=id)
-            form = EventForm(request.POST or None, instance=instance)
-        else:
-            form = EventForm
-
-    return render(request, 'edit.html', {'form': form, 'id': id, 'call_back': 'edit event'})
+class EventEditView(BenchcoachEditView):
+    Model = Event
+    edit_url = 'edit event'
+    list_url = 'events list'
+    Form = EventForm

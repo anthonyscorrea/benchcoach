@@ -20,7 +20,7 @@ class StatLine(models.Model):
    slugging_pct = models.DecimalField(max_digits=4, decimal_places=3, default=0)
 
    def __str__(self):
-      return f"{self.batting_avg}/{self.onbase_pct}/{self.slugging_pct}"
+      return f"{self.slash_line}"
 
    @property
    def slash_line(self):

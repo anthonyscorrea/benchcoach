@@ -8,19 +8,24 @@
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <link rel='stylesheet' href="{% static 'base.css' %}">
-
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BenchCoach">
+    <meta name='viewport' content='viewport-fit=cover, width=device-width, initial-scale=1.0'>
+<link rel="apple-touch-icon" href="{% static 'favicon.ico' %}">
 </head>
 
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" style="padding-top: env(safe-area-inset-top);">
     <div class="container-fluid">
     <a class="navbar-brand fw-bolder text-uppercase" href="{% url 'home' %}">⚾️ Bench Coach</a>
 
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
             <li>
-                <a class="nav-link" href="{% url 'schedule' %}">Schedule</a>
+                <a class="nav-link" href="{% url 'events list' %}">Events</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'players list' %}">Players</a>
