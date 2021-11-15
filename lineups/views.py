@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.forms import formset_factory
 from .models import Positioning
 from .forms import PositioningFormSet
-from django.http import HttpResponse
-from django import forms
 from events.models import Event
 from players.models import Player
+from django.forms.models import model_to_dict
 
 # Create your views here.
 def edit(request, event_id):
@@ -31,7 +29,16 @@ def edit(request, event_id):
         return render(request, 'success.html', {'call_back':'edit lineup','id':event_id}, status=200)
             # return render(request, 'success.html', {'call_back':'schedule'})
     event = Event.objects.get(id=event_id)
-    players = Player.objects.all()
+    players = Player.objects.all().prefetch_related('availability_set')
+    players = [
+        {
+            **model_to_dict(player),
+            'available':player.availability_set.get(event_id=event_id).get_available_display(),
+            'available_value': player.availability_set.get(event_id=event_id).available
+        }
+        for player in players
+    ]
+    players.sort(key=lambda d: d['available_value'], reverse = True)
     qset = Positioning.objects.filter(event_id=event_id, order__isnull = False)
     formset = PositioningFormSet(queryset=qset)
     for form in formset:
