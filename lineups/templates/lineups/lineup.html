@@ -8,7 +8,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-            <h6>Lineup</h6>
+            <h5>Lineup</h5>
 {#                <ul class="list-group">#}
             <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
 
@@ -23,12 +23,20 @@
                         <th scope="col">Position</th>
                     </tr>
                     </thead>
-                    {% for form in positionings_formset %}
-                        <tr>
-                            <th scope="row">{{ form.order }}</th>
-                            <td>{{ form.player }}</td>
-                            <td>{{ form.position }}</td>
+                    {% for player in positionings_players_initial|dictsort:"positioning.order" %}
+                        {% if player.positioning  %}
+                        <tr data-player-id="{{ player.id }}",
+                            data-positioning-position="{{ player.positioning.position }}"
+                        >
+{#                            <th scope="row">{{ form.order }}</th>#}
+{#                            <td>{{ form.player }}</td>#}
+{#                            <td>{{ form.position }}</td>#}
+                            <th scope="row">{% if player.positioning.order %}{{ player.positioning.order }}{% endif %}</th>
+                            <th>{{ player.first_name }} {{ player.last_name }}</th>
+                            <td>{{ player.positioning.position }}</td>
+
                         </tr>
+                        {% endif %}
                     {% endfor %}
                 </table>
 {#                    {% endfor %}#}
@@ -37,11 +45,23 @@
             </div>
 
             <div class="col-md-6">
-                <h6>Players</h6>
-                <ul class="list-group">
+                <h5>Players</h5>
+            <div class="col-md-6">
+                <table class="table">
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Name</th>
+                        <th scope="col">#</th>
+                        <th scope="col">Avg</th>
+                        <th scope="col">Slug</th>
+                        <th scope="col">OBP</th>
+                    </tr>
+
                     {% for player in players %}
-                        <li class="list-group-item">
-                        {% if player.availability.available == 2 %}
+                        {% if not player.positioning  %}
+                        <tr>
+                        <td>
+                            {% if player.availability.available == 2 %}
                         <img class="bg-success p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Yes</span></img>
                         {% elif player.availability.available == 1%}
                         <img class="bg-info p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Maybe</span></span>
@@ -50,11 +70,16 @@
                         {% elif player.availability.available == -1%}
                         <img class="bg-secondary p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Unknown</span></span>
                         {% endif %}
-                            {{ player.first_name }} {{ player.last_name }}
-                            <code><small>{{ player.statline }}</small></code>
-                        </li>
+                        </td>
+                            <th><span class="d-none d-md-block">{{ player.first_name }}</span> {{ player.last_name }}</th>
+                            <td>{{ player.jersey_number }}</td>
+                            <td><code>{{ player.statline.batting_avg|stringformat:".3f"|slice:"1:" }}</code></td>
+                            <td><code>{{ player.statline.slugging_pct|stringformat:".3f"|slice:"1:" }}</code></td>
+                            <td><code>{{ player.statline.onbase_pct|stringformat:".3f"|slice:"1:" }}</code></td>
+                        </tr>
+                        {% endif %}
                     {% endfor %}
-                </ul>
+                </table >
             </div>
         </div>
     </div>
