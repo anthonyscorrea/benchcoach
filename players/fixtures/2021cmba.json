@@ -223,5 +223,255 @@
     "jersey_number": 45,
     "last_name": "Kelly"
   }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.417,
+    "onbase_pct": 0.488,
+    "player_id": 1,
+    "slugging_pct": 0.472
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.422,
+    "onbase_pct": 0.518,
+    "player_id": 2,
+    "slugging_pct": 0.667
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0,
+    "onbase_pct": 0.2,
+    "player_id": 3,
+    "slugging_pct": 0
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.061,
+    "onbase_pct": 0.233,
+    "player_id": 4,
+    "slugging_pct": 0.061
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.282,
+    "onbase_pct": 0.338,
+    "player_id": 5,
+    "slugging_pct": 0.296
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.267,
+    "onbase_pct": 0.333,
+    "player_id": 6,
+    "slugging_pct": 0.3
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.214,
+    "onbase_pct": 0.235,
+    "player_id": 7,
+    "slugging_pct": 0.357
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.219,
+    "onbase_pct": 0.324,
+    "player_id": 8,
+    "slugging_pct": 0.344
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.28,
+    "onbase_pct": 0.28,
+    "player_id": 9,
+    "slugging_pct": 0.32
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.333,
+    "onbase_pct": 0.424,
+    "player_id": 10,
+    "slugging_pct": 0.373
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0,
+    "onbase_pct": 0.25,
+    "player_id": 11,
+    "slugging_pct": 0
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0,
+    "onbase_pct": 0,
+    "player_id": 12,
+    "slugging_pct": 0
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.379,
+    "onbase_pct": 0.379,
+    "player_id": 13,
+    "slugging_pct": 0.552
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.095,
+    "onbase_pct": 0.174,
+    "player_id": 14,
+    "slugging_pct": 0.143
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.41,
+    "onbase_pct": 0.486,
+    "player_id": 15,
+    "slugging_pct": 0.525
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.357,
+    "onbase_pct": 0.406,
+    "player_id": 16,
+    "slugging_pct": 0.536
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.185,
+    "onbase_pct": 0.312,
+    "player_id": 17,
+    "slugging_pct": 0.259
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.299,
+    "onbase_pct": 0.378,
+    "player_id": 18,
+    "slugging_pct": 0.391
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.438,
+    "onbase_pct": 0.571,
+    "player_id": 19,
+    "slugging_pct": 0.781
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.333,
+    "onbase_pct": 0.417,
+    "player_id": 20,
+    "slugging_pct": 0.367
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.333,
+    "onbase_pct": 0.41,
+    "player_id": 22,
+    "slugging_pct": 0.522
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.062,
+    "onbase_pct": 0.211,
+    "player_id": 23,
+    "slugging_pct": 0.125
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.5,
+    "onbase_pct": 0.611,
+    "player_id": 24,
+    "slugging_pct": 0.5
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0.25,
+    "onbase_pct": 0.25,
+    "player_id": 25,
+    "slugging_pct": 0.5
+  }
+  },
+  {
+    "model": "players.statline",
+    "pk": null,
+    "fields": {
+    "batting_avg": 0,
+    "onbase_pct": 0,
+    "player_id": 21,
+    "slugging_pct": 0
+  }
   }
 ]
