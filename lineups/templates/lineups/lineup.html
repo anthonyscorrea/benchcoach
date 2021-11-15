@@ -30,7 +30,19 @@
                 <h6>Players</h6>
                 <ul class="list-group">
                     {% for player in players %}
-                        <li class="list-group-item">{{ player.first_name }} {{ player.last_name }} - {{ player.available }}</li>
+                        <li class="list-group-item">
+                        {% if player.availability.available == 2 %}
+                        <img class="bg-success p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Yes</span></img>
+                        {% elif player.availability.available == 1%}
+                        <img class="bg-info p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Maybe</span></span>
+                        {% elif player.availability.available == 0%}
+                        <img class="bg-danger p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">No</span></span>
+                        {% elif player.availability.available == -1%}
+                        <img class="bg-secondary p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Unknown</span></span>
+                        {% endif %}
+                            {{ player.first_name }} {{ player.last_name }}
+                            <code><small>{{ player.statline }}</small></code>
+                        </li>
                     {% endfor %}
                 </ul>
             </div>
