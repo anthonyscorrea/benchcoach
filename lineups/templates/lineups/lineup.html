@@ -8,80 +8,144 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-            <h5>Lineup</h5>
-{#                <ul class="list-group">#}
-            <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
+                <h5>Lineup</h5>
+                {#                <ul class="list-group">#}
+                <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
 
-{#                {% csrf_token %}#}
-{#                    {{ positionings_formset.management_form }}#}
-{#                    {% for pos in positionings_formset %}#}
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Player</th>
-                        <th scope="col">Position</th>
-                    </tr>
-                    </thead>
-                    {% for player in positionings_players_initial|dictsort:"positioning.order" %}
-                        {% if player.positioning  %}
-                        <tr data-player-id="{{ player.id }}",
-                            data-positioning-position="{{ player.positioning.position }}"
-                        >
-{#                            <th scope="row">{{ form.order }}</th>#}
-{#                            <td>{{ form.player }}</td>#}
-{#                            <td>{{ form.position }}</td>#}
-                            <th scope="row">{% if player.positioning.order %}{{ player.positioning.order }}{% endif %}</th>
-                            <th>{{ player.first_name }} {{ player.last_name }}</th>
-                            <td>{{ player.positioning.position }}</td>
-
+                    {% csrf_token %}
+                                        {{ positionings_formset.management_form }}
+                    {#                    {% for pos in positionings_formset %}#}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Player</th>
+                            <th scope="col">Position</th>
                         </tr>
-                        {% endif %}
-                    {% endfor %}
-                </table>
-{#                    {% endfor %}#}
-                <input type="submit" value="Submit">
-            </form>
+                        </thead>
+                        <tbody  id="lineup">
+                        {% for player in positionings_players_initial|dictsort:"positioning.order" %}
+                            {% if player.positioning  %}
+                                <tr data-player-id="{{ player.id }}",
+                                    data-positioning-position="{{ player.positioning.position }}"
+                                >
+                                    {#                            <th scope="row">{{ form.order }}</th>#}
+                                    {#                            <td>{{ form.player }}</td>#}
+                                    {#                            <td>{{ form.position }}</td>#}
+                                    <th scope="row">{% if player.positioning.order %}{{ player.positioning.order }}{% endif %}</th>
+                                    <th>{{ player.first_name }} {{ player.last_name }}</th>
+                                    <td>{{ player.positioning.position }}</td>
+
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {#                    {% endfor %}#}
+                    <input type="submit" value="Submit">
+                </form>
             </div>
 
             <div class="col-md-6">
                 <h5>Players</h5>
-            <div class="col-md-6">
-                <table class="table">
-                    <tr>
-                        <th scope="col"></th>
-                        <th scope="col">Name</th>
-                        <th scope="col">#</th>
-                        <th scope="col">Avg</th>
-                        <th scope="col">Slug</th>
-                        <th scope="col">OBP</th>
-                    </tr>
-
-                    {% for player in players %}
-                        {% if not player.positioning  %}
+                <div class="col-md-6">
+                    <table class="table">
                         <tr>
-                        <td>
-                            {% if player.availability.available == 2 %}
-                        <img class="bg-success p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Yes</span></img>
-                        {% elif player.availability.available == 1%}
-                        <img class="bg-info p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Maybe</span></span>
-                        {% elif player.availability.available == 0%}
-                        <img class="bg-danger p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">No</span></span>
-                        {% elif player.availability.available == -1%}
-                        <img class="bg-secondary p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Unknown</span></span>
-                        {% endif %}
-                        </td>
-                            <th><span class="d-none d-md-block">{{ player.first_name }}</span> {{ player.last_name }}</th>
-                            <td>{{ player.jersey_number }}</td>
-                            <td><code>{{ player.statline.batting_avg|stringformat:".3f"|slice:"1:" }}</code></td>
-                            <td><code>{{ player.statline.slugging_pct|stringformat:".3f"|slice:"1:" }}</code></td>
-                            <td><code>{{ player.statline.onbase_pct|stringformat:".3f"|slice:"1:" }}</code></td>
+                            <th scope="col"></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">#</th>
+                            <th scope="col">Statline</th>
                         </tr>
-                        {% endif %}
-                    {% endfor %}
-                </table >
+                        <tbody id="bench">
+                        {% for player in players %}
+                            {% if not player.positioning  %}
+                                <tr data-player-id="{{ player.id }}">
+                                    <td>
+                                        {% if player.availability.available == 2 %}
+                                            <img class="bg-success p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Yes</span></img>
+                                        {% elif player.availability.available == 1%}
+                                            <img class="bg-info p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Maybe</span></span>
+                                        {% elif player.availability.available == 0%}
+                                            <img class="bg-danger p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">No</span></span>
+                                        {% elif player.availability.available == -1%}
+                                            <img class="bg-secondary p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Unknown</span></span>
+                                        {% endif %}
+                                    </td>
+                                    <th><span class="d-none d-md-block" id="player-name-{{ player.id }}">{{ player.first_name }}</span> {{ player.last_name }}</th>
+                                    <td id="player-jersey-number-{{ player.id }}">{{ player.jersey_number }} </td>
+                                    <td id="player-statline-{{ player.id }}"><code>{{ player.statline}}</code></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table >
+                </div>
             </div>
         </div>
     </div>
+    <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
+    <script id="sortable">
+        var lineup = new Sortable.create(
+            document.getElementById('lineup'), {
+                animation: 150,
+                ghostClass:"ghost",
+                {#handle: ".bars-move",#}
+                group:{
+                    put:true,
+                    pull:true
+                },
+                onAdd: function (/**Event*/evt) {
+                    console.log('added to lineup')
+                    var itemEl = evt.item;  // dragged HTMLElement
+                    var player_id = itemEl.dataset.playerId
+                    var statline = document.querySelector('#player-statline-'+player_id);
+                    {#console.log(itemEl)#}
+                    {#console.log(player_id)#}
+                    {#console.log(statline)#}
+                    statline.style.visibility='hidden'
+                    evt.to;    // target list
+                    evt.from;  // previous list
+                    evt.oldIndex;  // element's old index within old parent
+                    evt.newIndex;  // element's new index within new parent
+                    evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
+                    evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
+                    evt.clone // the clone element
+                    evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
+                },
+                onUpdate: function (/**Event*/evt) {
+                    console.log('update to lineup')
+                },
+            });
+        var bench = new Sortable.create(
+            document.getElementById('bench'), {
+                animation: 150,
+                ghostClass:"ghost",
+                {#handle: ".bars-move",#}
+                group:{
+                    put:true,
+                    pull:true
+                },
+                onAdd: function (/**Event*/evt) {
+                    console.log('added to bench')
+                    var itemEl = evt.item;  // dragged HTMLElement
+                    console.log(itemEl)
+                    evt.to;    // target list
+                    evt.from;  // previous list
+                    evt.oldIndex;  // element's old index within old parent
+                    evt.newIndex;  // element's new index within new parent
+                    evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
+                    evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
+                    evt.clone // the clone element
+                    evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
+                    var player_id = itemEl.dataset.playerId
+                    var statline = document.querySelector('#player-statline-'+player_id);
+                    {#console.log(itemEl)#}
+                    {#console.log(player_id)#}
+                    {#console.log(statline)#}
+                    statline.style.visibility='visible'
+                }
+            });
+
+    </script>
 
 {% endblock %}
