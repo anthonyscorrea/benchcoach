@@ -2,24 +2,26 @@ from django import forms
 from .models import Positioning
 from events.models import Event
 from players.models import Player
-from django.forms import modelformset_factory, inlineformset_factory, BaseModelFormSet
+from django.forms import modelformset_factory, inlineformset_factory, BaseModelFormSet,formset_factory
 from crispy_forms.helper import FormHelper, Layout
 
 class PositioningForm(forms.ModelForm):
+    available = forms.TextInput()
+
     class Meta:
         model = Positioning
         widgets = {
             'order': forms.NumberInput(attrs={'class':'w-100'}),
             # 'player': forms.Select(attrs={'class': 'form-control'}),
             'position': forms.Select(attrs={'class': 'w-100'}),
-            'ordering': forms.NumberInput(attrs={'class':'w-100'})
+            # 'ordering': forms.NumberInput(attrs={'class':'w-100'})
         }
         exclude = ()
 
 PositioningFormSet = modelformset_factory(
     model=Positioning,
     form=PositioningForm,
-    fields = ['player', 'position', 'order'],
+    # fields=['order', 'position','player'],
     min_num=9,
     can_order=True
 )

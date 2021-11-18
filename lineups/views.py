@@ -4,6 +4,7 @@ from .forms import PositioningFormSet
 from events.models import Event
 from players.models import Player
 from django.forms.models import model_to_dict
+from django.db.models import Q
 
 # Create your views here.
 def edit(request, event_id):
@@ -30,24 +31,31 @@ def edit(request, event_id):
             # return render(request, 'success.html', {'call_back':'schedule'})
     event = Event.objects.get(id=event_id)
     players = Player.objects.all().prefetch_related('availability_set', 'statline_set', 'positioning_set')
-    players = [
-        {
-            **model_to_dict(player),
-            'availability':player.availability_set.get(event_id=event_id),
-            # 'available_value': player.availability_set.get(event_id=event_id).available,
-            'statline': player.statline_set.get(player_id=player.id),
-            'positioning': player.positioning_set.filter(event_id=event_id).first()
-        }
+    players_info = { player.id:{
+        'availability': player.availability_set.get(event_id=event_id),
+        'statline': player.statline_set.get(player_id=player.id),
+        **model_to_dict(player)
+    }
         for player in players
-    ]
-    players.sort(key=lambda d: (-d['availability'].available, d['last_name']))
+    }
+    # players_d.sort(key=lambda d: (-d['availability'].available, d['last_name']))
+
+    players_with_positioning = [i.player for i in Positioning.objects.filter(event_id=event_id)]
+    players_without_positioning = [i for i in players if i not in players_with_positioning]
+    Positioning.objects.bulk_create([Positioning(event_id=event_id, player=player) for player in players_without_positioning])
     qset = Positioning.objects.filter(event_id=event_id)
     formset = PositioningFormSet(queryset=qset)
-    for form in formset:
-        for field in form.fields:
-            field
+    pass
+    formset_starting = PositioningFormSet(
+        queryset=Positioning.objects.exclude(order__isnull=True).filter(event_id=event_id))
+    formset_bench = PositioningFormSet(
+        queryset=Positioning.objects.exclude(order__isnull=False).filter(event_id=event_id))
+
     return render(request, 'lineups/lineup.html', {'title': 'Lineup',
                                                    'event': event,
-                                                   'players': players,
-                                                   'positionings_players_initial':[player for player in players if player['positioning']],
-                                                   'positionings_formset':formset})
+                                                   'players_info': players_info,
+                                                   # 'players': players_d,
+                                                   # 'positionings_players_initial':[player for player in players if player['positioning']],
+                                                   'formset_starting':formset_starting,
+                                                   'formset_bench':formset_bench
+                                                   })
