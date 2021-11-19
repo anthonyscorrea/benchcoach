@@ -6,14 +6,13 @@ from django.forms import modelformset_factory, inlineformset_factory, BaseModelF
 from crispy_forms.helper import FormHelper, Layout
 
 class PositioningForm(forms.ModelForm):
-    available = forms.TextInput()
-
+    availability = None
     class Meta:
         model = Positioning
         widgets = {
-            'order': forms.NumberInput(attrs={'class':'w-100'}),
+            # 'order': forms.NumberInput(attrs={'class':'w-100'}),
             # 'player': forms.Select(attrs={'class': 'form-control'}),
-            'position': forms.Select(attrs={'class': 'w-100'}),
+            'position': forms.Select(attrs={'class': 'form-control form-control-sm'}),
             # 'ordering': forms.NumberInput(attrs={'class':'w-100'})
         }
         exclude = ()
@@ -22,8 +21,9 @@ PositioningFormSet = modelformset_factory(
     model=Positioning,
     form=PositioningForm,
     # fields=['order', 'position','player'],
-    min_num=9,
-    can_order=True
+    # min_num=9,
+    extra=0
+
 )
 
 # class PositioningFormSet(modelformset_factory):

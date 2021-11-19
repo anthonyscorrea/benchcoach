@@ -6,12 +6,13 @@
     {{ event.start|date:"l, F j, Y g:i A" }} <br>
     {{ event.venue.name }} <br>
     <div class="container">
+    <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
         <div class="row">
-            <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
-
-            <div class="col-md-6">
-                <h5>Lineup</h5>
+                <div class="col-md-6">
+                    <h5>Lineup</h5>
                     <table class="table">
+                        {% csrf_token %}
+                        {{ formset.management_form }}
                         <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -20,68 +21,83 @@
                         </tr>
                         </thead>
                         <tbody  id="lineup">
-                        {#{% for player in positionings_players_initial|dictsort:"positioning.order" %}#}
-                        {% csrf_token %}
-                        {{ formset_starting.management_form }}
-                            {% for form in formset_starting %}
-                                <tr data-player-id="{{ player.id }}",
-                                    data-positioning-position="{{ form.instance.player.positioning.position }}"
-                                >
-                                    {#                            <th scope="row">{{ form.order }}</th>#}
-                                    {#                            <td>{{ form.player }}</td>#}
-                                    {#                            <td>{{ form.position }}</td>#}
-                                    <th scope="row">{% if form.instance.order %}{{ form.instance.order }}{% endif %}</th>
-                                    <th>{{ form.instance.player.first_name }} {{ form.instance.player.last_name }}</th>
-                                    <td>{{ form.instance.position }}</td>
-
+                        {% for form in formset %}
+                            {% if form.instance.order or form.instance.position == "P"  %}
+                                <tr data-player-id="{{ form.instance.player.id }}"
+                                    data-position="{{ form.instance.position }}"
+                                    data-order="{{ form.instance.order }}">
+                                    {{ form.id.as_hidden }}
+                                    {{ form.event.as_hidden }}
+                                    {{ form.order.as_hidden }}
+                                    {{ form.player.as_hidden }}
+                                    <th scope="row" id="player-order-{{ form.instance.player.id }}">{% if form.order.value %}{{ form.order.value }}{% endif %}</th>
+                                    <th>{{ form.instance.player.first_name }} {{ form.instance.player.last_name }} - # {{ form.instance.player.jersey_number }}</th>
+                                    <td>{{ form.position }}</td>
+                                    {#                                    <td>{{ form.instance.position }}</td>#}
                                 </tr>
+                            {% endif %}
                         {% endfor %}
                         </tbody>
                     </table>
-                    {#                    {% endfor %}#}
                     <input type="submit" value="Submit">
-                </form>
-            </div>
+                </div>
 
-            <div class="col-md-6">
-                <h5>Players</h5>
                 <div class="col-md-6">
+                    <h5>Players</h5>
                     <table class="table">
                         <tr>
-                            <th scope="col"></th>
+                            <th scope="col" style="display: none"></th>
+                            <th scope="col">Ava.</th>
                             <th scope="col">Name</th>
-                            <th scope="col">#</th>
-                            <th scope="col">Statline</th>
+                            <th scope="col">Pos</th>
                         </tr>
                         <tbody id="bench">
-                        {% for form in formset_bench %}
-                            {% if not player.positioning.order and not player.positioning.position == "P"  %}
+                        {% for form in formset|dictsortreversed:"availability.available"%}
+                            {% if not form.instance.order and not form.instance.position == "P"  %}
+
                                 <tr data-player-id="{{ pos.player.id }}">
+                                    {{ form.id.as_hidden }}
+                                    {{ form.event.as_hidden }}
+                                    {{ form.order.as_hidden}}
+                                    {{ form.player.as_hidden }}
+                                <th style="display: none" id="player-order-{{ form.instance.player.id }}">{{ form.order.value }}</th>
                                     <td>
-                                        {% if pos.player.availability.available == 2 %}
-                                            <img class="bg-success p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Yes</span></img>
-                                        {% elif pos.player.availability.available == 1%}
-                                            <img class="bg-info p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Maybe</span></span>
-                                        {% elif pos.player.availability.available == 0%}
-                                            <img class="bg-danger p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">No</span></span>
-                                        {% elif pos.player.availability.available == -1%}
-                                            <img class="bg-secondary p-2 rounded-circle" width="5" height="5"><span class="visually-hidden">Unknown</span></span>
+
+                                        {% if form.availability.available == 2 %}
+                                            <img class="bg-success p-2 rounded-circle" width="5" height="5" id="player-available-{{ form.instance.player.id }}"><span class="visually-hidden">Yes</span></img>
+                                        {% elif form.availability.available == 1%}
+                                            <img class="bg-info p-2 rounded-circle" width="5" height="5" id="player-available-{{ form.instance.player.id }}"><span class="visually-hidden">Maybe</span></span>
+                                        {% elif form.availability.available == 0%}
+                                            <img class="bg-danger p-2 rounded-circle" width="5" height="5" id="player-available-{{ form.instance.player.id }}"><span class="visually-hidden">No</span></span>
+                                        {% elif form.availability.available == -1%}
+                                            <img class="bg-secondary p-2 rounded-circle" width="5" height="5" id="player-available-{{ form.instance.player.id }}"><span class="visually-hidden">Unknown</span></span>
                                         {% endif %}
                                     </td>
-                                    <th><span class="d-none d-md-block" id="player-name-{{ form.instance.player.id }}">{{ form.instance.player.first_name }}</span> {{ form.instance.player.last_name }}</th>
-                                    <td id="player-jersey-number-{{ form.instance.player.id }}">{{ form.instance.player.jersey_number }} </td>
-                                    <td id="player-statline-{{ form.instance.player.player.id }}"><code>{{ form.instance.player.statline}}</code></td>
+                                    <th>{{ form.instance.player.first_name }} {{ form.instance.player.last_name }} # {{ form.instance.player.jersey_number }}</th>
+                                    <td id="player-position-{{ form.instance.player.id }}">{{ form.position }} </td>
+                                    {#                                    <td id="player-statline-{{ form.instance.player.player.id }}"><code>{{ form.instance.player.statline}}</code></td>#}
                                 </tr>
                             {% endif %}
                         {% endfor %}
                         </tbody>
                     </table >
                 </div>
-            </div>
+
         </div>
+      </form>
     </div>
     <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
     <script id="sortable">
+        function refresh_lineup_order (){
+            var player_rows = document.getElementById('lineup').querySelectorAll('tr')
+                    for (let i = 0; i < player_rows.length; i++) {
+                        player_rows[i].dataset.order = i + 1
+                        var player_order = player_rows[i].querySelector('[id^="player-order"]')
+                        var form_element_order = player_rows[i].querySelector('[id$="order"]')
+                        player_order.innerText = parseInt(player_rows[i].dataset.order)
+                        form_element_order.value = parseInt(player_rows[i].dataset.order)
+                    }
+        }
         var lineup = new Sortable.create(
             document.getElementById('lineup'), {
                 animation: 150,
@@ -95,11 +111,17 @@
                     console.log('added to lineup')
                     var itemEl = evt.item;  // dragged HTMLElement
                     var player_id = itemEl.dataset.playerId
-                    var statline = document.querySelector('#player-statline-'+player_id);
-                    {#console.log(itemEl)#}
-                    {#console.log(player_id)#}
-                    {#console.log(statline)#}
-                    statline.style.visibility='hidden'
+                    {#itemEl.order.set(99)#}
+                    {#var statline = document.querySelector('#player-statline-'+player_id);#}
+                    console.log(itemEl)
+                    var form_element_order =itemEl.querySelector('[id$="order"]')
+                    var player_order = itemEl.querySelector('[id^="player-order"]')
+                    var player_available =itemEl.querySelector('[id^="player-available"]')
+                    refresh_lineup_order()
+                    player_available.parentElement.style.display="none"
+                    form_element_order.value = evt.newIndex + 1
+                    player_order.innerHTML = evt.newIndex + 1
+                    player_order.style.display="block"
                     evt.to;    // target list
                     evt.from;  // previous list
                     evt.oldIndex;  // element's old index within old parent
@@ -111,6 +133,13 @@
                 },
                 onUpdate: function (/**Event*/evt) {
                     console.log('update to lineup')
+                    var itemEl = evt.item;  // dragged HTMLElement
+                    refresh_lineup_order()
+
+                    {#player_available.parentElement.style.display="none"#}
+                    {#form_element_order.value = evt.newIndex - 4#}
+                    {#player_order.innerHTML = evt.newIndex - 4#}
+                    {#player_order.style.display="block"#}
                 },
             });
         var bench = new Sortable.create(
@@ -126,6 +155,13 @@
                     console.log('added to bench')
                     var itemEl = evt.item;  // dragged HTMLElement
                     console.log(itemEl)
+                    var form_element_order =itemEl.querySelector('[id$="order"]')
+                    var player_order = itemEl.querySelector('[id^="player-order"]')
+                    var player_available =itemEl.querySelector('[id^="player-available"]')
+                    player_available.parentElement.style.display="block"
+                    form_element_order.value = evt.newIndex - 4
+                    player_order.innerHTML = evt.newIndex - 4
+                    player_order.style.display="none"
                     evt.to;    // target list
                     evt.from;  // previous list
                     evt.oldIndex;  // element's old index within old parent
@@ -136,10 +172,11 @@
                     evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
                     var player_id = itemEl.dataset.playerId
                     var statline = document.querySelector('#player-statline-'+player_id);
+                    refresh_lineup_order()
                     {#console.log(itemEl)#}
                     {#console.log(player_id)#}
                     {#console.log(statline)#}
-                    statline.style.visibility='visible'
+                    {#statline.style.visibility='visible'#}
                 }
             });
 

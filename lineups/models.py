@@ -7,6 +7,7 @@ class Positioning(models.Model):
    player = models.ForeignKey(Player, on_delete=models.CASCADE)
    event = models.ForeignKey(Event, on_delete=models.CASCADE)
    positions = [
+      ('EH', 'EH'),
       ('P', 'P'),
       ('C', 'C'),
       ('1B', '1B'),
@@ -16,8 +17,7 @@ class Positioning(models.Model):
       ('LF', 'LF'),
       ('CF', 'CF'),
       ('RF', 'RF'),
-      ('DH','DH'),
-      ('EH','EH')
+      ('DH','DH')
    ]
    position = models.CharField(choices=positions, default=None, max_length=2, null=True)
    order = models.IntegerField(default=None, null=True)
