@@ -1,0 +1,54 @@
+<tr data-player-id="{{ form.instance.player.id }}"
+    data-position="{{ form.instance.position }}"
+    data-order="{{ form.instance.order }}">
+    {{ form.id.as_hidden }}
+    {{ form.event.as_hidden }}
+    {{ form.order.as_hidden }}
+    {{ form.player.as_hidden }}
+    <td id="player-availability-{{ form.instance.player.id }}"
+        style="display:{{ available_display }};"
+    >
+        {% if form.availability.available == 2 %}
+            <img class="bg-success p-2 rounded-circle"
+                 width="5"
+                 height="5"
+                 id="player-available-{{ form.instance.player.id }}"
+            >
+            <span class="visually-hidden">Yes</span>
+        {% elif form.availability.available == 1%}
+            <img class="bg-info p-2 rounded-circle"
+                 width="5"
+                 height="5"
+                 id="player-available-{{ form.instance.player.id }}"
+            >
+            <span class="visually-hidden">Maybe</span>
+        {% elif form.availability.available == 0%}
+            <img class="bg-danger p-2 rounded-circle"
+                 width="5" height="5"
+                 id="player-available-{{ form.instance.player.id }}"
+            >
+            <span class="visually-hidden">No</span>
+        {% elif form.availability.available == -1%}
+            <img class="bg-secondary p-2 rounded-circle"
+                 width="5"
+                 height="5"
+                 id="player-available-{{ form.instance.player.id }}"
+            >
+            <span class="visually-hidden">Unknown</span>
+        {% endif %}
+    </td>
+    <th scope="row"
+        id="player-order-{{ form.instance.player.id }}"
+        style="display:{{ order_display }};">
+        {% if form.order.value %}
+            {{ form.order.value }}
+        {% endif %}
+    </th>
+    <th>
+        {{ form.instance.player.first_name }} {{ form.instance.player.last_name }} - # {{ form.instance.player.jersey_number }}
+    </th>
+    <td>
+        {{ form.position }}
+    </td>
+    {#                                    <td>{{ form.instance.position }}</td>#}
+</tr>
