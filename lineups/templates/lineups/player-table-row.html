@@ -45,7 +45,9 @@
         {% endif %}
     </th>
     <th>
-        {{ form.instance.player.first_name }} {{ form.instance.player.last_name }} - # {{ form.instance.player.jersey_number }}
+        {{ form.instance.player.first_name }}&nbsp;{{ form.instance.player.last_name }}&nbsp;
+        <small class="text-muted fw-light">#{{ form.instance.player.jersey_number }}</small><br>
+        <code><small>{{ form.statline }}</small></code>
     </th>
     <td>
         {{ form.position }}

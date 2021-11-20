@@ -44,9 +44,7 @@ def edit(request, event_id):
     players_without_positioning = [i for i in players if i not in players_with_positioning]
     Positioning.objects.bulk_create([Positioning(event_id=event_id, player=player) for player in players_without_positioning])
     qset = Positioning.objects.filter(event_id=event_id)
-    for q in qset:
-        q.available= q.player.availability_set.get(player_id=q.player.id, event_id=event_id)
-        q.statline = q.player.statline_set.get(player_id=q.player.id)
+
     formset = PositioningFormSet(queryset=qset.order_by('order'))
     pass
     formset_starting = PositioningFormSet(
@@ -57,7 +55,7 @@ def edit(request, event_id):
     for f in formset:
         if f.instance.player_id:
             f.availability = f.instance.player.availability_set.get(event_id=event_id)
-            # f.statline = f.instance.player.statline_set.get()
+            f.statline = f.instance.player.statline_set.get()
 
 
 
