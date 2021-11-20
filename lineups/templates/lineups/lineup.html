@@ -46,9 +46,20 @@
     <script id="sortable">
         function refresh_lineup_order (){
             var player_rows = document.getElementById('lineup').querySelectorAll('tr')
+            var has_dh = false
+
             for (let i = 0; i < player_rows.length; i++) {
-                player_rows[i].dataset.order = i + 1
-                var player_order = player_rows[i].querySelector('[id^="player-order"]')
+                if (player_rows[i].dataset.order == 0) {
+                    has_dh = true
+                    continue
+                }
+                if (has_dh) {
+                    player_rows[i].dataset.order = i
+                }
+                else {
+                    player_rows[i].dataset.order = i+1
+                }
+                var player_order = player_rows[i].querySelector('[id^="player-order-button"]')
                 var form_element_order = player_rows[i].querySelector('[id$="order"]')
                 player_order.innerText = parseInt(player_rows[i].dataset.order)
                 form_element_order.value = parseInt(player_rows[i].dataset.order)
@@ -64,19 +75,18 @@
                     pull:true
                 },
                 onAdd: function (/**Event*/evt) {
-                    console.log('added to lineup')
                     var itemEl = evt.item;  // dragged HTMLElement
                     var player_id = itemEl.dataset.playerId
-                    {#itemEl.order.set(99)#}
-                    {#var statline = document.querySelector('#player-statline-'+player_id);#}
                     console.log(itemEl)
                     var form_element_order =itemEl.querySelector('[id$="order"]')
                     var player_order = itemEl.querySelector('[id^="player-order"]')
                     var player_available =itemEl.querySelector('[id^="player-available"]')
+                    var player_order_button =itemEl.querySelector('[id^="player-order-button"]')
+                    console.log(player_order.parentElement.dataset)
+                    toggle_in_lineup(player_order_button)
+                    player_order.parentElement.dataset.order = evt.newIndex
                     refresh_lineup_order()
                     player_available.parentElement.style.display="none"
-                    form_element_order.value = evt.newIndex + 1
-                    player_order.innerHTML = evt.newIndex + 1
                     player_order.style.display="table-cell"
                     evt.to;    // target list
                     evt.from;  // previous list
@@ -91,11 +101,6 @@
                     console.log('update to lineup')
                     var itemEl = evt.item;  // dragged HTMLElement
                     refresh_lineup_order()
-
-                    {#player_available.parentElement.style.display="none"#}
-                    {#form_element_order.value = evt.newIndex - 4#}
-                    {#player_order.innerHTML = evt.newIndex - 4#}
-                    {#player_order.style.display="block"#}
                 },
             });
         var bench = new Sortable.create(
@@ -116,26 +121,29 @@
                     var player_order = itemEl.querySelector('[id^="player-order"]')
                     var player_available =itemEl.querySelector('[id^="player-available"]')
                     player_available.parentElement.style.display="table-cell"
-                    form_element_order.value = evt.newIndex - 4
-                    player_order.innerHTML = evt.newIndex - 4
+                    form_element_order.value = 0
+                    player_order.innerHTML = 1
                     player_order.style.display="none"
-                    evt.to;    // target list
-                    evt.from;  // previous list
-                    evt.oldIndex;  // element's old index within old parent
-                    evt.newIndex;  // element's new index within new parent
-                    evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
-                    evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
-                    evt.clone // the clone element
-                    evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
                     var player_id = itemEl.dataset.playerId
-                    var statline = document.querySelector('#player-statline-'+player_id);
                     refresh_lineup_order()
-                    {#console.log(itemEl)#}
-                    {#console.log(player_id)#}
-                    {#console.log(statline)#}
-                    {#statline.style.visibility='visible'#}
                 }
             });
+        function toggle_in_lineup(order_button){
+            var player_row = order_button.parentNode.parentNode
+            if (player_row.dataset.order == 0) {
+                order_button.innerText = "1"
+                order_button.classList.add("btn-light")
+                order_button.classList.remove("btn-dark")
+                player_row.dataset.order = 1
+            }
+            else {
+                order_button.innerText = "D"
+                order_button.classList.remove("btn-light")
+                order_button.classList.add("btn-dark")
+                player_row.dataset.order = 0
+            }
+            refresh_lineup_order()
+                              }
 
     </script>
 

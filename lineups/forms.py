@@ -10,10 +10,7 @@ class PositioningForm(forms.ModelForm):
     class Meta:
         model = Positioning
         widgets = {
-            # 'order': forms.NumberInput(attrs={'class':'w-100'}),
-            # 'player': forms.Select(attrs={'class': 'form-control'}),
-            'position': forms.Select(attrs={'class': 'form-control form-control-sm'}),
-            # 'ordering': forms.NumberInput(attrs={'class':'w-100'})
+            'position': forms.Select(attrs={'class': 'form-control form-control-sm'})
         }
         exclude = ()
 
@@ -25,11 +22,3 @@ PositioningFormSet = modelformset_factory(
     extra=0
 
 )
-
-# class PositioningFormSet(modelformset_factory):
-#     class Meta:
-#         model = Positioning
-#         fields = ['player', 'position', 'order']
-#         widgets = {
-#             'order':forms.NumberInput(attrs={'style':'width:6ch'})
-#         }

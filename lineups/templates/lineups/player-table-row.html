@@ -41,7 +41,21 @@
         id="player-order-{{ form.instance.player.id }}"
         style="display:{{ order_display }};">
         {% if form.order.value %}
-            {{ form.order.value }}
+            <button type="button"
+                    class="btn btn-light"
+                    id="player-order-button-{{ form.instance.player.id }}"
+                    onclick="toggle_in_lineup(this)"
+            >
+                {{ form.order.value }}
+            </button>
+        {% elif  form.order.value == 0 %}
+            <button type="button"
+                    class="btn btn-dark"
+                    id="player-order-button-{{ form.instance.player.id }}"
+                    onclick="toggle_in_lineup(this)"
+            >
+                D
+            </button>
         {% endif %}
     </th>
     <th>

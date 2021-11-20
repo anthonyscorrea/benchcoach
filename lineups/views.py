@@ -17,7 +17,6 @@ def edit(request, event_id):
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
-                # form.cleaned_data.pop('id')
 
                 if isinstance(form.cleaned_data['id'], Positioning):
                     positioning_id = form.cleaned_data.pop('id').id #FIXME this is a workaround, not sure why it is necessary
@@ -27,7 +26,9 @@ def edit(request, event_id):
                 else:
                     positioning = Positioning.objects.create(**form.cleaned_data, event_id=event_id)
                     did_create = True
-        return render(request, 'success.html', {'call_back':'edit lineup','id':event_id}, status=200)
+            else:
+                pass
+        return render(request, 'success.html', {'call_back':'edit lineup','id':event_id, 'errors':[error for error in formset.errors if error]}, status=200)
             # return render(request, 'success.html', {'call_back':'schedule'})
     event = Event.objects.get(id=event_id)
     players = Player.objects.all().prefetch_related('availability_set', 'statline_set', 'positioning_set')
