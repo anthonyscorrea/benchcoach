@@ -46,6 +46,9 @@ class Location (ApiObject):
 class Opponent (ApiObject):
     rel = "opponents"
 
+class EventLineupEntry (ApiObject):
+    rel = "event_lineup_entries"
+
 class TeamSnap(APIClient):
     base_url = 'https://api.teamsnap.com/v3'
 

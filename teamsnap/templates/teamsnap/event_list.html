@@ -4,10 +4,10 @@
 {% block content %}
 
 <h1>{{ title }}</h1>
-<ol class="list-group">
+{#<ol class="list-group">#}
 {% for item in object_list %}
-    <li class="list-group-item">
-        <span class="fs-5 fw-bold">{{ item.formatted_title }}</span>
+    <ul class="card">
+        <span class="card-title">{{ item.formatted_title }}</span>
         <span class="fs-6">{{ item.subtitle }}</span>
 {#        {% if item.body %}#}
 {#            <br><span class="fs-6">{{ item.body }}</span>#}
@@ -17,7 +17,7 @@
         {% for button in item.buttons %}
             <a class="btn btn-primary btn-sm" href="{{ button.href }}" role="button">{{ button.label }}</a>
             {% endfor %}
-    </li>
+    </ul>
 {% endfor %}
 </ol>
 {% endblock %}
