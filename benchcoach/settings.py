@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'venues.apps.VenuesConfig',
     'players.apps.PlayersConfig',
     'lineups.apps.LineupsConfig',
+    'teamsnap.apps.TeamsnapConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
