@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="w-100 text-center mx-auto text-center">
-        <h1 class="display-5 fw">{{ event.formatted_title }}</h1>
+        <h1 class="display-5 fw-bold"><a href="#" class="btn btn-primary btn-secondary p-1 mx-3"><</a>{{ event.formatted_title }}<a href="#" class="btn btn-primary btn-secondary p-1 mx-3">></a></h1>
         <div class="lead">
             <p class="">{{ event.start_date|date:"l, F j, Y g:i A" }}<br>{{ event.location.name }}</p>
         </div>
@@ -12,10 +12,10 @@
             {% csrf_token %}
             {{ formset.management_form }}
             <div class="row">
-
-                    <div class="col-md-6">
+{#                    <input type="submit" value="Submit" class="btn btn-sm btn-success mx-3 my-0 my-0">#}
+                <div class="col-md-6">
                     <div class="card my-1">
-                        <div class="card-header"><h5>Lineup<input type="submit" value="Submit" class="btn btn-sm btn-success mx-3 my-0"></h5></div>
+                        <div class="card-header"><h5>Lineup</h5></div>
                         <div class="card-body p-0">
                             <table class="table">
                                 {% include 'teamsnap/player-table-header.html' %}
@@ -27,7 +27,19 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
-                            <div class="justify-content-md-end d-md-flex p-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
+                            <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
+                        </div>
+                    </div>
+                    <div class="card my-1">
+                        <div class="card-header"><h5>Subs</h5></div>
+                        <div class="card-body p-0">
+                            <table class="table">
+                                {% include 'teamsnap/player-table-header.html' %}
+                                <tbody id="planned-subs">
+
+                                </tbody>
+                            </table>
+                            <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
                         </div>
                     </div>
                 </div>
@@ -79,6 +91,16 @@
                 form_element_sequence.value = parseInt(member_rows[i].dataset.sequence)
             }
         }
+        var lineup = new Sortable.create(
+            document.getElementById('planned-subs'), {
+                animation: 150,
+                ghostClass: "ghost",
+                {#handle: ".bars-move",#}
+                group: {
+                    put: 'clone',
+                    pull: true
+                }
+            })
         var lineup = new Sortable.create(
             document.getElementById('lineup'), {
                 animation: 150,
