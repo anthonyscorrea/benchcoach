@@ -1,0 +1,72 @@
+<tr data-member-id="{{ form.instance.member.id }}"
+    data-position="{{ form.instance.position }}"
+    data-sequence="{{ form.instance.sequence }}">
+    {{ form.id.as_hidden }}
+    {{ form.event.as_hidden }}
+    {{ form.sequence.as_hidden }}
+    {{ form.member.as_hidden }}
+    {{ form.teamsnap_id.as_hidden }}
+    <td id="member-availability-{{ form.instance.member.id }}"
+        style="display:{{ available_display }};"
+    >
+        {% if form.availability.status_code == 2 %}
+            <button class="btn btn-light bg-info p-1"
+                 id="member-available-{{ form.instance.member.id }}"
+            >
+            <span style="visibility: hidden">2</span>
+            <span class="visually-hidden">Maybe</span>
+            </button>
+        {% elif form.availability.status_code == 1%}
+            <button class="btn btn-light bg-success p-1"
+                 id="member-available-{{ form.instance.member.id }}"
+            >
+            <span style="visibility: hidden">1</span>
+            </button>
+            <span class="visually-hidden">Maybe</span>
+        {% elif form.availability.status_code == 0%}
+            <button class="btn btn-light bg-danger p-1"
+                 id="member-available-{{ form.instance.member.id }}"
+            >
+            <span style="visibility: hidden">0</span>
+            </button>
+            <span class="visually-hidden">No</span>
+        {% else %}
+            <button class="btn btn-light bg-secondary p-1"
+                 id="member-available-{{ form.instance.member.id }}"
+            >
+            <span style="visibility: hidden">X</span>
+            </button>
+            <span class="visually-hidden">Unknown</span>
+        {% endif %}
+    </td>
+    <th scope="row"
+        id="member-sequence-{{ form.instance.member.id }}"
+        style="display:{{ sequence_display }};">
+        {% if form.sequence.value %}
+            <button type="button"
+                    class="btn btn-light p-1"
+                    id="member-sequence-button-{{ form.instance.member.id }}"
+                    onclick="toggle_in_lineup(this)"
+            >
+                {{ form.sequence.value }}
+            </button>
+        {% elif  form.sequence.value == 0 %}
+            <button type="button"
+                    class="btn btn-dark p-1"s
+                    id="member-sequence-button-{{ form.instance.member.id }}"
+                    onclick="toggle_in_lineup(this)"
+            >
+                D
+            </button>
+        {% endif %}
+    </th>
+    <th>
+        {{ form.instance.member.first_name }}&nbsp;{{ form.instance.member.last_name }}&nbsp;
+        <small class="text-muted fw-light">#{{ form.instance.member.jersey_number }}</small>
+{#        <br><code><small>{{ form.statline }}</small></code>#}
+    </th>
+    <td>
+        {{ form.label }}
+    </td>
+    {#                                    <td>{{ form.instance.position }}</td>#}
+</tr>
