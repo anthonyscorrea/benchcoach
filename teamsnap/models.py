@@ -107,3 +107,27 @@ class Availability(TeamsnapBaseModel):
 
    class Meta:
       verbose_name_plural = "availabilities"
+
+class LineupEntry(TeamsnapBaseModel):
+   name = None
+   teamsnap_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
+   member = models.ForeignKey(Member, on_delete=models.CASCADE)
+   event = models.ForeignKey(Event, on_delete=models.CASCADE)
+   positions = [
+      (11, 'EH'),
+      (1, 'P'),
+      (2, 'C'),
+      (3, '1B'),
+      (4, '2B'),
+      (5, '3B'),
+      (6, 'SS'),
+      (7, 'LF'),
+      (8, 'CF'),
+      (9, 'RF'),
+      (10,'DH')
+   ]
+   label = models.PositiveSmallIntegerField(choices=positions, default=None, null=True, blank=True)
+   sequence = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
+
+   class Meta:
+      unique_together = ('member', 'event',)
