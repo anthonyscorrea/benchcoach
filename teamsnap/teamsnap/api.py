@@ -49,6 +49,12 @@ class Opponent (ApiObject):
 class EventLineupEntry (ApiObject):
     rel = "event_lineup_entries"
 
+class Statistics (ApiObject):
+    rel = "statistics"
+
+class MemberStatistics (ApiObject):
+    rel = "member_statistics"
+
 class TeamSnap(APIClient):
     base_url = 'https://api.teamsnap.com/v3'
 
