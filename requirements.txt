@@ -14,6 +14,5 @@ soupsieve==2.2.1
 sqlparse==0.4.1
 urllib3==1.26.6
 zipp==3.5.0
-django-bootstrap-v5==1.0.7
 django-crispy-forms
 psycopg2
