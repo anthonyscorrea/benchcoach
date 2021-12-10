@@ -1,0 +1,1 @@
+[{"model": "teamsnap.user", "pk": 1, "fields": {"teamsnap_id": "25560745", "access_token": "u2SqDq78FumVvhkt1D-V1CQ2ZIaB-nUVlzGwd1YhGtA"}}, {"model": "teamsnap.team", "pk": 1, "fields": {"teamsnap_id": "7644001", "name": null, "bencoach_team": null}}]
