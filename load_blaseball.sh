@@ -1,5 +1,5 @@
 #!/bin/bash
-PROJECT_PATH="/Users/asc/PycharmProjects_Local/benchcoach"
+PROJECT_PATH="."
 PYTHON_PATH="$PROJECT_PATH/venv/bin/python"
 FIXTURES="blaseball"
 MANAGE_PY_PATH="$PROJECT_PATH/manage.py"
