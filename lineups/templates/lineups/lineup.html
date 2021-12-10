@@ -33,33 +33,30 @@
             {% csrf_token %}
             {{ formset.management_form }}
             <div class="row">
+{#                    <input type="submit" value="Submit" class="btn btn-sm btn-success mx-3 my-0 my-0">#}
                 <div class="col-md-6">
-                    <h5>Lineup</h5>
-                    <table class="table">
-                        {% include 'lineups/player-table-header.html' %}
-                        <tbody  id="lineup">
-                        {% for form in formset %}
-                            {% if form.instance.order or form.instance.position == "P"  %}
-                                {% include 'lineups/player-table-row.html' with form=form available_display="none" order_display="table-cell" %}
-                            {% endif %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <input type="submit" value="Submit">
+                    <div class="card my-1">
+                        <div class="card-header"><h5>DH'd</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'lineups/player-table.html' with table_id="dhd" formset=formset_dhd available_class="d-none" order_class="d-none"%}
+                        </div>
+                    </div>
+                    <div class="card my-1">
+                        <div class="card-header"><h5>Lineup</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'lineups/player-table.html' with table_id="lineup" formset=formset_lineup available_class="d-none"%}
+                            <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
-                    <h5>Players</h5>
-                    <table class="table">
-                        {% include 'lineups/player-table-header.html' %}
-                        <tbody id="bench">
-                        {% for form in formset|dictsortreversed:"availability.available"%}
-                            {% if not form.instance.order and not form.instance.position == "P"  %}
-                                {% include 'lineups/player-table-row.html' with form=form available_display="table-cell" order_display="none" %}
-                            {% endif %}
-                        {% endfor %}
-                        </tbody>
-                    </table >
+                    <div class="card my-1">
+                        <div class="card-header"><h5>Bench</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'lineups/player-table.html' with table_id="bench" formset=formset_bench order_class="d-none"%}
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -90,6 +87,16 @@
             }
         }
         var lineup = new Sortable.create(
+            document.getElementById('dhd'), {
+                animation: 150,
+                ghostClass: "ghost",
+                {#handle: ".bars-move",#}
+                group: {
+                    put: true,
+                    pull: true
+                }
+            })
+        var lineup = new Sortable.create(
             document.getElementById('lineup'), {
                 animation: 150,
                 ghostClass:"ghost",
@@ -99,6 +106,7 @@
                     pull:true
                 },
                 onAdd: function (/**Event*/evt) {
+                    // Add to Lineup
                     var itemEl = evt.item;  // dragged HTMLElement
                     var player_id = itemEl.dataset.playerId
                     console.log(itemEl)
@@ -110,16 +118,10 @@
                     toggle_in_lineup(player_order_button)
                     player_order.parentElement.dataset.order = evt.newIndex
                     refresh_lineup_order()
-                    player_available.parentElement.style.display="none"
-                    player_order.style.display="table-cell"
-                    evt.to;    // target list
-                    evt.from;  // previous list
-                    evt.oldIndex;  // element's old index within old parent
-                    evt.newIndex;  // element's new index within new parent
-                    evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
-                    evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
-                    evt.clone // the clone element
-                    evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
+                    {#player_available.parentElement.style.display="none"#}
+                    player_available.parentElement.classList.add('d-none')
+                    {#player_order.style.display="table-cell"#}
+                    player_order.classList.remove('d-none')
                 },
                 onUpdate: function (/**Event*/evt) {
                     console.log('update to lineup')
@@ -144,10 +146,12 @@
                     var form_element_order =itemEl.querySelector('[id$="order"]')
                     var player_order = itemEl.querySelector('[id^="player-order"]')
                     var player_available =itemEl.querySelector('[id^="player-available"]')
-                    player_available.parentElement.style.display="table-cell"
+                    {#player_available.parentElement.style.display="table-cell"#}
+                    player_available.parentElement.classList.remove('d-none')
                     form_element_order.value = 0
                     player_order.innerHTML = 1
-                    player_order.style.display="none"
+                    {#player_order.style.display="none"#}
+                    player_order.classList.add('d-none')
                     var player_id = itemEl.dataset.playerId
                     refresh_lineup_order()
                 }
@@ -167,7 +171,7 @@
                 player_row.dataset.order = 0
             }
             refresh_lineup_order()
-        }
+                              }
 
     </script>
 
