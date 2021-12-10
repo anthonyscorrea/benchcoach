@@ -30,7 +30,9 @@ def edit(request, event_id):
                 pass
         return render(request, 'success.html', {'call_back':'edit lineup','id':event_id, 'errors':[error for error in formset.errors if error]}, status=200)
             # return render(request, 'success.html', {'call_back':'schedule'})
+    previous_event = Event.objects.get(id=event_id-1)
     event = Event.objects.get(id=event_id)
+    next_event = Event.objects.get(id=event_id+1)
     players = Player.objects.all().prefetch_related('availability_set', 'statline_set', 'positioning_set')
     players_info = { player.id:{
         'availability': player.availability_set.get(event_id=event_id),
@@ -64,6 +66,7 @@ def edit(request, event_id):
                                                    'events_tab':'active',
                                                    'previous_event':previous_event,
                                                    'event': event,
+                                                   'next_event': next_event,
                                                    'players_info': players_info,
                                                    'formset': formset,
                                                    # 'players': players_d,

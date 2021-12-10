@@ -1,11 +1,34 @@
 {% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}{% load crispy_forms_tags %}{% load static %}
+{% with events_active="active" %}
+{% block precontent %}
+    <div class="d-flex justify-content-center justify-content-md-center border-bottom bg-white">
+        <a class="btn btn-outline-secondary btn-sm d-md-flex my-auto align-items-md-center my-3 mx-3" href="{% url 'edit lineup' event_id=previous_event.id %}" role="button">&lt; {{ previous_event.start|date:"D" }}&nbsp;{{ previous_event.start|date:"n/j" }}</a>
+        <div>
+            <h6 class="text-center m-1">{{ event.away_team.name }} vs. {{ event.home_team.name }}</h6>
+            <p class="text-center text-muted m-1">{{ event.start|date:"l, F j, Y g:i A" }}<br>{{ event.venue.name }}</p>
+            <h6 class="text-muted m-1"></h6>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm align-items-center my-auto my-3 mx-3" href="{% url 'edit lineup' event_id=next_event.id %}" role="button">{{ next_event.start|date:"D" }}&nbsp;{{ next_event.start|date:"n/j" }} &gt;</a>
+    </div>
 
+    <ul class="nav nav-pills nav-fill bg-white" role="tablist">
+        <li class="nav-item m-1" role="presentation"><a id="event-details-tab" class="nav-link active px-2 py-0" data-bs-toggle="pill" data-bs-target="#event-details" role="tab" aria-controls="event-details" aria-selected="true">Details</a></li>
+        <li class="nav-item m-1" role="presentation"><a id="event-lineup-tab" class="nav-link px-2 py-0" data-bs-toggle="pill" data-bs-target="#event-lineup" role="tab" aria-controls="event-lineup" aria-selected="false">Lineup</a></li>
+    </ul>
+
+{% endblock %}{% endwith %}
 {% block content %}
-    <h1>{{ title }}</h1>
-    {{ event.away_team.name }} vs. {{ event.home_team.name }} <br>
-    {{ event.start|date:"l, F j, Y g:i A" }} <br>
-    {{ event.venue.name }} <br>
-    <div class="container">
+    <div id="pills-tabContent" class="container-fluid tab-content bg-white my-1" data-toggle="tab">
+    <div id="event-details" class="tab-pane show active" role="tabpanel" aria-labelledby="event-details-tab">
+        <div>
+            <p class="m-1">Away Team: {{ event.away_team.name }}</p>
+            <p class="m-1">Home Team: {{ event.home_team.name }}</p>
+            <p class="m-1">Day: {{ event.start|date:"l, F j Y" }}</p>
+            <p class="m-1">Time: {{ event.start|date:"g:i A" }}</p>
+            <p class="m-1">Venue: {{ event.venue.name }}</p>
+        </div>
+    </div>
+    <div id="event-lineup" class="tab-pane" role="tabpanel" aria-labelledby="event-lineup-tab">
         <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
             {% csrf_token %}
             {{ formset.management_form }}
@@ -41,6 +64,7 @@
 
             </div>
         </form>
+    </div>
     </div>
     <script src="{% static 'js/Sortable.js' %}"></script>
     <script id="sortable">
@@ -143,7 +167,7 @@
                 player_row.dataset.order = 0
             }
             refresh_lineup_order()
-                              }
+        }
 
     </script>
 
