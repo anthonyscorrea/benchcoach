@@ -35,7 +35,7 @@ class Team(TeamsnapBaseModel):
       return f"https://go.teamsnap.com/{self.team.teamsnap_id}/team/edit/{self.teamsnap_id}"
 
 class Location(TeamsnapBaseModel):
-   bencoach_venue = models.ForeignKey(venues.models.Venue, null=True, on_delete=models.CASCADE)
+   benchcoach_venue = models.ForeignKey(venues.models.Venue, null=True, on_delete=models.CASCADE)
 
    @property
    def view_url(self):
@@ -47,7 +47,7 @@ class Location(TeamsnapBaseModel):
 
 class Member(TeamsnapBaseModel):
    name = None
-   bencoach_player = models.ForeignKey(players.models.Player, null=True, on_delete=models.CASCADE)
+   benchcoach_player = models.ForeignKey(players.models.Player, null=True, on_delete=models.CASCADE)
    team = models.ForeignKey(Team, null=True, on_delete=models.CASCADE)
    first_name = models.CharField(max_length = 50, null=True)
    last_name = models.CharField(max_length = 50, null=True)
@@ -66,7 +66,7 @@ class Member(TeamsnapBaseModel):
       return f"https://go.teamsnap.com/{self.team.teamsnap_id}/roster/edit/{self.teamsnap_id}"
 
 class Event(TeamsnapBaseModel):
-   bencoach_event = models.ForeignKey(events.models.Event, null=True, on_delete=models.CASCADE)
+   benchcoach_event = models.ForeignKey(events.models.Event, null=True, on_delete=models.CASCADE)
    label = models.CharField(max_length = 50, null=True)
    start_date = models.DateTimeField(null=True)
    opponent = models.ForeignKey(Team, null=True, on_delete=models.CASCADE, related_name="opponent")
