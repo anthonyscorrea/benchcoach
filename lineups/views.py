@@ -72,8 +72,24 @@ def edit(request, event_id):
     formset_dhd = [f for f in formset if not f.instance.order and f.instance.position]
     formset_bench = [f for f in formset if f not in formset_lineup and f not in formset_dhd]
 
+    details = {
+        "Away Team": event.away_team,
+        "Home Team": event.home_team,
+        "Date": event.start.date(),
+        "Time": event.start.time(),
+        "Venue": event.venue,
+        "TeamSnap Link": event.event_set.first()
+    }
+    # <p class="m-1">Away Team: {{ event.away_team.name }}</p>
+    # <p class="m-1">Home Team: {{ event.home_team.name }}</p>
+    # <p class="m-1">Day: {{ event.start|date:"l, F j Y" }}</p>
+    # <p class="m-1">Time: {{ event.start|date:"g:i A" }}</p>
+    # <p class="m-1">Venue: {{ event.venue.name }}</p>
+    # <p class="m-1">TeamSnap Link: <a href="{% url "teamsnap edit event" event.event_set.first.id %}">{{ event.event_set.first }}</a> </p>
+
+
     return render(request, 'lineups/lineup.html', {'title': 'Lineup',
-                                                   'event': event,
+                                                   'event': event,                                               'details':details,
                                                    'previous_event': previous_event,
                                                    'next_event': next_event,
                                                    'formset': formset,

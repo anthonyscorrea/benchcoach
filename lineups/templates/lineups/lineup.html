@@ -25,11 +25,7 @@
     <div id="pills-tabContent" class="container-fluid tab-content bg-white my-1" data-toggle="tab">
     <div id="event-details" class="tab-pane show active" role="tabpanel" aria-labelledby="event-details-tab">
         <div>
-            <p class="m-1">Away Team: {{ event.away_team.name }}</p>
-            <p class="m-1">Home Team: {{ event.home_team.name }}</p>
-            <p class="m-1">Day: {{ event.start|date:"l, F j Y" }}</p>
-            <p class="m-1">Time: {{ event.start|date:"g:i A" }}</p>
-            <p class="m-1">Venue: {{ event.venue.name }}</p>
+            {% include 'lineups/info-table.html' with d=details %}
         </div>
     </div>
     <div id="event-lineup" class="tab-pane" role="tabpanel" aria-labelledby="event-lineup-tab">
