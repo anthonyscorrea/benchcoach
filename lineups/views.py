@@ -3,8 +3,6 @@ from .models import Positioning
 from .forms import PositioningFormSet
 from events.models import Event
 from players.models import Player
-from django.forms.models import model_to_dict
-from django.db.models import Q
 from django.db.models import Case, When
 
 def queryset_from_ids(Model, id_list):
@@ -36,21 +34,11 @@ def edit(request, event_id):
             else:
                 pass
         return render(request, 'success.html', {'call_back':'edit lineup','id':event_id, 'errors':[error for error in formset.errors if error]}, status=200)
-            # return render(request, 'success.html', {'call_back':'schedule'})
     previous_event = Event.objects.get(id=event_id-1)
 
     event = Event.objects.get(id=event_id)
     next_event = Event.objects.get(id=event_id+1)
-    players = Player.objects.all().prefetch_related('availability_set', 'statline_set', 'positioning_set')
-    players_info = { player.id:{
-        'availability': player.availability_set.get(event_id=event_id),
-        'statline': player.statline_set.get(player_id=player.id),
-        **model_to_dict(player)
-    }
-        for player in players
-    }
     players = Player.objects.prefetch_related('availability_set', 'positioning_set')
-    # players_d.sort(key=lambda d: (-d['availability'].available, d['last_name']))
 
     for player in players:
         Positioning.objects.get_or_create(player_id=player.id, event_id=event_id)
