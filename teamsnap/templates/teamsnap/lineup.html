@@ -17,28 +17,14 @@
                     <div class="card my-1">
                         <div class="card-header"><h5>Lineup</h5></div>
                         <div class="card-body p-0">
-                            <table class="table">
-                                {% include 'teamsnap/player-table-header.html' %}
-                                <tbody id="lineup">
-                                {% for form in formset %}
-                                    {% if form.instance.sequence or form.instance.label == "P" %}
-                                        {% include 'teamsnap/player-table-row.html' with form=form available_display="none" sequence_display="table-cell" %}
-                                    {% endif %}
-                                {% endfor %}
-                                </tbody>
-                            </table>
+                            {% include 'teamsnap/player-table.html' with table_id="lineup" formset=formset_lineup available_class="d-none"%}
                             <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
                         </div>
                     </div>
                     <div class="card my-1">
-                        <div class="card-header"><h5>Subs</h5></div>
+                        <div class="card-header"><h5>DH'd</h5></div>
                         <div class="card-body p-0">
-                            <table class="table">
-                                {% include 'teamsnap/player-table-header.html' %}
-                                <tbody id="planned-subs">
-
-                                </tbody>
-                            </table>
+                            {% include 'teamsnap/player-table.html' with table_id="dhd" formset=formset_dhd available_class="d-none" sequence_class="d-none"%}
                             <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
                         </div>
                     </div>
@@ -48,19 +34,7 @@
                     <div class="card my-1">
                         <div class="card-header"><h5>Bench</h5></div>
                         <div class="card-body p-0">
-                            <table class="table">
-                                {% include 'teamsnap/player-table-header.html' %}
-                                <tbody id="bench">
-                                {% for form in formset %}
-                            {% if not form.instance.member.is_non_player %}
-                                {% if not form.instance.sequence and not form.instance.label == "P"  %}
-                                    {% include 'teamsnap/player-table-row.html' with form=form available_display="table-cell" sequence_display="none" %}
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                                </tbody>
-                            </table>
-
+                            {% include 'teamsnap/player-table.html' with table_id="bench" formset=formset_bench sequence_class="d-none"%}
                         </div>
                     </div>
                 </div>
@@ -68,7 +42,7 @@
             </div>
         </form>
     </div>
-    <script src="{% static 'Sortable.js' %}"></script>
+    <script src="{% static 'js/Sortable.js' %}"></script>
     <script id="sortable">
         function refresh_lineup_sequence (){
             var member_rows = document.getElementById('lineup').querySelectorAll('tr')
@@ -92,12 +66,12 @@
             }
         }
         var lineup = new Sortable.create(
-            document.getElementById('planned-subs'), {
+            document.getElementById('dhd'), {
                 animation: 150,
                 ghostClass: "ghost",
                 {#handle: ".bars-move",#}
                 group: {
-                    put: 'clone',
+                    put: true,
                     pull: true
                 }
             })
@@ -123,16 +97,10 @@
                     toggle_in_lineup(member_sequence_button)
                     member_sequence.parentElement.dataset.sequence = evt.newIndex
                     refresh_lineup_sequence()
-                    member_available.parentElement.style.display="none"
-                    member_sequence.style.display="table-cell"
-                    evt.to;    // target list
-                    evt.from;  // previous list
-                    evt.oldIndex;  // element's old index within old parent
-                    evt.newIndex;  // element's new index within new parent
-                    evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
-                    evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
-                    evt.clone // the clone element
-                    evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
+                    {#member_available.parentElement.style.display="none"#}
+                    member_available.parentElement.classList.add('d-none')
+                    {#member_sequence.style.display="table-cell"#}
+                    member_sequence.classList.remove('d-none')
                 },
                 onUpdate: function (/**Event*/evt) {
                     console.log('update to lineup')
@@ -157,10 +125,12 @@
                     var form_element_sequence =itemEl.querySelector('[id$="sequence"]')
                     var member_sequence = itemEl.querySelector('[id^="member-sequence"]')
                     var member_available =itemEl.querySelector('[id^="member-available"]')
-                    member_available.parentElement.style.display="table-cell"
+                    {#member_available.parentElement.style.display="table-cell"#}
+                    member_available.parentElement.classList.remove('d-none')
                     form_element_sequence.value = 0
                     member_sequence.innerHTML = 1
-                    member_sequence.style.display="none"
+                    {#member_sequence.style.display="none"#}
+                    member_sequence.classList.add('d-none')
                     var member_id = itemEl.dataset.memberId
                     refresh_lineup_sequence()
                 }

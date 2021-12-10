@@ -102,7 +102,13 @@ def edit_lineup(request, event_id):
             f.availability = f.instance.member.availability_set.get(event_id=event_id)
             # f.statline = f.instance.member.statline_set.get()
 
+    formset_lineup = [f for f in formset if f.instance.sequence]
+    formset_bench = [f for f in formset if f not in formset_lineup]
+    formset_dhd = [f for f in formset if not f.instance.sequence and f.instance.label]
+
     return render(request, 'teamsnap/lineup.html', {'title': 'Lineup',
                                                    'event': event,
-                                                   'formset': formset,
+                                                   'formset_lineup': formset_lineup,
+                                                    'formset_bench':formset_bench,
+                                                    'formset_dhd':formset_dhd
                                                    })
