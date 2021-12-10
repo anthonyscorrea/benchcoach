@@ -5,13 +5,20 @@
 
     <head>
 
-            <meta http-equiv="refresh" content="2;url={{ call_back_url }}" />
+        <meta http-equiv="refresh" content="2;url={{ call_back_url }}" />
 
     </head>
 
-    <span class="text-success">Success!</span> <span class="text-muted">Redirecting...</span>
-    {% for error in errors %}
-        error
-    {% endfor %}
+    {% if errors %}
+        <span class="text-danger">Errors...</span>
+        {% for error in errors %}
+            error
+        {% endfor %}
+
+    {% else %}
+        <span class="text-success">Success!</span>
+    {% endif %}
+    <span class="text-muted">Redirecting...</span>
+
 
 {% endblock %}

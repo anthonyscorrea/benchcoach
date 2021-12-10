@@ -1,0 +1,157 @@
+{% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}{% load crispy_forms_tags %}{% load static %}
+
+{% block content %}
+    <div class="w-100 text-center mx-auto text-center">
+        <h1 class="display-5 fw-bold"><a href="#" class="btn btn-primary btn-secondary p-1 mx-3"><</a>{{ event.formatted_title }}<a href="#" class="btn btn-primary btn-secondary p-1 mx-3">></a></h1>
+        <div class="lead">
+            <p class="">{{ event.start_date|date:"l, F j, Y g:i A" }}<br>{{ event.location.name }}</p>
+        </div>
+    </div>
+    <div class="container">
+        <form action="{%  url 'teamsnap edit lineup' event_id=event.id%}" method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <div class="row">
+{#                    <input type="submit" value="Submit" class="btn btn-sm btn-success mx-3 my-0 my-0">#}
+                <div class="col-md-6">
+                    <div class="card my-1">
+                        <div class="card-header"><h5>Lineup</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'teamsnap/player-table.html' with table_id="lineup" formset=formset_lineup available_class="d-none"%}
+                            <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
+                        </div>
+                    </div>
+                    <div class="card my-1">
+                        <div class="card-header"><h5>DH'd</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'teamsnap/player-table.html' with table_id="dhd" formset=formset_dhd available_class="d-none" sequence_class="d-none"%}
+                            <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card my-1">
+                        <div class="card-header"><h5>Bench</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'teamsnap/player-table.html' with table_id="bench" formset=formset_bench sequence_class="d-none"%}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <script src="{% static 'js/Sortable.js' %}"></script>
+    <script id="sortable">
+        function refresh_lineup_sequence (){
+            var member_rows = document.getElementById('lineup').querySelectorAll('tr')
+            var has_dh = false
+
+            for (let i = 0; i < member_rows.length; i++) {
+                if (member_rows[i].dataset.sequence == 0) {
+                    has_dh = true
+                    continue
+                }
+                if (has_dh) {
+                    member_rows[i].dataset.sequence = i
+                }
+                else {
+                    member_rows[i].dataset.sequence = i+1
+                }
+                var member_sequence = member_rows[i].querySelector('[id^="member-sequence-button"]')
+                var form_element_sequence = member_rows[i].querySelector('[id$="sequence"]')
+                member_sequence.innerText = parseInt(member_rows[i].dataset.sequence)
+                form_element_sequence.value = parseInt(member_rows[i].dataset.sequence)
+            }
+        }
+        var lineup = new Sortable.create(
+            document.getElementById('dhd'), {
+                animation: 150,
+                ghostClass: "ghost",
+                {#handle: ".bars-move",#}
+                group: {
+                    put: true,
+                    pull: true
+                }
+            })
+        var lineup = new Sortable.create(
+            document.getElementById('lineup'), {
+                animation: 150,
+                ghostClass:"ghost",
+                {#handle: ".bars-move",#}
+                group:{
+                    put:true,
+                    pull:true
+                },
+                onAdd: function (/**Event*/evt) {
+                    // Add to Lineup
+                    var itemEl = evt.item;  // dragged HTMLElement
+                    var member_id = itemEl.dataset.memberId
+                    console.log(itemEl)
+                    var form_element_sequence =itemEl.querySelector('[id$="sequence"]')
+                    var member_sequence = itemEl.querySelector('[id^="member-sequence"]')
+                    var member_available =itemEl.querySelector('[id^="member-available"]')
+                    var member_sequence_button =itemEl.querySelector('[id^="member-sequence-button"]')
+                    console.log(member_sequence.parentElement.dataset)
+                    toggle_in_lineup(member_sequence_button)
+                    member_sequence.parentElement.dataset.sequence = evt.newIndex
+                    refresh_lineup_sequence()
+                    {#member_available.parentElement.style.display="none"#}
+                    member_available.parentElement.classList.add('d-none')
+                    {#member_sequence.style.display="table-cell"#}
+                    member_sequence.classList.remove('d-none')
+                },
+                onUpdate: function (/**Event*/evt) {
+                    console.log('update to lineup')
+                    var itemEl = evt.item;  // dragged HTMLElement
+                    refresh_lineup_sequence()
+                },
+            });
+        var bench = new Sortable.create(
+            document.getElementById('bench'), {
+                animation: 150,
+                ghostClass:"ghost",
+                sort: false,
+                {#handle: ".bars-move",#}
+                group:{
+                    put:true,
+                    pull:true
+                },
+                onAdd: function (/**Event*/evt) {
+                    console.log('added to bench')
+                    var itemEl = evt.item;  // dragged HTMLElement
+                    console.log(itemEl)
+                    var form_element_sequence =itemEl.querySelector('[id$="sequence"]')
+                    var member_sequence = itemEl.querySelector('[id^="member-sequence"]')
+                    var member_available =itemEl.querySelector('[id^="member-available"]')
+                    {#member_available.parentElement.style.display="table-cell"#}
+                    member_available.parentElement.classList.remove('d-none')
+                    form_element_sequence.value = 0
+                    member_sequence.innerHTML = 1
+                    {#member_sequence.style.display="none"#}
+                    member_sequence.classList.add('d-none')
+                    var member_id = itemEl.dataset.memberId
+                    refresh_lineup_sequence()
+                }
+            });
+        function toggle_in_lineup(sequence_button){
+            var member_row = sequence_button.parentNode.parentNode
+            if (member_row.dataset.sequence == 0) {
+                sequence_button.innerText = "1"
+                sequence_button.classList.add("btn-light")
+                sequence_button.classList.remove("btn-dark")
+                member_row.dataset.sequence = 1
+            }
+            else {
+                sequence_button.innerText = "D"
+                sequence_button.classList.remove("btn-light")
+                sequence_button.classList.add("btn-dark")
+                member_row.dataset.sequence = 0
+            }
+            refresh_lineup_sequence()
+                              }
+
+    </script>
+
+{% endblock %}
