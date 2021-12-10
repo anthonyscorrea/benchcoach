@@ -13,6 +13,7 @@ class TeamsListView(BenchcoachListView):
     edit_url = 'edit team'
     list_url = 'teams list'
     page_title = "Teams"
+    active_tabs = ['opponents_tab']
 
 class TeamEditView(BenchcoachEditView):
     Model = Team

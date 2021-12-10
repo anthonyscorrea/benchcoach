@@ -61,6 +61,8 @@ def edit(request, event_id):
 
 
     return render(request, 'lineups/lineup.html', {'title': 'Lineup',
+                                                   'events_tab':'active',
+                                                   'previous_event':previous_event,
                                                    'event': event,
                                                    'players_info': players_info,
                                                    'formset': formset,
