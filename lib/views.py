@@ -21,6 +21,7 @@ class BenchcoachListView(TemplateView):
     title_strf = "{item}"
     subtitle_strf = ""
     body_strf = ""
+    active_tabs = []
 
     def get_context_data(self):
         items = self.Model.objects.all()
@@ -42,6 +43,8 @@ class BenchcoachListView(TemplateView):
                 for item in items
             ]
         }
+        for tab in self.active_tabs:
+            context[tab] = 'active'
         return context
 
 class BenchcoachEditView(TemplateView):

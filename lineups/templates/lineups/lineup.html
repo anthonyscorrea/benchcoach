@@ -1,46 +1,67 @@
 {% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}{% load crispy_forms_tags %}{% load static %}
+{% with events_active="active" %}
+{% block precontent %}
+    <div class="d-flex justify-content-center justify-content-md-center border-bottom bg-white">
+        <a class="btn btn-outline-secondary btn-sm d-md-flex my-auto align-items-md-center my-3 mx-3" href="{% url 'edit lineup' event_id=previous_event.id %}" role="button">&lt; {{ previous_event.start|date:"D" }}&nbsp;{{ previous_event.start|date:"n/j" }}</a>
+        <div>
+            <h6 class="text-center m-1">{{ event.away_team.name }} vs. {{ event.home_team.name }}</h6>
+            <p class="text-center text-muted m-1">{{ event.start|date:"l, F j, Y g:i A" }}<br>{{ event.venue.name }}</p>
+            <h6 class="text-muted m-1"></h6>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm align-items-center my-auto my-3 mx-3" href="{% url 'edit lineup' event_id=next_event.id %}" role="button">{{ next_event.start|date:"D" }}&nbsp;{{ next_event.start|date:"n/j" }} &gt;</a>
+    </div>
 
+    <ul class="nav nav-pills nav-fill bg-white" role="tablist">
+        <li class="nav-item m-1" role="presentation"><a id="event-details-tab" class="nav-link active px-2 py-0" data-bs-toggle="pill" data-bs-target="#event-details" role="tab" aria-controls="event-details" aria-selected="true">Details</a></li>
+        <li class="nav-item m-1" role="presentation"><a id="event-lineup-tab" class="nav-link px-2 py-0" data-bs-toggle="pill" data-bs-target="#event-lineup" role="tab" aria-controls="event-lineup" aria-selected="false">Lineup</a></li>
+    </ul>
+
+{% endblock %}{% endwith %}
 {% block content %}
-    <h1>{{ title }}</h1>
-    {{ event.away_team.name }} vs. {{ event.home_team.name }} <br>
-    {{ event.start|date:"l, F j, Y g:i A" }} <br>
-    {{ event.venue.name }} <br>
-    <div class="container">
+    <div id="pills-tabContent" class="container-fluid tab-content bg-white my-1" data-toggle="tab">
+    <div id="event-details" class="tab-pane show active" role="tabpanel" aria-labelledby="event-details-tab">
+        <div>
+            <p class="m-1">Away Team: {{ event.away_team.name }}</p>
+            <p class="m-1">Home Team: {{ event.home_team.name }}</p>
+            <p class="m-1">Day: {{ event.start|date:"l, F j Y" }}</p>
+            <p class="m-1">Time: {{ event.start|date:"g:i A" }}</p>
+            <p class="m-1">Venue: {{ event.venue.name }}</p>
+        </div>
+    </div>
+    <div id="event-lineup" class="tab-pane" role="tabpanel" aria-labelledby="event-lineup-tab">
         <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
             {% csrf_token %}
             {{ formset.management_form }}
             <div class="row">
+{#                    <input type="submit" value="Submit" class="btn btn-sm btn-success mx-3 my-0 my-0">#}
                 <div class="col-md-6">
-                    <h5>Lineup</h5>
-                    <table class="table">
-                        {% include 'lineups/player-table-header.html' %}
-                        <tbody  id="lineup">
-                        {% for form in formset %}
-                            {% if form.instance.order or form.instance.position == "P"  %}
-                                {% include 'lineups/player-table-row.html' with form=form available_display="none" order_display="table-cell" %}
-                            {% endif %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <input type="submit" value="Submit">
+                    <div class="card my-1">
+                        <div class="card-header"><h5>DH'd</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'lineups/player-table.html' with table_id="dhd" formset=formset_dhd available_class="d-none" order_class="d-none"%}
+                        </div>
+                    </div>
+                    <div class="card my-1">
+                        <div class="card-header"><h5>Lineup</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'lineups/player-table.html' with table_id="lineup" formset=formset_lineup available_class="d-none"%}
+                            <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
-                    <h5>Players</h5>
-                    <table class="table">
-                        {% include 'lineups/player-table-header.html' %}
-                        <tbody id="bench">
-                        {% for form in formset|dictsortreversed:"availability.available"%}
-                            {% if not form.instance.order and not form.instance.position == "P"  %}
-                                {% include 'lineups/player-table-row.html' with form=form available_display="table-cell" order_display="none" %}
-                            {% endif %}
-                        {% endfor %}
-                        </tbody>
-                    </table >
+                    <div class="card my-1">
+                        <div class="card-header"><h5>Bench</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'lineups/player-table.html' with table_id="bench" formset=formset_bench order_class="d-none"%}
+                        </div>
+                    </div>
                 </div>
 
             </div>
         </form>
+    </div>
     </div>
     <script src="{% static 'js/Sortable.js' %}"></script>
     <script id="sortable">
@@ -66,6 +87,16 @@
             }
         }
         var lineup = new Sortable.create(
+            document.getElementById('dhd'), {
+                animation: 150,
+                ghostClass: "ghost",
+                {#handle: ".bars-move",#}
+                group: {
+                    put: true,
+                    pull: true
+                }
+            })
+        var lineup = new Sortable.create(
             document.getElementById('lineup'), {
                 animation: 150,
                 ghostClass:"ghost",
@@ -75,6 +106,7 @@
                     pull:true
                 },
                 onAdd: function (/**Event*/evt) {
+                    // Add to Lineup
                     var itemEl = evt.item;  // dragged HTMLElement
                     var player_id = itemEl.dataset.playerId
                     console.log(itemEl)
@@ -86,16 +118,10 @@
                     toggle_in_lineup(player_order_button)
                     player_order.parentElement.dataset.order = evt.newIndex
                     refresh_lineup_order()
-                    player_available.parentElement.style.display="none"
-                    player_order.style.display="table-cell"
-                    evt.to;    // target list
-                    evt.from;  // previous list
-                    evt.oldIndex;  // element's old index within old parent
-                    evt.newIndex;  // element's new index within new parent
-                    evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
-                    evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
-                    evt.clone // the clone element
-                    evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
+                    {#player_available.parentElement.style.display="none"#}
+                    player_available.parentElement.classList.add('d-none')
+                    {#player_order.style.display="table-cell"#}
+                    player_order.classList.remove('d-none')
                 },
                 onUpdate: function (/**Event*/evt) {
                     console.log('update to lineup')
@@ -120,10 +146,12 @@
                     var form_element_order =itemEl.querySelector('[id$="order"]')
                     var player_order = itemEl.querySelector('[id^="player-order"]')
                     var player_available =itemEl.querySelector('[id^="player-available"]')
-                    player_available.parentElement.style.display="table-cell"
+                    {#player_available.parentElement.style.display="table-cell"#}
+                    player_available.parentElement.classList.remove('d-none')
                     form_element_order.value = 0
                     player_order.innerHTML = 1
-                    player_order.style.display="none"
+                    {#player_order.style.display="none"#}
+                    player_order.classList.add('d-none')
                     var player_id = itemEl.dataset.playerId
                     refresh_lineup_order()
                 }

@@ -1,0 +1,86 @@
+<table class="table table-sm">
+    <thead>
+    <tr class="border border-light">
+        {#    <th scope="col" style="display: none"></th>#}
+        {#    <th scope="col" class="border border-light"></th>#}
+        {#    <th scope="col">Name</th>#}
+        {#    <th scope="col">Pos</th>#}
+    </tr>
+    </thead>
+    <tbody id={{ table_id }}>
+    {% for form in formset %}
+        <tr data-player-id="{{ form.instance.player.id }}"
+            data-position="{{ form.instance.position }}"
+            data-order="{{ form.instance.order }}">
+            {{ form.id.as_hidden }}
+            {{ form.event.as_hidden }}
+            {{ form.order.as_hidden }}
+            {{ form.player.as_hidden }}
+            {{ form.teamsnap_id.as_hidden }}
+            <td id="player-availability-{{ form.instance.player.id }}"
+                class="{{ available_class }}"
+            >
+                {% if form.availability.available == 1 %}
+                    <button class="btn btn-light bg-info p-1"
+                            id="player-available-{{ form.instance.player.id }}"
+                    >
+                        <span style="visibility: hidden">2</span>
+                        <span class="visually-hidden">Maybe</span>
+                    </button>
+                {% elif form.availability.available == 2%}
+                    <button class="btn btn-light bg-success p-1"
+                            id="player-available-{{ form.instance.player.id }}"
+                    >
+                        <span style="visibility: hidden">1</span>
+                    </button>
+                    <span class="visually-hidden">Yes</span>
+                {% elif form.availability.available == 0%}
+                    <button class="btn btn-light bg-danger p-1"
+                            id="player-available-{{ form.instance.player.id }}"
+                    >
+                        <span style="visibility: hidden">0</span>
+                    </button>
+                    <span class="visually-hidden">No</span>
+                {% else %}
+                    <button class="btn btn-light bg-secondary p-1"
+                            id="player-available-{{ form.instance.player.id }}"
+                    >
+                        <span style="visibility: hidden">X</span>
+                    </button>
+                    <span class="visually-hidden">Unknown</span>
+                {% endif %}
+            </td>
+            <th scope="row"
+                id="player-order-{{ form.instance.player.id }}"
+                class="{{ order_class }}">
+                {% if form.order.value %}
+                    <button type="button"
+                            class="btn btn-light p-1"
+                            id="player-order-button-{{ form.instance.player.id }}"
+                            onclick="toggle_in_lineup(this)"
+                    >
+                        {{ form.order.value }}
+                    </button>
+                {% elif  form.order.value == 0 %}
+                    <button type="button"
+                            class="btn btn-dark p-1"s
+                            id="player-order-button-{{ form.instance.player.id }}"
+                            onclick="toggle_in_lineup(this)"
+                    >
+                        D
+                    </button>
+                {% endif %}
+            </th>
+            <th>
+                {{ form.instance.player.first_name }}&nbsp;{{ form.instance.player.last_name }}&nbsp;
+                <small class="text-muted fw-light">#{{ form.instance.player.jersey_number }}</small>
+                {#        <br><code><small>{{ form.statline }}</small></code>#}
+            </th>
+            <td>
+                {{ form.position }}
+            </td>
+            {#                                    <td>{{ form.instance.position }}</td>#}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

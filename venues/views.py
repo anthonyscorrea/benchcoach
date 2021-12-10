@@ -13,6 +13,7 @@ class VenueListView(BenchcoachListView):
     edit_url = 'edit venue'
     list_url = 'venues list'
     page_title = "Venues"
+    active_tabs = ['venues_tab']
 
 class VenueEditView(BenchcoachEditView):
     Model = Venue

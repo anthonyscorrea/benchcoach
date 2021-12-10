@@ -15,6 +15,7 @@ class PlayerListView(BenchcoachListView):
     page_title = "Players"
     title_strf = "{first_name} {last_name}"
     subtitle_strf = "#{jersey_number}"
+    active_tabs = ['members_tab']
 
 def root(request):
     return redirect('/players/list')
