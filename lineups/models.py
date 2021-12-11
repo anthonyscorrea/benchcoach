@@ -25,6 +25,9 @@ class Positioning(models.Model):
    class Meta:
       unique_together = ('player', 'event',)
 
+   def __str__(self):
+      return f"{self.player}; {self.event};"
+
 class Availability(models.Model):
    YES = 2
    MAYBE = 1

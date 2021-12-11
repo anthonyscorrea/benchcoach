@@ -5,6 +5,8 @@ from events.models import Event
 from players.models import Player
 from django.db.models import Case, When
 from django.urls import reverse
+from django.contrib import messages
+from django.http import HttpResponse
 
 def queryset_from_ids(Model, id_list):
     #https://stackoverflow.com/questions/4916851/django-get-a-queryset-from-array-of-ids-in-specific-order
@@ -18,6 +20,7 @@ def edit(request, event_id):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         formset = PositioningFormSet(request.POST)
+        is_valid = [f.is_valid() for f in formset]
         for form in formset:
             if form.is_valid():
                 # process the data in form.cleaned_data as required
@@ -33,8 +36,18 @@ def edit(request, event_id):
                     positioning = Positioning.objects.create(**form.cleaned_data, event_id=event_id)
                     did_create = True
             else:
+                messages.error(request, f'Error submitting lineup. {form.instance} {form.errors}')
                 pass
-        return render(request, 'success.html', {'call_back':'edit lineup','id':event_id, 'errors':[error for error in formset.errors if error]}, status=200)
+        if (True in is_valid) and (False in is_valid):
+            messages.warning(request, 'Lineup partially submitted.')
+        elif (True in is_valid):
+            messages.success(request, 'Lineup submitted successfully.')
+        elif (True not in is_valid):
+            messages.error(request, f'Error submitting lineup.')
+        else:
+            messages.error(request, f'Error submitting lineup.')
+        # return HttpResponse(status=204)
+        # return render(request, 'success.html', {'call_back':'edit lineup','id':event_id, 'errors':[error for error in formset.errors if error]}, status=200)
     previous_event = Event.objects.filter(id=event_id-1).first()
 
     event = Event.objects.get(id=event_id)
