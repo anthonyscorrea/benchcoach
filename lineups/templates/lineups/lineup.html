@@ -22,10 +22,25 @@
 
 {% endblock %}{% endwith %}
 {% block content %}
-    <div id="pills-tabContent" class="container-fluid tab-content bg-white my-1" data-toggle="tab">
+    <div id="pills-tabContent" class="container-fluid tab-content my-1" data-toggle="tab">
     <div id="event-details" class="tab-pane show active" role="tabpanel" aria-labelledby="event-details-tab">
         <div>
-            {% include 'lineups/info-table.html' with d=details %}
+            <div class="card my-1">
+                <div class="card-header d-inline-flex">
+                            <div class="d-inline-flex flex-grow-1"><h5>Event</h5></div>
+                            <div class="d-inline-flex">
+                                <button class="btn btn-sm btn-outline-secondary d-xl-flex align-items-xl-center mx-1" type="button">
+                                <i class="bi bi-arrow-clockwise"></i>TeamSnap
+                                </button>
+                                <button type="button" value="Submit" class="btn btn-sm btn-outline-primary d-xl-flex align-items-xl-center mx-1">
+                                    <i class="bi bi-pencil-square mx-1"></i>Edit
+                                </button>
+                            </div>
+                        </div>
+                <div class="card-body p-0">
+                    {% include 'lineups/info-table.html' with d=details %}
+                </div>
+            </div>
         </div>
     </div>
     <div id="event-lineup" class="tab-pane" role="tabpanel" aria-labelledby="event-lineup-tab">
@@ -33,7 +48,6 @@
             {% csrf_token %}
             {{ formset.management_form }}
             <div class="row">
-{#                    <input type="submit" value="Submit" class="btn btn-sm btn-success mx-3 my-0 my-0">#}
                 <div class="col-md-6">
                     <div class="card my-1">
                         <div class="card-header d-inline-flex">

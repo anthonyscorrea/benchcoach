@@ -84,13 +84,6 @@ def edit(request, event_id):
         # "TeamSnap Link": event.event_set.first()
         "TeamSnap Link": f'<a href="{reverse("teamsnap edit event", kwargs={"id": event.event_set.first().id})}"> {event.event_set.first()} </a>' if event.event_set.first() else None
     }
-    # <p class="m-1">Away Team: {{ event.away_team.name }}</p>
-    # <p class="m-1">Home Team: {{ event.home_team.name }}</p>
-    # <p class="m-1">Day: {{ event.start|date:"l, F j Y" }}</p>
-    # <p class="m-1">Time: {{ event.start|date:"g:i A" }}</p>
-    # <p class="m-1">Venue: {{ event.venue.name }}</p>
-    # <p class="m-1">TeamSnap Link: <a href="{% url "teamsnap edit event" event.event_set.first.id %}">{{ event.event_set.first }}</a> </p>
-
 
     return render(request, 'lineups/lineup.html', {'title': 'Lineup',
                                                    'event': event,                                               'details':details,
