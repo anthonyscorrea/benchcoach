@@ -53,18 +53,16 @@
                         <div class="card-header d-inline-flex">
                             <div class="d-inline-flex flex-grow-1"><h5>Lineup</h5></div>
                             <div>
-                                <input type="submit" value="Submit" class="btn btn-sm btn-outline-success d-xl-flex align-items-xl-center">
+                                <input type="submit" value="Submit" class="btn btn-sm btn-success d-xl-flex align-items-xl-center">
                             </div>
                         </div>
                         <div class="card-body p-0">
                             {% include 'lineups/player-table.html' with table_id="dhd" formset=formset_dhd available_class="d-none" %}
-                        </div>
 
-{#                        <div class="card-header"><h5>Lineup</h5></div>#}
-                        <div class="card-body p-0">
-                            {% include 'lineups/player-table.html' with table_id="lineup" formset=formset_lineup available_class="d-none"%}
+                        <hr class="m-0">
+                        {% include 'lineups/player-table.html' with table_id="lineup" formset=formset_lineup available_class="d-none"%}
                         </div>
-                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
