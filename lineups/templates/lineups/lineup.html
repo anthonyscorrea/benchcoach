@@ -36,25 +36,38 @@
 {#                    <input type="submit" value="Submit" class="btn btn-sm btn-success mx-3 my-0 my-0">#}
                 <div class="col-md-6">
                     <div class="card my-1">
-                        <div class="card-header"><h5>DH'd</h5></div>
-                        <div class="card-body p-0">
-                            {% include 'lineups/player-table.html' with table_id="dhd" formset=formset_dhd available_class="d-none" order_class="d-none"%}
+                        <div class="card-header d-inline-flex">
+                            <div class="d-inline-flex flex-grow-1"><h5>Lineup</h5></div>
+                            <div>
+                                <input type="submit" value="Submit" class="btn btn-sm btn-outline-success d-xl-flex align-items-xl-center">
+                            </div>
                         </div>
-                    </div>
-                    <div class="card my-1">
-                        <div class="card-header"><h5>Lineup</h5></div>
+                        <div class="card-body p-0">
+                            {% include 'lineups/player-table.html' with table_id="dhd" formset=formset_dhd available_class="d-none" %}
+                        </div>
+
+{#                        <div class="card-header"><h5>Lineup</h5></div>#}
                         <div class="card-body p-0">
                             {% include 'lineups/player-table.html' with table_id="lineup" formset=formset_lineup available_class="d-none"%}
-                            <div class="justify-content-md-end d-md-flex m-2"><input type="submit" value="Submit" class="btn btn-primary"></div>
                         </div>
-                    </div>
+                        </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="card my-1">
-                        <div class="card-header"><h5>Bench</h5></div>
+                        <div class="card-header d-inline-flex">
+                            <div class="d-inline-flex flex-grow-1">
+                                <h5>Bench</h5>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary d-xl-flex align-items-xl-center" type="button">
+                                <i class="bi bi-arrow-clockwise"></i>TeamSnap
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="card-body p-0">
-                            {% include 'lineups/player-table.html' with table_id="bench" formset=formset_bench order_class="d-none" available_class="d-none"%}
+                            {% include 'lineups/player-table.html' with table_id="bench" formset=formset_bench order_class="d-none" %}
                         </div>
                     </div>
                 </div>
@@ -67,38 +80,57 @@
     <script id="sortable">
         function refresh_lineup_order (){
             var player_rows = document.getElementById('lineup').querySelectorAll('tr')
-            var has_dh = false
-
             for (let i = 0; i < player_rows.length; i++) {
-                if (player_rows[i].dataset.order == 0) {
-                    has_dh = true
-                    continue
-                }
-                if (has_dh) {
-                    player_rows[i].dataset.order = i
-                }
-                else {
-                    player_rows[i].dataset.order = i+1
-                }
-                var player_order = player_rows[i].querySelector('[id^="player-order-button"]')
+                var player_order = player_rows[i].querySelector('[id^="player-order"]')
                 var form_element_order = player_rows[i].querySelector('[id$="order"]')
-                player_order.innerText = parseInt(player_rows[i].dataset.order)
-                form_element_order.value = parseInt(player_rows[i].dataset.order)
+                {#player_order.innerText = parseInt(player_rows[i].dataset.order)#}
+                player_rows[i].dataset.order = i+1
+                form_element_order.value = i+1
+                player_order.innerHTML = i+1
+            }
+            var player_rows = document.getElementById('bench').querySelectorAll('tr')
+            for (let i = 0; i < player_rows.length; i++) {
+                var player_order = player_rows[i].querySelector('[id^="player-order"]')
+                var form_element_order = player_rows[i].querySelector('[id$="order"]')
+                {#player_order.innerText = parseInt(player_rows[i].dataset.order)#}
+                player_rows[i].dataset.order = null
+                form_element_order.value = null
+                player_order.innerHTML = null
+            }
+            var player_rows = document.getElementById('dhd').querySelectorAll('tr')
+            for (let i = 0; i < player_rows.length; i++) {
+                var player_order = player_rows[i].querySelector('[id^="player-order"]')
+                var form_element_order = player_rows[i].querySelector('[id$="order"]')
+                {#player_order.innerText = parseInt(player_rows[i].dataset.order)#}
+                player_rows[i].dataset.order = 0
+                form_element_order.value = 0
+                player_order.innerHTML = null
             }
         }
-        var lineup = new Sortable.create(
+        var dhd = new Sortable.create(
             document.getElementById('dhd'), {
                 animation: 150,
                 ghostClass: "ghost",
+                handle: ".drag-handle",
                 {#handle: ".bars-move",#}
                 group: {
                     put: true,
                     pull: true
+                },
+                onAdd: function (/**Event*/evt){
+                    // Add to DH'd
+                    var itemEl = evt.item;  // dragged HTMLElement
+                    var player_order = itemEl.querySelector('[id^="player-order"]')
+                    var player_available =itemEl.querySelector('[id^="player-availability"]')
+                    refresh_lineup_order()
+                    player_order.classList.remove('d-none')
+                    player_available.classList.add('d-none')
                 }
             })
         var lineup = new Sortable.create(
             document.getElementById('lineup'), {
                 animation: 150,
+                handle: ".drag-handle",
                 ghostClass:"ghost",
                 {#handle: ".bars-move",#}
                 group:{
@@ -108,20 +140,11 @@
                 onAdd: function (/**Event*/evt) {
                     // Add to Lineup
                     var itemEl = evt.item;  // dragged HTMLElement
-                    var player_id = itemEl.dataset.playerId
-                    console.log(itemEl)
-                    var form_element_order =itemEl.querySelector('[id$="order"]')
                     var player_order = itemEl.querySelector('[id^="player-order"]')
-                    var player_available =itemEl.querySelector('[id^="player-available"]')
-                    var player_order_button =itemEl.querySelector('[id^="player-order-button"]')
-                    console.log(player_order.parentElement.dataset)
-                    toggle_in_lineup(player_order_button)
-                    player_order.parentElement.dataset.order = evt.newIndex
+                    var player_available =itemEl.querySelector('[id^="player-availability"]')
                     refresh_lineup_order()
-                    {#player_available.parentElement.style.display="none"#}
-                    player_available.parentElement.classList.add('d-none')
-                    {#player_order.style.display="table-cell"#}
                     player_order.classList.remove('d-none')
+                    player_available.classList.add('d-none')
                 },
                 onUpdate: function (/**Event*/evt) {
                     console.log('update to lineup')
@@ -134,44 +157,21 @@
                 animation: 150,
                 ghostClass:"ghost",
                 sort: false,
+                handle: ".drag-handle",
                 {#handle: ".bars-move",#}
                 group:{
                     put:true,
                     pull:true
                 },
                 onAdd: function (/**Event*/evt) {
-                    console.log('added to bench')
                     var itemEl = evt.item;  // dragged HTMLElement
-                    console.log(itemEl)
-                    var form_element_order =itemEl.querySelector('[id$="order"]')
                     var player_order = itemEl.querySelector('[id^="player-order"]')
-                    var player_available =itemEl.querySelector('[id^="player-available"]')
-                    {#player_available.parentElement.style.display="table-cell"#}
-                    player_available.parentElement.classList.remove('d-none')
-                    form_element_order.value = 0
-                    player_order.innerHTML = 1
-                    {#player_order.style.display="none"#}
-                    player_order.classList.add('d-none')
-                    var player_id = itemEl.dataset.playerId
+                    var player_available =itemEl.querySelector('[id^="player-availability"]')
                     refresh_lineup_order()
+                    player_order.classList.add('d-none')
+                    player_available.classList.remove('d-none')
                 }
             });
-        function toggle_in_lineup(order_button){
-            var player_row = order_button.parentNode.parentNode
-            if (player_row.dataset.order == 0) {
-                order_button.innerText = "1"
-                order_button.classList.add("btn-light")
-                order_button.classList.remove("btn-dark")
-                player_row.dataset.order = 1
-            }
-            else {
-                order_button.innerText = "D"
-                order_button.classList.remove("btn-light")
-                order_button.classList.add("btn-dark")
-                player_row.dataset.order = 0
-            }
-            refresh_lineup_order()
-                              }
 
     </script>
 
