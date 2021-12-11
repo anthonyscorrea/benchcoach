@@ -20,7 +20,7 @@ class Positioning(models.Model):
       ('DH','DH')
    ]
    position = models.CharField(choices=positions, default=None, max_length=2, null=True, blank=True)
-   order = models.PositiveSmallIntegerField(default=None, null=True)
+   order = models.PositiveSmallIntegerField(default=None, null=True, blank=True)
 
    class Meta:
       unique_together = ('player', 'event',)
