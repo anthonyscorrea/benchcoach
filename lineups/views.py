@@ -4,6 +4,7 @@ from .forms import PositioningFormSet
 from events.models import Event
 from players.models import Player
 from django.db.models import Case, When
+from django.urls import reverse
 
 def queryset_from_ids(Model, id_list):
     #https://stackoverflow.com/questions/4916851/django-get-a-queryset-from-array-of-ids-in-specific-order
@@ -80,7 +81,8 @@ def edit(request, event_id):
         "Date": event.start.date(),
         "Time": event.start.time(),
         "Venue": event.venue,
-        "TeamSnap Link": event.event_set.first()
+        # "TeamSnap Link": event.event_set.first()
+        "TeamSnap Link": f'<a href="{reverse("teamsnap edit event", kwargs={"id": event.event_set.first().id})}"> {event.event_set.first()} </a>' if event.event_set.first() else None
     }
     # <p class="m-1">Away Team: {{ event.away_team.name }}</p>
     # <p class="m-1">Home Team: {{ event.home_team.name }}</p>
