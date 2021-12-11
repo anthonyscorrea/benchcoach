@@ -39,13 +39,15 @@ def edit(request, event_id):
     event = Event.objects.get(id=event_id)
     next_event = Event.objects.get(id=event_id+1)
     players = Player.objects.prefetch_related('availability_set', 'positioning_set')
+    positionings = Positioning.objects.filter(event_id=event_id)
 
     for player in players:
         Positioning.objects.get_or_create(player_id=player.id, event_id=event_id)
 
-    qs_starting_lineup = Positioning.objects.filter(event_id=event_id, order__isnull=False).order_by(
-        'order')
-    qs_bench = Positioning.objects.filter(event_id=event_id, order__isnull=True).prefetch_related(
+    qs_starting_lineup = positionings.filter(order__isnull=False).order_by(
+        'order').prefetch_related(
+        'player__availability_set')
+    qs_bench = positionings.filter(order__isnull=True).prefetch_related(
         'player__availability_set').order_by('player__last_name')
 
     # This is all a compromise to get the sorting just the way I wanted. THERE'S GOT TO BE A BETTER WAY
