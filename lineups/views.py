@@ -35,7 +35,7 @@ def edit(request, event_id):
             else:
                 pass
         return render(request, 'success.html', {'call_back':'edit lineup','id':event_id, 'errors':[error for error in formset.errors if error]}, status=200)
-    previous_event = Event.objects.get(id=event_id-1)
+    previous_event = Event.objects.filter(id=event_id-1).first()
 
     event = Event.objects.get(id=event_id)
     next_event = Event.objects.get(id=event_id+1)
@@ -86,7 +86,8 @@ def edit(request, event_id):
     }
 
     return render(request, 'lineups/lineup.html', {'title': 'Lineup',
-                                                   'event': event,                                               'details':details,
+                                                   'event': event,
+                                                   'details':details,
                                                    'previous_event': previous_event,
                                                    'next_event': next_event,
                                                    'formset': formset,
