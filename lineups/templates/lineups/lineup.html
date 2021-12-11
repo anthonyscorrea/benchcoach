@@ -11,7 +11,7 @@
             <h6 class="text-muted m-1"></h6>
         </div>
         <a class="btn btn-outline-secondary btn-sm align-items-center my-auto my-3 mx-3" href="{% url 'edit lineup' event_id=next_event.id %}" role="button">
-            {{ previous_event.start|date:"D" }}&nbsp;{{ previous_event.start|date:"n/j" }}<i class="bi bi-chevron-right"></i>
+            {{ next_event.start|date:"D" }}&nbsp;{{ next_event.start|date:"n/j" }}<i class="bi bi-chevron-right"></i>
         </a>
     </div>
 
