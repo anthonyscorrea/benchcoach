@@ -26,6 +26,9 @@ class Me (ApiObject):
     def __init__(self, client):
         super().__init__(client=client, rel=self.rel, data=client.get(client.link(self.rel)))
 
+class User (ApiObject):
+    rel = "users"
+
 class Event (ApiObject):
     rel = "events"
 

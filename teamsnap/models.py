@@ -14,14 +14,7 @@ class TeamsnapBaseModel(models.Model):
       abstract = True
 
    def __str__(self):
-      return f"{self.name} ({self.teamsnap_id})"
-
-class User(TeamsnapBaseModel):
-   access_token = models.CharField(max_length = 50)
-   name = None
-
-   def __str__(self):
-      return f"{self.teamsnap_id}"
+      return f"TeamSnap {self.__class__.__name__} Object ({self.teamsnap_id})"
 
 class Team(TeamsnapBaseModel):
    bencoach_team = models.ForeignKey(teams.models.Team, null=True, on_delete=models.CASCADE)
@@ -35,7 +28,7 @@ class Team(TeamsnapBaseModel):
       return f"https://go.teamsnap.com/{self.team.teamsnap_id}/team/edit/{self.teamsnap_id}"
 
 class Location(TeamsnapBaseModel):
-   benchcoach_venue = models.ForeignKey(venues.models.Venue, null=True, on_delete=models.CASCADE)
+   benchcoach_object = models.ForeignKey(venues.models.Venue, null=True, on_delete=models.CASCADE)
 
    @property
    def view_url(self):
@@ -47,7 +40,7 @@ class Location(TeamsnapBaseModel):
 
 class Member(TeamsnapBaseModel):
    name = None
-   benchcoach_player = models.ForeignKey(players.models.Player, null=True, on_delete=models.CASCADE)
+   benchcoach_object = models.ForeignKey(players.models.Player, null=True, on_delete=models.CASCADE)
    team = models.ForeignKey(Team, null=True, on_delete=models.CASCADE)
    first_name = models.CharField(max_length = 50, null=True)
    last_name = models.CharField(max_length = 50, null=True)
@@ -66,7 +59,8 @@ class Member(TeamsnapBaseModel):
       return f"https://go.teamsnap.com/{self.team.teamsnap_id}/roster/edit/{self.teamsnap_id}"
 
 class Event(TeamsnapBaseModel):
-   benchcoach_event = models.ForeignKey(events.models.Event, null=True, on_delete=models.CASCADE)
+   name = None
+   benchcoach_object = models.ForeignKey(events.models.Event, null=True, on_delete=models.CASCADE)
    label = models.CharField(max_length = 50, null=True)
    start_date = models.DateTimeField(null=True)
    opponent = models.ForeignKey(Team, null=True, on_delete=models.CASCADE, related_name="opponent")
@@ -99,7 +93,7 @@ class Availability(TeamsnapBaseModel):
    team = models.ForeignKey(Team, null=True, on_delete=models.CASCADE)
    event = models.ForeignKey(Event, null=True, on_delete=models.CASCADE)
    member = models.ForeignKey(Member, null=True, on_delete=models.CASCADE)
-   benchcoach_availability =  models.ForeignKey(lineups.models.Availability, null=True, on_delete=models.CASCADE)
+   benchcoach_object =  models.ForeignKey(lineups.models.Availability, null=True, on_delete=models.CASCADE)
    status_code = models.SmallIntegerField(null=True, choices=status_codes, default=None)
 
    def __str__(self):
@@ -131,3 +125,10 @@ class LineupEntry(TeamsnapBaseModel):
 
    class Meta:
       unique_together = ('member', 'event',)
+
+class User(TeamsnapBaseModel):
+   name = None
+   first_name = models.CharField(max_length=50, null=True)
+   last_name = models.CharField(max_length = 50, null=True)
+   email = models.EmailField(null=True)
+   managed_teams = models.ManyToManyField(Team)
