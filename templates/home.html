@@ -1,12 +1,25 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load static %}
 
 {% block title %}Bench Coach Home{% endblock %}
 
 {% block content %}
-<h1>Home</h1>
-    List of pages:
-{% for page in pages %}
-<li><a style="text-transform:capitalize;" href="{% url page %}">{{ page }} </a></li>
-{% endfor %}
+    <div class="text-center my-2">
+    <h1><img class="mx-auto" src="{% static 'benchcoach.svg' %}" style="width: 64px;" /><span class="text-nowrap"><strong>Welcome to Bench Coach</strong></span></h1>
+    <div class="col-lg-6 m-auto">
+        <p class="lead mb-4 d-none">Quisque at curabitur mollis ornare, malesuada maecenas. Orci elit tristique, malesuada eu pharetra. Est praesent tortor porttitor aptent, amet quisque.</p>
+{#        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mx-1">#}
+{#            <button class="btn btn-primary" type="button">Login</button><button class="btn btn-outline-secondary" type="button">Sign Up</button>#}
+{#        </div>#}
+    </div>
+        <div class="container-sm">
+            <div class="list-group">
+                {% for page in pages %}
+                    <li class="list-group-item"><a style="text-transform:capitalize;"
+                                                   href="{% url page %}">{{ page }} </a></li>
+                {% endfor %}
+            </div>
+        </div>
+
+</div>
 
 {% endblock %}
