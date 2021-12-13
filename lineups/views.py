@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Positioning
-from .forms import PositioningFormSet
+from .forms import PositioningFormSet, TeamsnapEventForm
 from events.models import Event
 from players.models import Player
 from django.db.models import Case, When
@@ -88,20 +88,26 @@ def edit(request, event_id):
     formset_dhd = [f for f in formset if not f.instance.order and f.instance.position]
     formset_bench = [f for f in formset if f not in formset_lineup and f not in formset_dhd]
 
+    teamsnap_form = TeamsnapEventForm(instance=event)
+
     details = {
         "Away Team": event.away_team,
         "Home Team": event.home_team,
         "Date": event.start.date(),
         "Time": event.start.time(),
         "Venue": event.venue,
+        "TeamSnap": teamsnap_form
         # "TeamSnap Link": event.event_set.first()
-        "TeamSnap Link": f'<a href="{reverse("teamsnap edit event", kwargs={"id": event.event_set.first().id})}"> {event.event_set.first()} </a>' if event.event_set.first() else None
+        # "TeamSnap Link": f'<a href="{reverse("teamsnap edit event", kwargs={"id": event.event_set.first().id})}"> {event.event_set.first()} </a>' if event.event_set.first() else None
     }
+
+
 
     return render(request, 'lineups/lineup.html', {'title': 'Lineup',
                                                    'event': event,
                                                    'details':details,
                                                    'previous_event': previous_event,
+                                                   'teamsnap_form': teamsnap_form,
                                                    'next_event': next_event,
                                                    'formset': formset,
                                                    'formset_lineup':formset_lineup,

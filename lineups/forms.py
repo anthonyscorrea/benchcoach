@@ -4,6 +4,7 @@ from events.models import Event
 from players.models import Player
 from django.forms import modelformset_factory, inlineformset_factory, BaseModelFormSet,formset_factory
 from crispy_forms.helper import FormHelper, Layout
+from teamsnap.models import Event as TeamsnapEvent
 
 class PositioningForm(forms.ModelForm):
     availability = None
@@ -20,5 +21,24 @@ PositioningFormSet = modelformset_factory(
     # fields=['order', 'position','player'],
     # min_num=9,
     extra=0
-
 )
+
+class TeamsnapEventForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(TeamsnapEventForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.event_set.first():
+            initial = (self.instance.event_set.first().id, self.instance.event_set.first())
+        else:
+            initial = None
+        self.fields = {}
+        choices = [("","-----")]
+        choices += [(choice.id, choice) for choice in TeamsnapEvent.objects.all()]
+        self.fields['teamsnap event'] = forms.MultipleChoiceField(
+            widget=forms.Select(attrs={'class': 'form-control'}),
+            choices=choices,
+            initial=initial
+        )
+
+    class Meta:
+        model = Event
+        fields = ['start', 'home_team', 'away_team', 'venue']

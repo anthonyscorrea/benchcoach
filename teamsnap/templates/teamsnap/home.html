@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %} {{ title }}{% endblock %}
+
+{% block content %}
+
+    <h1>Currently Logged in as</h1>
+    <p><b>BenchCoach: </b>{{ user }} ({{ user.email }})</p>
+    <p><b>TeamSnap: </b>{{ teamsnap_user.email }}</p>
+
+{% endblock %}

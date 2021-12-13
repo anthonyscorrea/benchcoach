@@ -4,10 +4,13 @@ from django.shortcuts import render, redirect
 from .models import User, Member, Team, Event, Location, LineupEntry
 from django.views.generic.list import ListView
 from lib.views import BenchcoachListView
-from .forms import LineupEntryForm, LineupEntryFormSet
+from .forms import LineupEntryForm, LineupEntryFormSet, EventForm, EventFormSet
 from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.db.models import Case, When
+from django.views import View
+from django.http import HttpResponse
+from benchcoach.models import Profile as BenchcoachUser
 
 def queryset_from_ids(Model, id_list):
     #https://stackoverflow.com/questions/4916851/django-get-a-queryset-from-array-of-ids-in-specific-order
@@ -18,6 +21,22 @@ def queryset_from_ids(Model, id_list):
 def edit_event(request, id):
     event = Event.objects.get(id = id)
     return redirect(event.edit_url)
+
+def home(request):
+    current_benchcoach_user = BenchcoachUser.objects.get(id=1)
+    current_teamsnap_user = current_benchcoach_user.teamsnap_user
+    context= {
+        'user': request.user,
+        'benchcoach_user': current_benchcoach_user,
+        'teamsnap_user': current_teamsnap_user
+    }
+    return render(request, 'teamsnap/home.html', context)
+
+class EventsTableView(View):
+    def get(self, request):
+        qs = Event.objects.all()
+        formset = EventFormSet(queryset=qs)
+        return render(request,'teamsnap/event-table.html', context={'formset':formset})
 
 class EventsListView(BenchcoachListView):
     Model = Event
