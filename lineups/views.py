@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Positioning
+from .models import Positioning,Availability
 from .forms import PositioningFormSet, TeamsnapEventForm
 from events.models import Event
 from players.models import Player
@@ -7,6 +7,8 @@ from django.db.models import Case, When
 from django.urls import reverse
 from django.contrib import messages
 from django.http import HttpResponse
+from django.db.models import Prefetch
+from django.db.models import F
 
 def queryset_from_ids(Model, id_list):
     #https://stackoverflow.com/questions/4916851/django-get-a-queryset-from-array-of-ids-in-specific-order
@@ -53,36 +55,14 @@ def edit(request, event_id):
     event = Event.objects.get(id=event_id)
     next_event = Event.objects.get(id=event_id+1)
     players = Player.objects.prefetch_related('availability_set', 'positioning_set')
-    positionings = Positioning.objects.filter(event_id=event_id)
 
     for player in players:
         Positioning.objects.get_or_create(player_id=player.id, event_id=event_id)
 
-    qs_starting_lineup = positionings.filter(order__isnull=False).order_by(
-        'order').prefetch_related(
-        'player__availability_set')
-    qs_bench = positionings.filter(order__isnull=True).prefetch_related(
-        'player__availability_set').order_by('player__last_name')
+    qs = event.positioning_set.all().filter(player__availability__event=event_id).order_by(
+        'order','-player__availability__available','player__last_name').annotate(event_availability=F('player__availability__available'))
 
-    # This is all a compromise to get the sorting just the way I wanted. THERE'S GOT TO BE A BETTER WAY
-    ids_starting_lineup = [item.id for item in qs_starting_lineup]
-    ids_bench_available = [item.id for item in qs_bench
-                           if item.player.availability_set.get(event_id=event_id).available == 2]
-    ids_bench_maybe = [item.id for item in qs_bench
-                       if item.player.availability_set.get(event_id=event_id).available == 1]
-    ids_bench_no = [item.id for item in qs_bench
-                    if item.player.availability_set.get(event_id=event_id).available == 0]
-    ids_bench_unknown = [item.id for item in qs_bench
-                         if item.player.availability_set.get(event_id=event_id).available == -1]
-    qset = queryset_from_ids(Positioning,
-                             ids_starting_lineup + ids_bench_available + ids_bench_maybe + ids_bench_no + ids_bench_unknown)
-
-    formset = PositioningFormSet(queryset=qset)
-
-    for f in formset:
-        if f.instance.player_id:
-            f.availability = f.instance.player.availability_set.get(event_id=event_id)
-            # f.statline = f.instance.player.statline_set.get()
+    formset = PositioningFormSet(queryset=qs)
 
     formset_lineup = [f for f in formset if f.instance.order]
     formset_dhd = [f for f in formset if not f.instance.order and f.instance.position]

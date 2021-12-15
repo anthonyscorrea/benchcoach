@@ -15,12 +15,12 @@
                 {% if form.order.value > 0 %} {{ form.order.value }} {% endif %}
                 </span>
 
-                <span id="player-availability-{{ form.instance.player.id }}" class="mx-1 {{ available_class }}">
-                {% if form.availability.available == 2 %}
+                    <span id="player-availability-{{ form.instance.player.id }}" class="{{ available_class }}">
+                {% if form.instance.event_availability == 2 %}
                     <i class="bi bi-circle-fill text-success"></i>
-                {% elif form.availability.available == 1 %}
+                {% elif form.instance.event_availabilitye == 1 %}
                     <i class="bi bi-circle-fill text-info"></i>
-                {% elif form.availability.available == 0 %}
+                {% elif form.instance.event_availability == 0 %}
                     <i class="bi bi-circle-fill text-danger"></i>
                 {% else %}
                     <i class="bi bi-circle-fill text-secondary"></i>
