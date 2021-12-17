@@ -1,4 +1,4 @@
-<table class="table table-sm my-0" style="min-height: 2em">
+<table class="table table-sm my-0">
     <tbody id={{ table_id }}>
     {% for form in formset %}
         <tr data-player-id="{{ form.instance.player.id }}"
@@ -10,8 +10,9 @@
             {{ form.player.as_hidden }}
             {{ form.teamsnap_id.as_hidden }}
 
-            <th scope="row" class="col-1">
-                <span id="player-order-{{ form.instance.player.id }}">
+            <td class="col-1">
+                <div class="mx-1">
+                    <span id="player-order-{{ form.instance.player.id }}">
                 {% if form.order.value > 0 %} {{ form.order.value }} {% endif %}
                 </span>
 
@@ -26,8 +27,8 @@
                     <i class="bi bi-circle-fill text-secondary"></i>
                 {% endif %}
                 </span>
-
-            </th>
+                </div>
+            </td>
 
             <th>
 
