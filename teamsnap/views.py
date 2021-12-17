@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 
-# from .teamsnap.api import TeamSnap, Team, Event, Availability
+from .teamsnap.api import Event as TsApiEvent
+from .teamsnap.api import TeamSnap
 from .models import User, Member, Team, Event, Location, LineupEntry
 from django.views.generic.list import ListView
 from lib.views import BenchcoachListView
@@ -11,6 +12,11 @@ from django.db.models import Case, When
 from django.views import View
 from django.http import HttpResponse
 from benchcoach.models import Profile as BenchcoachUser
+from events.models import Event as BenchcoachEvent
+import teamsnap.teamsnap.api
+import json
+from django.http import JsonResponse
+from .utils.import_teamsnap import update_users, update_teams, update_events, update_members, update_locations, update_availabilities
 
 def queryset_from_ids(Model, id_list):
     #https://stackoverflow.com/questions/4916851/django-get-a-queryset-from-array-of-ids-in-specific-order
@@ -70,65 +76,40 @@ class LocationListView(BenchcoachListView):
     list_url = 'teamsnap list locations'
     page_title = "TeamSnap Locations"
 
-def edit_lineup(request, event_id):
+def update_from_teamsnap_event(request):
+    TOKEN = BenchcoachUser.objects.get(id=1).teamsnap_access_token
+    CLIENT = TeamSnap(token=TOKEN)
+    teamsnap_event_id=request.POST.get('teamsnap event')
+    benchcoach_event_id=request.POST.get('teamsnap event')
+    if teamsnap_event_id:
+        benchcoach_event = BenchcoachEvent.objects.get(id=benchcoach_event_id)
+        teamsnap_object = Event.objects.get(id=teamsnap_event_id)
+        teamsnap_id = teamsnap_object.teamsnap_id
+        teamsnap_response = TsApiEvent.search(client=CLIENT, id=teamsnap_id)
+        if teamsnap_response[0]:
+            data = teamsnap_response[0].data
+            location = Location.objects.get(teamsnap_id=data['location_id'])
+            opponent = Team.objects.get(teamsnap_id=data['opponent_id'])
 
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        formset = LineupEntryFormSet(request.POST)
-        for form in formset:
-            if form.is_valid():
-                # process the data in form.cleaned_data as required
-                # ...
-                # redirect to a new URL:
+    return HttpResponse(f'Success, {data}')
 
-                if isinstance(form.cleaned_data['id'], LineupEntry):
-                    positioning_id = form.cleaned_data.pop('id').id #FIXME this is a workaround, not sure why it is necessary
-                    positioning = LineupEntry.objects.filter(id=positioning_id)
-                    positioning.update(**form.cleaned_data)
-                    did_create = False
-                else:
-                    positioning = LineupEntry.objects.create(**form.cleaned_data, event_id=event_id)
-                    did_create = True
-            else:
-                pass
-        return render(request, 'success.html', {'call_back':'teamsnap edit lineup','id':event_id, 'errors':[error for error in formset.errors if error]}, status=200)
-            # return render(request, 'success.html', {'call_back':'schedule'})
-    event = Event.objects.get(id=event_id)
-    members = Member.objects.filter(is_non_player=False).prefetch_related('availability_set', 'lineupentry_set')
-    # players_d.sort(key=lambda d: (-d['availability'].available, d['last_name']))
+def sync_teamsnap(request):
+    TOKEN = request.user.profile.teamsnap_access_token
+    USER_ID = request.user.profile.teamsnap_user.id
+    TEAM_ID = request.user.profile.teamsnapsettings.managed_team.id
+    CLIENT = TeamSnap(token=TOKEN)
+    l = []
+    l += update_users(CLIENT, id=USER_ID)
+    l += update_teams(CLIENT, team_id=TEAM_ID)
+    l += update_members(CLIENT, team_id=TEAM_ID)
+    l += update_locations(CLIENT, team_id=TEAM_ID)
+    l += update_events(CLIENT, team_id=TEAM_ID)
+    l += update_availabilities(CLIENT, team_id=TEAM_ID)
 
-    for member in members:
-        LineupEntry.objects.get_or_create(member_id=member.id, event_id=event_id)
+    return JsonResponse({'number of objects updated':len(l)})
 
-    qs_starting_lineup = LineupEntry.objects.filter(event_id=event_id, sequence__isnull=False, sequence__gt=0).order_by('sequence')
-    qs_bench = LineupEntry.objects.filter(event_id=event_id, sequence=0).prefetch_related('member__availability_set').order_by('member__last_name')
 
-    # This is all a compromise to get the sorting just the way I wanted. THERE'S GOT TO BE A BETTER WAY
-    ids_starting_lineup = [item.id for item in qs_starting_lineup]
-    ids_bench_available = [item.id for item in qs_bench
-                           if item.member.availability_set.get(event_id=event_id).status_code == 1]
-    ids_bench_maybe = [item.id for item in qs_bench
-                           if item.member.availability_set.get(event_id=event_id).status_code == 2]
-    ids_bench_no = [item.id for item in qs_bench
-                       if item.member.availability_set.get(event_id=event_id).status_code == 0]
-    ids_bench_unknown = [item.id for item in qs_bench
-                    if item.member.availability_set.get(event_id=event_id).status_code is None]
-    qset = queryset_from_ids(LineupEntry, ids_starting_lineup + ids_bench_available + ids_bench_maybe + ids_bench_no + ids_bench_unknown)
 
-    formset = LineupEntryFormSet(queryset=qset)
 
-    for f in formset:
-        if f.instance.member_id:
-            f.availability = f.instance.member.availability_set.get(event_id=event_id)
-            # f.statline = f.instance.member.statline_set.get()
 
-    formset_lineup = [f for f in formset if f.instance.sequence]
-    formset_bench = [f for f in formset if f not in formset_lineup]
-    formset_dhd = [f for f in formset if not f.instance.sequence and f.instance.label]
 
-    return render(request, 'teamsnap/lineup.html', {'title': 'Lineup',
-                                                   'event': event,
-                                                   'formset_lineup': formset_lineup,
-                                                    'formset_bench':formset_bench,
-                                                    'formset_dhd':formset_dhd
-                                                   })

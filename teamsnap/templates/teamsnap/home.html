@@ -6,5 +6,44 @@
     <h1>Currently Logged in as</h1>
     <p><b>BenchCoach: </b>{{ user }} ({{ user.email }})</p>
     <p><b>TeamSnap: </b>{{ teamsnap_user.email }}</p>
+    <p><b>TeamSnap Managed Team: </b>{{ teamsnap_team.name }}</p>
+
+    <button type="button" class="btn btn-primary m-1" onclick="sync_teamsnap_db()">
+        Sync TeamSnap DB
+        <div id="teamsnap-sync-spinner" class="spinner-border spinner-border-sm d-none" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </button>
+
+    <textarea id="output_box" name="comment" disabled class="w-100 m" style="min-height: 400px"></textarea>
+    <button type="button" class="btn btn-outline-secondary m-1" onclick="clear_output_box()">Clear</button>
+    <script>
+        const output_box = document.getElementById("output_box");
+        const progress_spinner = document.getElementById("teamsnap-sync-spinner")
+        function sync_teamsnap_db(){
+            const Http = new XMLHttpRequest();
+            const url='{% url 'sync teamsnap' %}';
+            console.log(progress_spinner)
+            progress_spinner.classList.remove("d-none");
+            fetch(url)
+                .then((response) => {
+                    progress_spinner.classList.add("d-none")
+                    return response.json();
+                })
+                .then((myJson) => {
+                    var s = 'Number of objects updated: '
+                    for (i in myJson) {
+                        s += myJson[i]
+                        {#s += myJson[i].name +" ("+ myJson[i].id+")"  + "\r\n"#}
+                    }
+                    output_box.value = s;
+                });
+        }
+
+        function clear_output_box(){
+            progress_spinner.classList.add('d-none')
+        }
+
+    </script>
 
 {% endblock %}

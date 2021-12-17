@@ -1,3 +1,3 @@
-from .api import TeamSnap
-
-__all__ = ['TeamSnap']
+# from .utils import TeamSnap
+#
+# __all__ = ['TeamSnap']
