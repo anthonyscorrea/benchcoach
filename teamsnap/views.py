@@ -23,12 +23,13 @@ def edit_event(request, id):
     return redirect(event.edit_url)
 
 def home(request):
-    current_benchcoach_user = BenchcoachUser.objects.get(id=1)
-    current_teamsnap_user = current_benchcoach_user.teamsnap_user
+    current_benchcoach_user = request.user
+    current_teamsnap_user = request.user.profile.teamsnap_user
+    current_teamsnap_team = request.user.profile.teamsnapsettings.managed_team
     context= {
-        'user': request.user,
         'benchcoach_user': current_benchcoach_user,
-        'teamsnap_user': current_teamsnap_user
+        'teamsnap_user': current_teamsnap_user,
+        'teamsnap_team':current_teamsnap_team
     }
     return render(request, 'teamsnap/home.html', context)
 

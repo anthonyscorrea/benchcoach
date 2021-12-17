@@ -18,7 +18,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
-from .views import welcome
+from .views import welcome, user_login
 
 urlpatterns = [
     path('', welcome, name="home"),
@@ -28,5 +28,6 @@ urlpatterns = [
     path('venues/', include('venues.urls')),
     path('players/', include('players.urls')),
     path('lineups/', include('lineups.urls')),
-path('teamsnap/', include('teamsnap.urls'))
+path('teamsnap/', include('teamsnap.urls')),
+    path('login', user_login, name="login")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

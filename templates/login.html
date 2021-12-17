@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% load static %}
+
+{% block title %}Bench Coach Home{% endblock %}
+
+{% block content %}
+    <form method="post" action="{% url "login" %}">
+ {% csrf_token %}
+
+  <header>Login</header>
+  <label>Username <span>*</span></label>
+  <input type="text"   name="username" placeholder="Username" required="" />
+  <div class="help">At least 5 character</div>
+  <label>Password <span>*</span></label>
+  <input type="password"  name="password" placeholder="Password" required="" />
+  <div class="help">Use upper and lowercase letters as well</div>
+  <button type="submit">Login</button>
+
+</form>
+
+{% endblock %}
