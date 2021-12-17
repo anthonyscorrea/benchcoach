@@ -3,7 +3,7 @@
 *.pot
 *.pyc
 __pycache__
-db.sqlite3
+*.sqlite3
 media
 /data
 
@@ -91,3 +91,4 @@ venv.bak/
 
 scripts/
 /.idea/benchcoach.iml
+/db_back.sqlite3
