@@ -26,8 +26,8 @@ PositioningFormSet = modelformset_factory(
 class TeamsnapEventForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(TeamsnapEventForm, self).__init__(*args, **kwargs)
-        if self.instance and self.instance.event_set.first():
-            initial = (self.instance.event_set.first().id, self.instance.event_set.first())
+        if self.instance and self.instance.teamsnap_event.first():
+            initial = (self.instance.teamsnap_event.first().id, self.instance.teamsnap_event.first())
         else:
             initial = None
         self.fields = {}

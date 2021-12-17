@@ -8,8 +8,17 @@
                 </a>
             {% endif %}
             <div>
-                <h5 class="text-center m-1">{{ event.away_team.name }} vs. {{ event.home_team.name }}</h5>
-                <p class="text-center text-muted m-1">{{ event.start|date:"l, F j, Y g:i A" }}<br>{{ event.venue.name }}</p>
+                <h5 class="text-center m-1 d-none d-md-block">{{ event.away_team.name }} vs. {{ event.home_team.name }}</h5>
+                <h5 class="text-center my-0 d-md-none">
+                    {% if event.home_team.name == "Hounds" %}
+                        v{{ event.away_team }}
+                    {% endif %}
+                    {% if event.away_team.name == "Hounds" %}
+                        @{{ event.home_team }}
+                    {% endif %}
+                </h5>
+                <p class="text-center text-muted m-1 d-none d-md-block">{{ event.start|date:"l, F j, Y g:i A" }}<br>{{ event.venue.name }}</p>
+                <p class="text-center text-muted my-0 d-md-none">{{ event.start|date:"D" }}&nbsp;{{ event.start|date:"n/j" }}, {{ event.start|date:"g:i" }}<br><span class="text-truncate">{{ event.venue.name }}</span></p>
                 <h6 class="text-muted m-1"></h6>
             </div>
             {% if next_event %}
@@ -29,17 +38,19 @@
     {% include 'messages.html' %}
     <div id="pills-tabContent" class="container-fluid tab-content my-1" data-toggle="tab">
         <div id="event-details" class="tab-pane show active" role="tabpanel" aria-labelledby="event-details-tab">
+            <form method="post" action="{% url "update from teamsnap" %}">{% csrf_token %}
+                <input type="hidden" name="event_id" value={{ event.id }}>
             <div>
                 <div class="card my-1">
                     <div class="card-header d-inline-flex">
                         <div class="d-inline-flex flex-grow-1"><h5>Event</h5></div>
                         <div class="d-inline-flex">
-                            <button class="btn btn-sm btn-outline-secondary d-xl-flex align-items-xl-center mx-1" type="button">
-                                <i class="bi bi-arrow-clockwise"></i>TeamSnap
-                            </button>
-                            <button type="button" value="Submit" class="btn btn-sm btn-outline-primary d-xl-flex align-items-xl-center mx-1">
-                                <i class="bi bi-pencil-square mx-1"></i>Edit
-                            </button>
+                                <button class="btn btn-sm btn-outline-secondary d-xl-flex align-items-xl-center mx-1" type="submit">
+                                    <i class="bi bi-arrow-clockwise"></i>TeamSnap
+                                </button>
+                                <button type="button" value="Submit" class="btn btn-sm btn-outline-primary d-xl-flex align-items-xl-center mx-1">
+                                    <i class="bi bi-pencil-square mx-1"></i>Edit
+                                </button>
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -47,6 +58,7 @@
                     </div>
                 </div>
             </div>
+            </form>
         </div>
         <div id="event-lineup" class="tab-pane" role="tabpanel" aria-labelledby="event-lineup-tab">
             <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
