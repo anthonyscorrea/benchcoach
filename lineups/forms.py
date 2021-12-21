@@ -3,7 +3,6 @@ from .models import Positioning
 from events.models import Event
 from players.models import Player
 from django.forms import modelformset_factory, inlineformset_factory, BaseModelFormSet,formset_factory
-from crispy_forms.helper import FormHelper, Layout
 from teamsnap.models import Event as TeamsnapEvent
 
 class PositioningForm(forms.ModelForm):
