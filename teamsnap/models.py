@@ -1,17 +1,14 @@
 from django.db import models
 
-import lineups.models
-import teams.models
-import venues.models
-import players.models
-import events.models
+import benchcoach.models
+import teamsnap.teamsnap.api
 
 class TeamsnapBaseModel(models.Model):
    type = None
    id = models.CharField(max_length=50, unique=True, primary_key=True)
-   name = models.CharField(max_length=50, null=True)
    created_at = models.DateTimeField(null=True)
    updated_at = models.DateTimeField(null=True)
+   ApiObject = teamsnap.teamsnap.api.ApiObject
 
    class Meta:
       abstract = True
@@ -25,44 +22,124 @@ class TeamsnapBaseModel(models.Model):
 
 class Team(TeamsnapBaseModel):
    type = 'team'
-   managed_by_team = None
-   benchcoach_object = models.ForeignKey(teams.models.Team, null=True, on_delete=models.CASCADE,related_name="teamsnapteam")
+   name = models.CharField(max_length=50, null=True)
+   benchcoach_object = models.OneToOneField(
+      benchcoach.models.Team,
+      null=True,
+      on_delete=models.CASCADE,
+      related_name="teamsnap_team"
+   )
+   ApiObject = teamsnap.teamsnap.api.Team
+
+   @classmethod
+   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
+      fields = ['id', 'name', 'created_at', 'updated_at']
+      data = {k: teamsnap_data[k] for k in fields}
+      team, created = cls.objects.update_or_create(**data)
+      return (team, created)
 
 class User(TeamsnapBaseModel):
    type = 'user'
-   name = None
    first_name = models.CharField(max_length=50, null=True)
    last_name = models.CharField(max_length = 50, null=True)
    email = models.EmailField(null=True)
    managed_teams = models.ManyToManyField(Team)
+   ApiObject = teamsnap.teamsnap.api.User
+
+   @classmethod
+   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
+      fields = ['id', 'first_name', 'last_name', 'email']
+      user_data = {k:teamsnap_data[k] for k in fields}
+      managed_teams = []
+      for managed_team_id in teamsnap_data['managed_team_ids']:
+         obj, created = Team.objects.get_or_create(id=managed_team_id)
+         managed_teams.append(obj)
+         pass
+      user, created = cls.objects.update_or_create(**user_data)
+      user.managed_teams.add(*managed_teams)
+      return (user, created)
 
 class TeamsnapManagedObjectModel(TeamsnapBaseModel):
-   managed_by_team = models.ForeignKey(Team, null=True, on_delete=models.CASCADE)
+   team = models.ForeignKey(
+      Team,
+      verbose_name="managed by team",
+      null=True,
+      on_delete=models.CASCADE,
+   )
 
    class Meta:
       abstract = True
 
    @property
    def url(self, endpoint='view'):
-      return f"https://go.teamsnap.com/{self.managed_by_team.id}/{self.type}/{endpoint}/{self.id}"
+      return f"https://go.teamsnap.com/{self.team.id}/{self.type}/{endpoint}/{self.id}"
 
 class Opponent(TeamsnapManagedObjectModel):
    type = 'opponent'
-   benchcoach_object = models.ForeignKey(teams.models.Team, null=True, on_delete=models.CASCADE)
+   name = models.CharField(max_length=50, null=True)
+   benchcoach_object = models.OneToOneField(
+      benchcoach.models.Team,
+      null=True,
+      on_delete=models.CASCADE,
+      related_name="teamsnap_opponent"
+   )
+   ApiObject = teamsnap.teamsnap.api.Opponent
+
+   @classmethod
+   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
+      fields = ['id', 'name', 'created_at', 'updated_at']
+      opponent_data = {k: teamsnap_data[k] for k in fields}
+      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
+      opponent, created = cls.objects.update_or_create(**opponent_data)
+      opponent.team = team
+      return (opponent, created)
 
 class Location(TeamsnapManagedObjectModel):
-   benchcoach_object = models.ForeignKey(venues.models.Venue, null=True, on_delete=models.CASCADE)
+   type = 'location'
+   name = models.CharField(max_length=50, null=True)
+   benchcoach_object = models.OneToOneField(
+      benchcoach.models.Venue,
+      null=True,
+      on_delete=models.CASCADE,
+      related_name="teamsnap_location"
+   )
+   ApiObject = teamsnap.teamsnap.api.Location
+
+   @classmethod
+   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
+      fields = ['id', 'name', 'created_at', 'updated_at']
+      opponent_data = {k: teamsnap_data[k] for k in fields}
+      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
+      location, created = cls.objects.update_or_create(**opponent_data)
+      location.team = team
+      return (location, created)
 
 class Member(TeamsnapManagedObjectModel):
    # url format is
    # f"https://go.teamsnap.com/{self.team.teamsnap_id}/roster/player/{self.teamsnap_id}"
    # f"https://go.teamsnap.com/{self.team.teamsnap_id}/roster/edit/{self.teamsnap_id}"
    type = 'member'
-   benchcoach_object = models.ForeignKey(players.models.Player, null=True, on_delete=models.CASCADE)
+   name = models.CharField(max_length=50, null=True)
+   benchcoach_object = models.OneToOneField(
+      benchcoach.models.Player,
+      null=True,
+      on_delete=models.CASCADE,
+      related_name="teamsnap_member"
+   )
    first_name = models.CharField(max_length = 50, null=True)
    last_name = models.CharField(max_length = 50, null=True)
    jersey_number = models.IntegerField(null=True)
    is_non_player = models.BooleanField()
+   ApiObject = teamsnap.teamsnap.api.Member
+
+   @classmethod
+   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
+      fields = ['id', 'created_at', 'updated_at', 'first_name', 'last_name', 'jersey_number','is_non_player']
+      member_data = {k: teamsnap_data[k] for k in fields}
+      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
+      member, created = cls.objects.update_or_create(**member_data)
+      member.team = team
+      return (member, created)
 
    def __str__(self):
       return f"{self.last_name}, {self.first_name} ({self.id})"
@@ -76,8 +153,12 @@ class Event(TeamsnapManagedObjectModel):
    # f"https://go.teamsnap.com/{self.team.teamsnap_id}/schedule/view_game/{self.teamsnap_id}"
    # f"https://go.teamsnap.com/{self.team.teamsnap_id}/schedule/edit_game/{self.teamsnap_id}"
    type = 'event'
-   name = None
-   benchcoach_object = models.ForeignKey(events.models.Event, null=True, on_delete=models.CASCADE, related_name ='teamsnap_event')
+   benchcoach_object = models.OneToOneField(
+      benchcoach.models.Event,
+      null=True,
+      on_delete=models.CASCADE,
+      related_name="teamsnap_event"
+   )
    label = models.CharField(max_length = 50, null=True)
    start_date = models.DateTimeField(null=True)
    opponent = models.ForeignKey(Opponent, null=True, on_delete=models.CASCADE, related_name="opponent")
@@ -86,6 +167,33 @@ class Event(TeamsnapManagedObjectModel):
    points_for_opponent = models.PositiveSmallIntegerField(null=True)
    points_for_team = models.PositiveSmallIntegerField(null=True)
    is_game = models.BooleanField()
+   game_type = models.CharField(max_length = 50, null=True)
+   ApiObject = teamsnap.teamsnap.api.Event
+
+   @classmethod
+   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
+      fields = [
+         'id',
+         'created_at',
+         'updated_at',
+         'label',
+         'start_date',
+         'formatted_title',
+         'points_for_opponent',
+         'points_for_team',
+         'is_game',
+         'game_type'
+      ]
+      event_data = {k: teamsnap_data[k] for k in fields}
+      location, created = Location.objects.get_or_create(id=teamsnap_data['location_id'])
+      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
+      event, created = cls.objects.update_or_create(**event_data)
+      event.location = location
+      if teamsnap_data['opponent_id']:
+         opponent, created = Opponent.objects.get_or_create(id=teamsnap_data['opponent_id'])
+         event.opponent = opponent
+      event.team = team
+      return (location, created)
 
    def __str__(self):
       return f"{self.formatted_title} ({self.id})"
@@ -101,11 +209,16 @@ class Availability(TeamsnapManagedObjectModel):
       (MAYBE, 'Maybe'),
       (UNKNOWN, 'Unknown')
    ]
-   name = None
    event = models.ForeignKey(Event, null=True, on_delete=models.CASCADE)
    member = models.ForeignKey(Member, null=True, on_delete=models.CASCADE)
-   benchcoach_object =  models.ForeignKey(lineups.models.Availability, null=True, on_delete=models.CASCADE)
+   benchcoach_object = models.OneToOneField(
+      benchcoach.models.Availability,
+      null=True,
+      on_delete=models.CASCADE,
+      related_name="teamsnap_availability"
+   )
    status_code = models.SmallIntegerField(null=True, choices=status_codes, default=None)
+   ApiObject = teamsnap.teamsnap.api.Availability
 
    def __str__(self):
       return f"{self.member} - {self.event} ({self.id})"
@@ -113,8 +226,25 @@ class Availability(TeamsnapManagedObjectModel):
    class Meta:
       verbose_name_plural = "availabilities"
 
+   @classmethod
+   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
+      fields = [
+         'id',
+         'created_at',
+         'updated_at',
+         'status_code'
+      ]
+      availability_data = {k: teamsnap_data[k] for k in fields}
+      member, created = Member.objects.get_or_create(id=teamsnap_data['member_id'])
+      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
+      event, created = Event.objects.get_or_create(id=teamsnap_data['event_id'])
+      availability, created = cls.objects.update_or_create(**availability_data)
+      availability.team = team
+      availability.event = event
+      availability.member = member
+      return (availability, created)
+
 class LineupEntry(TeamsnapManagedObjectModel):
-   name = None
    member = models.ForeignKey(Member, on_delete=models.CASCADE)
    event = models.ForeignKey(Event, on_delete=models.CASCADE)
    positions = [
@@ -130,8 +260,31 @@ class LineupEntry(TeamsnapManagedObjectModel):
       (9, 'RF'),
       (10,'DH')
    ]
+   benchcoach_object = models.OneToOneField(
+      benchcoach.models.Positioning,
+      null=True,
+      on_delete=models.CASCADE,
+      related_name="teamsnap_lineupentry"
+   )
    label = models.PositiveSmallIntegerField(choices=positions, default=None, null=True, blank=True)
    sequence = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
+   ApiObject = teamsnap.teamsnap.api.EventLineupEntry
 
-   class Meta:
-      unique_together = ('member', 'event',)
+   @classmethod
+   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
+      fields = [
+         'id',
+         'created_at',
+         'updated_at',
+         'label',
+         'sequence'
+      ]
+      lineup_entry_data = {k: teamsnap_data[k] for k in fields}
+      member, created = Member.objects.get_or_create(id=teamsnap_data['member_id'])
+      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
+      event, created = Event.objects.get_or_create(id=teamsnap_data['event_id'])
+      lineup_entry, created = cls.objects.update_or_create(**lineup_entry_data)
+      lineup_entry.team = team
+      lineup_entry.event = event
+      lineup_entry.member = member
+      return (lineup_entry, created)

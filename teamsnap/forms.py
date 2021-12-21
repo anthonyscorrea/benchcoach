@@ -1,8 +1,7 @@
 from django import forms
 from .models import LineupEntry, Event
-from players.models import Player
-from django.forms import modelformset_factory, inlineformset_factory, BaseModelFormSet,formset_factory
-from crispy_forms.helper import FormHelper, Layout
+import benchcoach.models
+from django.forms import modelformset_factory
 
 class LineupEntryForm(forms.ModelForm):
     availability = None
