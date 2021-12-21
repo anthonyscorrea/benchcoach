@@ -10,6 +10,6 @@ urlpatterns = [
     path('events', views.EventsListView.as_view(), name="teamsnap list events"),
     path('events-table', views.EventsTableView.as_view(), name="teamsnap table events"),
     path('edit/event/<int:id>', views.edit_event, name='teamsnap edit event'),
-    path('from_teamsnap', views.sync_teamsnap, name="sync teamsnap"),
+    path('sync_teamsnap_db', views.sync_teamsnap_db, name="sync teamsnap db"),
     # path('import_teamsnap', views.import_teamsnap, name="import teamsnap"),
 ]

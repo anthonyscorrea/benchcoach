@@ -1,156 +1,185 @@
 import os
 import sys
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "benchcoach.settings")
-os.environ["DJANGO_SETTINGS_MODULE"] = "benchcoach.settings"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "benchcoachproject.settings")
+os.environ["DJANGO_SETTINGS_MODULE"] = "benchcoachproject.settings"
 import django
 django.setup()
 
 from teamsnap.teamsnap.api import TeamSnap
 import teamsnap.teamsnap.api
-from teamsnap.models import User, Member, Team, Event, Location, Availability, Opponent
+from teamsnap.models import User, Member, Team, Event, Location, Availability, Opponent, TeamsnapBaseModel
 from typing import List
-from benchcoach.models import Profile as BenchcoachUser
-from teams.models import Team as BenchcoachTeam
-from events.models import Event as BenchcoachEvent
+from benchcoachproject.models import Profile as BenchcoachUser
+import benchcoach.models
+from django.db import models
 import pytz
 
-def update_object_from_teamsnap(
-        TeamsnapApiObject: teamsnap.teamsnap.api.ApiObject,
-        TeamsnapDbModelClass: teamsnap.models.TeamsnapBaseModel,
-        TeamsnapClient: teamsnap.teamsnap.api.TeamSnap,
-        teamsnap_search_kwargs: dict,
-        fetching_keys: List[tuple] = ['id'],
-        default_keys: List[tuple] = ['name']
-):
+def update_teamsnap_object(d, teamsnap_object: TeamsnapBaseModel, benchcoach_model: models.Model ,create_benchcoach_object: bool = True, create_related: bool = False):
+    ''' Function to update from a teamsnap object to Benchcoach object. This method is a simple method when there are no related objects
 
-    """
-    Import or Update database objects from TeamSnap API
-
-    additional_fetching_keys (key,) or (api_key, db_field_name) or (api_key, db_field_name, callable)
-    Additional kwargs used to fetch an object from the database. ('id', 'teamsnap_id') are already included
-    Callable will be run with the retrieved value as an argument. Example uses for this callable are to sanitize the value
-    such as for a date, or to retrieve another database object
-
-    additional_default_keys
-    Additional Keys used to update the object (key,) or (api_key, db_field_name) or (api_key, db_field_name, callable)
-    ('name',) is already included
-    Callable will be run with the retrieved value as an argument. Example uses for this callable are to sanitize the value
-    such as for a date, or to retrieve another database object
-
-    :rtype: object
-    """
-    api_response = TeamsnapApiObject.search(client=TeamsnapClient, **teamsnap_search_kwargs)
-
-    # This routine allows, for convenience, simplers tuples in which the additional detail is not needed
-    # for example [('key', 'key', None)] can be passed as ['key'] if the TeamsnapApi key is the same as the TeamsnapDb field/key
-    # and doesn't need to be sanitized
-    for d in [fetching_keys, fetching_keys, default_keys]:
-        for i, key in enumerate(d):
-            if isinstance(key, tuple):
-                if len(key) == 1:
-                    d[i] = (key[0], key[0], None)
-                if len(key) == 2:
-                    d[i] = (key[0], key[1], None)
-            elif isinstance(key, str):
-                d[i] = (key, key, None)
+    :param d: The information to update.
+    :param teamsnap_object: The teamsnap object from which to update.
+    :param create_benchcoach_object: If true, will create the benchcoach object if it doesn't exist
+    :param create_related: This is here for decoration only. It doesn't do anything.
+    :return: a list of tuples in the form (obj, did_create) for created or modified objects.
+    '''
 
     r = []
-    for data in [items.data for items in api_response]:
-        kwargs, defaults = {}, {}
-        for api_key, db_field_name, callable_function in fetching_keys:
-            if api_key in data.keys():
-                kwargs[db_field_name] = callable_function(data[api_key]) if callable_function else data[api_key]
-        for api_key, db_field_name, callable_function in default_keys:
-            if api_key in data.keys():
-                defaults[db_field_name] = callable_function(data[api_key]) if callable_function else data[api_key]
-        defaults ={k:v for k,v in defaults.items() if v is not None}
-        obj, created = TeamsnapDbModelClass.objects.update_or_create(**kwargs, defaults=defaults)
-        r.append((obj,created))
+
+    if teamsnap_object.benchcoach_object:
+        #TODO I'm not sure this does anything. need to make sure.
+        benchcoach_object = benchcoach_model.objects.filter(id=teamsnap_object.benchcoach_object.id).first()
+        created = False
+        r.append((benchcoach_object, created))
+    elif not teamsnap_object.benchcoach_object and create_benchcoach_object:
+        benchcoach_object = benchcoach_model(**d)  # create new benchcoach object
+        teamsnap_object.benchcoach_object = benchcoach_object
+        benchcoach_object.save()
+        teamsnap_object.save()
+        created = True
+        r.append((benchcoach_object, created))
+    elif not teamsnap_object.benchcoach_object:
+        raise benchcoach.models.Team.DoesNotExist
+
     return r
 
-def update_locations (client, **kwargs):
-    return update_object_from_teamsnap(
-        teamsnap.teamsnap.api.Location,
-        Location,
-        TeamsnapClient=client,
-        teamsnap_search_kwargs=kwargs,
-        default_keys=[
-            'name', 'created_at', 'updated_at',
-            ('team_id', 'managed_by_team_id')
-        ]
-    )
+def update_event(event: Event, create_benchcoach_object: bool = True, create_related=False):
+    benchcoach_model = benchcoach.models.Event
 
-def update_teams (client, **kwargs):
-    teams = update_object_from_teamsnap(
-        teamsnap.teamsnap.api.Team,
-        Team,
-        TeamsnapClient=client,
-        teamsnap_search_kwargs=kwargs,
-        default_keys=[
-            'name', 'created_at', 'updated_at',
-            ('team_id', 'managed_by_team_id')
-        ]
-    )
-    opponents = update_object_from_teamsnap(
-        teamsnap.teamsnap.api.Opponent,
-        Opponent,
-        TeamsnapClient=client,
-        teamsnap_search_kwargs=kwargs,
-        default_keys= [
-            'name', 'created_at', 'updated_at',
-            ('team_id', 'managed_by_team_id')
-        ]
-    )
-    return teams + opponents
+    d = {
+        'start': event.start_date,
+    }
 
-def update_members (client, **kwargs):
-    return update_object_from_teamsnap(
-        TeamsnapApiObject=teamsnap.teamsnap.api.Member,
-        TeamsnapDbModelClass=Member,
-        TeamsnapClient=client,
-        teamsnap_search_kwargs=kwargs,
-        default_keys=['first_name','last_name','jersey_number','is_non_player', 'created_at', 'updated_at',
-            ('team_id', 'managed_by_team_id'),
-        ]
-    )
-    pass
+    r = []
 
-def update_availabilities(client, **kwargs):
-    return update_object_from_teamsnap(
-        TeamsnapApiObject=teamsnap.teamsnap.api.Availability,
-        TeamsnapDbModelClass=Availability,
-        TeamsnapClient=client,
-        teamsnap_search_kwargs=kwargs,
-        default_keys=[ 'status_code',
-                       'member_id',
-                       'event_id',
-                       'created_at',
-                       'updated_at',
-                       ('team_id', 'managed_by_team_id')
-                       ]
-    )
+    if event.team:
+        if event.team.benchcoach_object:
+            if event.game_type == "Home":
+                d['home_team'] = event.team.benchcoach_object
+            elif event.game_type == "Away":
+                d['away_team'] = event.team.benchcoach_object
+        elif not event.team.benchcoach_object and create_related:
+            # create team object
+            # update_opponent
+            # r.append
+            pass
+        elif not event.team.benchcoach_object:
+            raise benchcoach.models.Team.DoesNotExist
 
-def update_events(client, **kwargs):
-    return update_object_from_teamsnap(
-        TeamsnapApiObject=teamsnap.teamsnap.api.Event,
-        TeamsnapDbModelClass=Event,
-        TeamsnapClient=client,
-        teamsnap_search_kwargs=kwargs,
-        default_keys=['formatted_title','label','points_for_opponent','points_for_team','is_game','opponent_id','location_id',
-            'start_date', 'created_at', 'updated_at',
-            ('team_id', 'managed_by_team_id')
-        ]
-    )
+    if event.opponent:
+        if event.opponent.benchcoach_object:
+            if event.game_type == 'Home':
+                d['away_team'] = event.opponent.benchcoach_object
+            elif event.game_type == 'Away':
+                d['home_team'] = event.opponent.benchcoach_object
+        elif not event.opponent.benchcoach_object and create_related:
+            # Create opponent object
+            # update_opponent()
+            # r.append
+            pass
+        elif not event.opponent.benchcoach_object:
+            raise benchcoach.models.Team.DoesNotExist
 
-def update_users(client, **kwargs):
-    return update_object_from_teamsnap(
-        TeamsnapApiObject=teamsnap.teamsnap.api.User,
-        TeamsnapDbModelClass=User,
-        TeamsnapClient=client,
-        teamsnap_search_kwargs=kwargs,
-        default_keys=['first_name', 'last_name', 'email', 'created_at', 'updated_at',]
-    )
+    if event.location:
+        if event.location.benchcoach_object:
+            if event.location:
+                d['venue'] = event.location.benchcoach_object
+        elif not event.location.benchcoach_object and create_related:
+            # Need to account for if no loacation assigned to teamsnap object.
+            # create team object
+            # update_opponent
+            # r.append
+            pass
+        elif not event.location.benchcoach_object:
+            raise benchcoach.models.Venue.DoesNotExist
+
+    r += update_teamsnap_object(d, teamsnap_object=event, benchcoach_model=benchcoach_model, create_benchcoach_object=create_benchcoach_object)
+
+    return r
+
+def update_opponent(opponent: Opponent, create_benchcoach_object: bool = True, create_related: bool = False):
+    benchcoach_model = benchcoach.models.Team
+    d = {
+        'name': opponent.name,
+    }
+
+    r = update_teamsnap_object(d, teamsnap_object=opponent, benchcoach_model=benchcoach_model, create_benchcoach_object= create_benchcoach_object, create_related = create_related)
+
+    return r
+
+def update_team(teamsnap_object: Team, create_benchcoach_object: bool = True, create_related: bool = False):
+    benchcoach_model = benchcoach.models.Team
+    d = {
+        'name': teamsnap_object.name,
+    }
+
+    r = update_teamsnap_object(d, teamsnap_object=teamsnap_object, benchcoach_model=benchcoach_model, create_benchcoach_object=create_benchcoach_object,
+                               create_related=create_related)
+
+    return r
+
+def update_location(teamsnap_object: Location, create_benchcoach_object: bool = True, create_related: bool = False):
+    benchcoach_model = benchcoach.models.Venue
+    d = {
+        'name': teamsnap_object.name,
+    }
+
+    r = update_teamsnap_object(d, teamsnap_object=teamsnap_object, benchcoach_model=benchcoach_model, create_benchcoach_object=create_benchcoach_object,
+                               create_related=create_related)
+
+    return r
+
+def update_member(teamsnap_object: Member, create_benchcoach_object: bool = True, create_related: bool = False):
+    benchcoach_model = benchcoach.models.Player
+    d = {
+            'first_name': teamsnap_object.first_name,
+            'last_name': teamsnap_object.last_name,
+            'jersey_number': teamsnap_object.jersey_number,
+        }
+
+    r = update_teamsnap_object(d, teamsnap_object=teamsnap_object, benchcoach_model=benchcoach_model, create_benchcoach_object=create_benchcoach_object,
+                               create_related=create_related)
+
+    return r
+
+def update_availability(availability: Availability, create_benchcoach_object: bool = True, create_related: bool = False):
+    benchcoach_model = benchcoach.models.Availability
+    translation = {
+        Availability.YES: benchcoach.models.Availability.YES,
+        Availability.NO: benchcoach.models.Availability.NO,
+        Availability.MAYBE: benchcoach.models.Availability.MAYBE
+    }
+
+    d = {
+        'available': translation.get(availability.status_code, benchcoach.models.Availability.UNKNOWN),
+        'player': availability.member.benchcoach_object,
+        'event': availability.event.benchcoach_object
+    }
+
+    r = []
+
+    if availability.member.benchcoach_object:
+        d['player'] = availability.member.benchcoach_object
+    elif not availability.member.benchcoach_object and create_related:
+        r += update_member(availability.member, create_benchcoach_object = True)
+        d['player'] = availability.member.benchcoach_object
+    elif not availability.member.benchcoach_object and not create_related:
+        raise benchcoach.models.Availability.DoesNotExist
+
+    if availability.event.benchcoach_object:
+        d['event'] = availability.event.benchcoach_object
+    elif not availability.event.benchcoach_object and create_related:
+        r += update_event(availability.member, create_benchcoach_object = True)
+        d['event'] = availability.event.benchcoach_object
+    elif not availability.event.benchcoach_object and not create_related:
+        raise benchcoach.models.Event.DoesNotExist
+
+    r += update_teamsnap_object(d, teamsnap_object=availability, benchcoach_model=benchcoach_model, create_benchcoach_object=create_benchcoach_object,
+                               create_related=create_related)
+
+    return r
+
 
 def import_teamsnap():
     user = BenchcoachUser.objects.get(id=1)
@@ -158,33 +187,25 @@ def import_teamsnap():
     USER_ID = user.teamsnap_user.id
     TEAM_ID = user.teamsnapsettings.managed_team.id
     CLIENT = TeamSnap(token=TOKEN)
-    update_users(CLIENT, id=USER_ID)
 
     l = []
-    for team in Opponent.objects.filter(managed_by_team_id=TEAM_ID):
-        d = {
-            'name': team.name,
-        }
-        obj, created = BenchcoachTeam.objects.update_or_create(opponent=team, defaults=d)
-        team.benchcoach_object = obj
-        team.save()
-        l.append((obj,created))
+    for team in Opponent.objects.filter(team_id=TEAM_ID):
+        l += update_opponent(team, create_benchcoach_object=True, create_related=True)
 
     for team in Team.objects.filter(id=TEAM_ID):
-        d = {
-            'name': team.name,
-        }
-        obj_id = BenchcoachTeam.objects.filter(id=team.benchcoach_object.id).update(**d)
-        team.benchcoach_object = BenchcoachTeam.objects.get(id=obj_id)
-        team.save()
-        l.append((obj,created))
+        l += update_team(team, create_benchcoach_object=True, create_related=True)
 
-    for event in Event.objects.filter(managed_by_team_id=TEAM_ID):
-        d = {
-            'start':event.start_date,
-        }
-        obj, created = BenchcoachEvent.objects.update_or_create(teamsnap_event=event, defaults=d)
-        # event.benchcoach_object = obj
+    for location in Location.objects.filter(team_id=TEAM_ID):
+        l += update_location(location, create_benchcoach_object=True, create_related=True)
+
+    for member in Member.objects.filter(team_id=TEAM_ID, is_non_player=False):
+        l += update_member(member, create_benchcoach_object= True, create_related=True)
+
+    for event in Event.objects.filter(team_id=TEAM_ID):
+        l += update_event(event, create_benchcoach_object=True, create_related=True)
+
+    for availability in Availability.objects.filter(team_id=TEAM_ID):
+        l += update_availability(availability, create_benchcoach_object=True, create_related=True)
 
     pass
     # l += update_teams(CLIENT, team_id=TEAM_ID)
