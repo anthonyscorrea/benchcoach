@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+    {% with events_tab="active" %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block page_heading %}
+Events
+{% endblock %}
+
+{% block content %}
+    <ul class="list-group">
+        {% for event in events %}
+            <li class="list-group-item">
+                {{ event.start.date }}<br>{{ event.start.time }}<br>
+            <a href="{% url 'edit lineup' event_id=event.id %}">Edit Lineup...</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+</html>

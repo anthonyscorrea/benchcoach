@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+    {% with events_tab="active" %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block page_heading %}
+    Object
+{% endblock %}
+
+{% block content %}
+    <div class="card p-0">
+        <div class="card-body p-0">
+        <table class="table m-0">
+        {% block rows %}
+        {% endblock %}
+        </table>
+        </div>
+    </div>
+{% endblock %}
