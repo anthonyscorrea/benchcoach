@@ -38,7 +38,7 @@
     {% include 'messages.html' %}
     <div id="pills-tabContent" class="container-fluid tab-content my-1" data-toggle="tab">
         <div id="event-details" class="tab-pane show active" role="tabpanel" aria-labelledby="event-details-tab">
-            <form method="post" action="{% url "sync teamsnap db" %}">{% csrf_token %}
+            <form method="post" action="#">{% csrf_token %}
                 <input type="hidden" name="event_id" value={{ event.id }}>
             <div>
                 <div class="card my-1">
