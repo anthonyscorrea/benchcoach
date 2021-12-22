@@ -6,17 +6,30 @@
     {% include 'base_layout.html' %}
 </head>
 
+
+
+<body class="bg-light">
+
+<div>
 {% block navbar %}
 {% include 'navbar.html' %}
 {% endblock %}
-
-<body class="bg-light">
+</div>
+<div>
 {% block header %}
 {% endblock %}
-<main role="main" class="container my-2">
-    <h1>{% block page_heading %}{% endblock %}</h1>
-    {% block content %}{% endblock %}
-</main>
+</div>
+
+<div class="row flex-row flex-nowrap">
+    <div class="col-auto">
+        {% block sidebar %}
+        {% endblock %}
+    </div>
+    <div class="container my-2 col-sm min-vh-100">
+        <h1>{% block page_heading %}{% endblock %}</h1>
+        {% block content %}{% endblock %}
+    </div>
+    </div></div>
 
 </body>
 </html>

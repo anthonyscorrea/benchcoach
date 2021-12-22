@@ -1,23 +1,33 @@
 {% extends "base.html" %}{% load static %}
 
 {% block title %}Bench Coach Home{% endblock %}
+{% block sidebar %}
 
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark min-vh-100 " style="width: 200px;">
+        <ul class="nav nav-pills flex-column mb-auto">
+            {% for page in pages %}
+                <li class="nav-item">
+                    <a class="nav-link text-white" style="text-transform:capitalize;" href="{% url page %}"
+                       aria-current="page">{{ page }} </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}
 {% block content %}
     <div class="text-center my-2">
-    <h1><img class="mx-auto" src="{% static 'benchcoach.svg' %}" style="width: 64px;" /><span class="text-nowrap"><strong>Welcome to Bench Coach</strong></span></h1>
+    <h1><img class="mx-auto" src="{% static 'benchcoach.svg' %}" style="width: 64px;" /><strong>Welcome to Bench Coach</strong></h1>
     <div class="col-lg-6 m-auto">
         <p class="lead mb-4 d-none">Quisque at curabitur mollis ornare, malesuada maecenas. Orci elit tristique, malesuada eu pharetra. Est praesent tortor porttitor aptent, amet quisque.</p>
 {#        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mx-1">#}
 {#            <button class="btn btn-primary" type="button">Login</button><button class="btn btn-outline-secondary" type="button">Sign Up</button>#}
 {#        </div>#}
     </div>
+
         <div class="container-sm">
-            <div class="list-group">
-                {% for page in pages %}
-                    <li class="list-group-item"><a style="text-transform:capitalize;"
-                                                   href="{% url page %}">{{ page }} </a></li>
-                {% endfor %}
-            </div>
+{#        <ul class="nav nav-pills flex-column mb-auto">#}
+
         </div>
 
 </div>
