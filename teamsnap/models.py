@@ -26,6 +26,7 @@ class Team(TeamsnapBaseModel):
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Team,
       null=True,
+      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_team"
    )
@@ -35,7 +36,8 @@ class Team(TeamsnapBaseModel):
    def update_or_create_from_teamsnap_api(cls, teamsnap_data):
       fields = ['id', 'name', 'created_at', 'updated_at']
       data = {k: teamsnap_data[k] for k in fields}
-      team, created = cls.objects.update_or_create(**data)
+      id = data.pop('id')
+      team, created = cls.objects.update_or_create(id=id, defaults=data)
       return (team, created)
 
 class User(TeamsnapBaseModel):
@@ -55,7 +57,8 @@ class User(TeamsnapBaseModel):
          obj, created = Team.objects.get_or_create(id=managed_team_id)
          managed_teams.append(obj)
          pass
-      user, created = cls.objects.update_or_create(**user_data)
+      id = user_data.pop('id')
+      user, created = cls.objects.update_or_create(id=id, defaults=user_data)
       user.managed_teams.add(*managed_teams)
       return (user, created)
 
@@ -80,6 +83,7 @@ class Opponent(TeamsnapManagedObjectModel):
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Team,
       null=True,
+      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_opponent"
    )
@@ -90,8 +94,10 @@ class Opponent(TeamsnapManagedObjectModel):
       fields = ['id', 'name', 'created_at', 'updated_at']
       opponent_data = {k: teamsnap_data[k] for k in fields}
       team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      opponent, created = cls.objects.update_or_create(**opponent_data)
+      id = opponent_data.pop('id')
+      opponent, created = cls.objects.update_or_create(id=id, defaults=opponent_data)
       opponent.team = team
+      opponent.save()
       return (opponent, created)
 
 class Location(TeamsnapManagedObjectModel):
@@ -100,6 +106,7 @@ class Location(TeamsnapManagedObjectModel):
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Venue,
       null=True,
+      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_location"
    )
@@ -110,8 +117,10 @@ class Location(TeamsnapManagedObjectModel):
       fields = ['id', 'name', 'created_at', 'updated_at']
       opponent_data = {k: teamsnap_data[k] for k in fields}
       team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      location, created = cls.objects.update_or_create(**opponent_data)
+      id = opponent_data.pop('id')
+      location, created = cls.objects.update_or_create(id=id, defaults=opponent_data)
       location.team = team
+      location.save()
       return (location, created)
 
 class Member(TeamsnapManagedObjectModel):
@@ -123,13 +132,14 @@ class Member(TeamsnapManagedObjectModel):
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Player,
       null=True,
+      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_member"
    )
    first_name = models.CharField(max_length = 50, null=True)
    last_name = models.CharField(max_length = 50, null=True)
    jersey_number = models.IntegerField(null=True)
-   is_non_player = models.BooleanField()
+   is_non_player = models.BooleanField(null=True)
    ApiObject = teamsnap.teamsnap.api.Member
 
    @classmethod
@@ -137,8 +147,10 @@ class Member(TeamsnapManagedObjectModel):
       fields = ['id', 'created_at', 'updated_at', 'first_name', 'last_name', 'jersey_number','is_non_player']
       member_data = {k: teamsnap_data[k] for k in fields}
       team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      member, created = cls.objects.update_or_create(**member_data)
+      id = member_data.pop('id')
+      member, created = cls.objects.update_or_create(id=id, defaults= member_data)
       member.team = team
+      member.save()
       return (member, created)
 
    def __str__(self):
@@ -156,6 +168,7 @@ class Event(TeamsnapManagedObjectModel):
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Event,
       null=True,
+      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_event"
    )
@@ -166,7 +179,7 @@ class Event(TeamsnapManagedObjectModel):
    formatted_title = models.CharField(max_length = 50, null=True)
    points_for_opponent = models.PositiveSmallIntegerField(null=True)
    points_for_team = models.PositiveSmallIntegerField(null=True)
-   is_game = models.BooleanField()
+   is_game = models.BooleanField(null=True)
    game_type = models.CharField(max_length = 50, null=True)
    ApiObject = teamsnap.teamsnap.api.Event
 
@@ -187,13 +200,15 @@ class Event(TeamsnapManagedObjectModel):
       event_data = {k: teamsnap_data[k] for k in fields}
       location, created = Location.objects.get_or_create(id=teamsnap_data['location_id'])
       team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      event, created = cls.objects.update_or_create(**event_data)
+      id = event_data.pop('id')
+      event, created = cls.objects.update_or_create(id=id, defaults=event_data)
       event.location = location
       if teamsnap_data['opponent_id']:
          opponent, created = Opponent.objects.get_or_create(id=teamsnap_data['opponent_id'])
          event.opponent = opponent
       event.team = team
-      return (location, created)
+      event.save()
+      return (team, created)
 
    def __str__(self):
       return f"{self.formatted_title} ({self.id})"
@@ -214,6 +229,7 @@ class Availability(TeamsnapManagedObjectModel):
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Availability,
       null=True,
+      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_availability"
    )
@@ -238,10 +254,12 @@ class Availability(TeamsnapManagedObjectModel):
       member, created = Member.objects.get_or_create(id=teamsnap_data['member_id'])
       team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
       event, created = Event.objects.get_or_create(id=teamsnap_data['event_id'])
-      availability, created = cls.objects.update_or_create(**availability_data)
+      id = availability_data.pop('id')
+      availability, created = cls.objects.update_or_create(id=id, defaults=availability_data)
       availability.team = team
       availability.event = event
       availability.member = member
+      availability.save()
       return (availability, created)
 
 class LineupEntry(TeamsnapManagedObjectModel):
@@ -263,6 +281,7 @@ class LineupEntry(TeamsnapManagedObjectModel):
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Positioning,
       null=True,
+      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_lineupentry"
    )
@@ -283,8 +302,10 @@ class LineupEntry(TeamsnapManagedObjectModel):
       member, created = Member.objects.get_or_create(id=teamsnap_data['member_id'])
       team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
       event, created = Event.objects.get_or_create(id=teamsnap_data['event_id'])
-      lineup_entry, created = cls.objects.update_or_create(**lineup_entry_data)
+      id = lineup_entry_data.pop('id')
+      lineup_entry, created = cls.objects.update_or_create(id=id, defaults=lineup_entry_data)
       lineup_entry.team = team
       lineup_entry.event = event
       lineup_entry.member = member
+      lineup_entry.save()
       return (lineup_entry, created)

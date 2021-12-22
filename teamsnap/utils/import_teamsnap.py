@@ -29,9 +29,10 @@ def update_teamsnap_object(d, teamsnap_object: TeamsnapBaseModel, benchcoach_mod
 
     if teamsnap_object.benchcoach_object:
         #TODO I'm not sure this does anything. need to make sure.
-        benchcoach_object = benchcoach_model.objects.filter(id=teamsnap_object.benchcoach_object.id).first()
+        benchcoach_object = benchcoach_model.objects.filter(id=teamsnap_object.benchcoach_object.id)
+        benchcoach_object.update(**d)
         created = False
-        r.append((benchcoach_object, created))
+        r.append((benchcoach_object.first(), created))
     elif not teamsnap_object.benchcoach_object and create_benchcoach_object:
         benchcoach_object = benchcoach_model(**d)  # create new benchcoach object
         teamsnap_object.benchcoach_object = benchcoach_object

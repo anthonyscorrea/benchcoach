@@ -7,32 +7,30 @@
     <p><b>TeamSnap: </b>{{ teamsnap_user.email }}</p>
     <p><b>TeamSnap Managed Team: </b>{{ teamsnap_team.name }}</p>
 
-    <button type="button" class="btn btn-primary m-1" onclick="sync_teamsnap_db()">
-        Sync TeamSnap DB
+    <button type="button" class="btn btn-primary m-1" onclick="sync_teamsnapdb_with_teamsnapapi()">
+        Sync TeamSnapDB with TeamSnap.com
         <div id="teamsnap-sync-spinner" class="spinner-border spinner-border-sm d-none" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </button>
-    <button type="button" class="btn btn-primary m-1" onclick="sync_teamsnap_db()">
-        Sync TeamSnap DB
-        <div id="teamsnap-sync-spinner" class="spinner-border spinner-border-sm d-none" role="status">
+    <button type="button" class="btn btn-primary m-1" onclick="sync_teamsnapdb_to_benchcoachdb()">
+        Sync BenchCoachDB with TeamSnapDB
+        <div id="benchcoach-sync-spinner" class="spinner-border spinner-border-sm d-none" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </button>
     {% include 'messages.html' %}
     <div id="message-area"> </div>
     <script>
-        const progress_spinner = document.getElementById("teamsnap-sync-spinner")
-        const message_area = document.getElementById("message-area")
-        function sync_teamsnap_db(){
+
+        function sync_teamsnapdb_with_teamsnapapi(){
+            const progress_spinner = document.getElementById("teamsnap-sync-spinner")
             const Http = new XMLHttpRequest();
-            const url='{% url 'sync teamsnap db' %}';
-            console.log(progress_spinner)
+            const url='{% url 'sync with teamsnapapi' %}';
             progress_spinner.classList.remove("d-none");
             fetch(url)
                 .then((response) => {
                     progress_spinner.classList.add("d-none")
-                    message_area.innerText = "test"
                     return response.json();
                 })
                 .then((myJson) => {
@@ -41,15 +39,16 @@
                 });
         }
 
-        function sync_teamsnap_db_2(){
+        function sync_teamsnapdb_to_benchcoachdb(){
+            console.log('hello')
+            const progress_spinner = document.getElementById("benchcoach-sync-spinner")
             const Http = new XMLHttpRequest();
-            const url='{% url 'sync teamsnap db' %}';
-            console.log(progress_spinner)
+            const url='{% url 'sync benchcoach' %}';
+            console.log(url)
             progress_spinner.classList.remove("d-none");
             fetch(url)
                 .then((response) => {
                     progress_spinner.classList.add("d-none")
-                    message_area.innerText = "test"
                     return response.json();
                 })
                 .then((myJson) => {

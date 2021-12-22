@@ -1,25 +1,29 @@
 from django import forms
-from .models import LineupEntry, Event
-import benchcoach.models
+from .models import Team, Location, Opponent, Event, Member
 from django.forms import modelformset_factory
 
-class LineupEntryForm(forms.ModelForm):
-    availability = None
-    class Meta:
-        model = LineupEntry
-        widgets = {
-            'label': forms.Select(attrs={'class': 'form-control form-control-sm'})
-        }
-        exclude = ()
+select_kwargs = {
+    'attrs':{'class': 'form-control form-control-sm'}
+}
 
-LineupEntryFormSet = modelformset_factory(
-    model=LineupEntry,
-    form=LineupEntryForm,
-    extra=0
-)
+text_input_kwargs = {
+    'attrs':{"readonly": "readonly", 'class':'form-control form-control-sm'}
+}
+
+class MemberForm(forms.ModelForm):
+    class Meta:
+        model = Member
+        fields = ('first_name', 'last_name', 'benchcoach_object')
+        labels = {
+            'benchcoach_object': 'BenchCoach Link',
+        }
+        widgets = {
+            "benchcoach_object": forms.Select(**select_kwargs),
+            "first_name": forms.TextInput(**text_input_kwargs),
+            "last_name": forms.TextInput(**text_input_kwargs),
+        }
 
 class EventForm(forms.ModelForm):
-    availability = None
     class Meta:
         model = Event
         fields = ('formatted_title', 'start_date', 'benchcoach_object')
@@ -29,12 +33,45 @@ class EventForm(forms.ModelForm):
             'start_date':'Date/Time'
         }
         widgets = {
-            "formatted_title":forms.TextInput(attrs={"disabled":"disabled"}),
-            "start_date": forms.DateTimeInput(attrs={"disabled": "disabled"})
+            "benchcoach_object": forms.Select(**select_kwargs),
+            "formatted_title":forms.TextInput(**text_input_kwargs),
+            "start_date": forms.DateTimeInput(**text_input_kwargs)
         }
 
-EventFormSet = modelformset_factory(
-    model=Event,
-    form=EventForm,
-    extra=0
-)
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ('name', 'benchcoach_object')
+        labels ={
+            'benchcoach_object':'BenchCoach Link',
+        }
+        widgets = {
+            "name":forms.TextInput(**text_input_kwargs),
+            "benchcoach_object": forms.Select(**select_kwargs)
+        }
+
+class OpponentForm(forms.ModelForm):
+    class Meta:
+        model = Opponent
+        fields = ('name', 'benchcoach_object')
+        labels ={
+            'benchcoach_object':'BenchCoach Link',
+        }
+        widgets = {
+            "name":forms.TextInput(**text_input_kwargs),
+            "benchcoach_object": forms.Select(**select_kwargs)
+        }
+
+class LocationForm(forms.ModelForm):
+    class Meta:
+        model = Location
+        fields = ('name', 'benchcoach_object')
+        labels ={
+            'benchcoach_object':'BenchCoach Link',
+        }
+        widgets = {
+            "name":forms.TextInput(**text_input_kwargs),
+            "benchcoach_object": forms.Select(**select_kwargs)
+        }
+
+
