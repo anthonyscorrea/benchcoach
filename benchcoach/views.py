@@ -111,17 +111,12 @@ def lineup_edit(request, event_id):
         f for f in formset if f not in formset_lineup and f not in formset_dhd
     ]
 
-    teamsnap_form = TeamsnapEventForm(instance=event)
-
     details = {
         "Away Team": event.away_team,
         "Home Team": event.home_team,
         "Date": event.start.date(),
         "Time": event.start.time(),
         "Venue": event.venue,
-        "TeamSnap": teamsnap_form
-        # "TeamSnap Link": event.event_set.first()
-        # "TeamSnap Link": f'<a href="{reverse("teamsnap edit event", kwargs={"id": event.event_set.first().id})}"> {event.event_set.first()} </a>' if event.event_set.first() else None
     }
 
     return render(
@@ -132,7 +127,6 @@ def lineup_edit(request, event_id):
             "event": event,
             "details": details,
             "previous_event": previous_event,
-            "teamsnap_form": teamsnap_form,
             "next_event": next_event,
             "formset": formset,
             "formset_lineup": formset_lineup,
