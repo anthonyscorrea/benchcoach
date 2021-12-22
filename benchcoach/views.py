@@ -98,7 +98,7 @@ def lineup_edit(request, event_id):
 
     qs = (
         event.positioning_set.all()
-        .filter(player__availability__event=event_id)
+        .filter(player__availability__event=event_id, player__teamsnap_member__is_non_player=False)
         .order_by("order", "-player__availability__available", "player__last_name")
         .annotate(event_availability=F("player__availability__available"))
     )
