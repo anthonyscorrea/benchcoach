@@ -32,45 +32,6 @@
     }
   },
   {
-    "model": "admin.logentry",
-    "pk": 1,
-    "fields": {
-      "action_time": "2021-12-17T01:32:54.671Z",
-      "user": 1,
-      "content_type": 3,
-      "object_id": "1",
-      "object_repr": "a",
-      "action_flag": 1,
-      "change_message": "[{\"added\": {}}]"
-    }
-  },
-  {
-    "model": "admin.logentry",
-    "pk": 2,
-    "fields": {
-      "action_time": "2021-12-17T01:32:59.237Z",
-      "user": 1,
-      "content_type": 9,
-      "object_id": "7644001",
-      "object_repr": "TeamSnap Team Object (7644001)",
-      "action_flag": 1,
-      "change_message": "[{\"added\": {}}]"
-    }
-  },
-  {
-    "model": "admin.logentry",
-    "pk": 3,
-    "fields": {
-      "action_time": "2021-12-17T01:33:57.742Z",
-      "user": 1,
-      "content_type": 10,
-      "object_id": "25560745",
-      "object_repr": "TeamSnap User Object (25560745)",
-      "action_flag": 1,
-      "change_message": "[{\"added\": {}}]"
-    }
-  },
-  {
     "model": "auth.permission",
     "pk": 1,
     "fields": {
@@ -1153,7 +1114,7 @@
     }
   },
   {
-    "model": "benchcoach.profile",
+    "model": "benchcoachproject.profile",
     "pk": 1,
     "fields": {
       "user": 1,
@@ -1163,7 +1124,7 @@
     }
   },
   {
-    "model": "benchcoach.teamsnapsettings",
+    "model": "benchcoachproject.teamsnapsettings",
     "pk": 1,
     "fields": {
       "user": 1,
