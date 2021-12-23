@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %} {{ title }}{% endblock %}
-
+{% block page_heading %}TeamSnap Info{% endblock %}
 {% block content %}
-    <h1>Currently Logged in as</h1>
+    <h6>Currently Logged in as</h6>
     <p><b>BenchCoach: </b>{{ user }} ({{ user.email }})</p>
     <p><b>TeamSnap: </b>{{ teamsnap_user.email }}</p>
     <p><b>TeamSnap Managed Team: </b>{{ teamsnap_team.name }}</p>
