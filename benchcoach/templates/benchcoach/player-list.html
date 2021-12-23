@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+    {% with events_tab=events_tab_active members_tab=members_tab_active opponents_tab=opponents_tab_active venues_tab=venues_tab_active %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block page_heading %}
+{{ page_title }}
+{% endblock %}
+
+{% block content %}
+    <ul class="list-group">
+        {% for object in object_list|dictsort:"last_name.lower" %}
+            <li class="list-group-item">{{ object }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+</html>

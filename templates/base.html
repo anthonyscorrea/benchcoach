@@ -15,10 +15,7 @@
             {% include 'navbar.html' %}
         {% endblock %}
     </div>
-    <div>
-        {% block header %}
-        {% endblock %}
-    </div>
+
 </header>
 
 <div class="d-inline-flex min-vw-100">
@@ -28,10 +25,14 @@
         {% endblock %}
     </div>
     <div class="container m-2">
+        <div>
+            {% block header %}
+            {% endblock %}
+        </div>
         <h1>{% block page_heading %}{% endblock %}</h1>
         {% block content %}{% endblock %}
     </div>
-    </div></div>
+</div>
 
 </body>
 </html>

@@ -12,12 +12,15 @@ Events
 
 {% block content %}
     <ul class="list-group">
-        {% for event in events %}
+        {% for event in events%}
+            {% if event.teamsnap_event.is_game %}
             <li class="list-group-item">
             <h6>{{ event.away_team|default_if_none:"" }} vs. {{ event.home_team|default_if_none:"" }}</h6>
-                {{ event.start.date }}<br>{{ event.start.time }}<br>
+            {{ event.start|date:"l, F j, Y g:i A" }} <br>
+            {{ event.venue.name }} <br>
             <a href="{% url 'edit lineup' event_id=event.id %}">Edit Lineup...</a>
             </li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endblock %}

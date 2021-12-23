@@ -20,7 +20,7 @@ class EventListView(ListView):
 
 class PlayerListView(ListView):
     model = Player
-    template_name = 'benchcoach/list.html'
+    template_name = 'benchcoach/player-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
