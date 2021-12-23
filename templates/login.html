@@ -2,10 +2,11 @@
 
 {% block title %}Bench Coach Home{% endblock %}
 
+{% block sidebar %}{% endblock %}
 {% block content %}
     <div class="text-center d-flex flex-column justify-content-center align-items-center mb-4">
         <form style="width: 100%;   max-width: 330px;   padding: 15px;   margin: 0 auto;"
-              method="post" action="{% url "login" %}">
+              method="post" action="{% url "login_view" %}">
             {% csrf_token %}
 
             <img class="mb-4" src="{% static "benchcoach.svg" %}" width="72" height="72"/>

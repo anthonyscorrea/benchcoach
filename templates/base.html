@@ -9,23 +9,25 @@
 
 
 <body class="bg-light">
-
-<div>
-{% block navbar %}
-{% include 'navbar.html' %}
-{% endblock %}
-</div>
-<div>
-{% block header %}
-{% endblock %}
-</div>
-
-<div class="row flex-row flex-nowrap">
-    <div class="col-auto">
-        {% block sidebar %}
+<header class="min-vw-100">
+    <div>
+        {% block navbar %}
+            {% include 'navbar.html' %}
         {% endblock %}
     </div>
-    <div class="container my-2 col-sm min-vh-100">
+    <div>
+        {% block header %}
+        {% endblock %}
+    </div>
+</header>
+
+<div class="d-inline-flex min-vw-100">
+    <div class="">
+        {% block sidebar %}
+            {% include 'sidebar.html' %}
+        {% endblock %}
+    </div>
+    <div class="container m-2">
         <h1>{% block page_heading %}{% endblock %}</h1>
         {% block content %}{% endblock %}
     </div>

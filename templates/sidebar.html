@@ -1,0 +1,39 @@
+<div class="bg-dark min-vh-100" >
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a class="nav-link {{ events_tab }} text-white" href="{% url 'event list' %}">
+                <div class="d-inline-block">
+                <i class="bi bi-calendar3"></i>
+                <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
+                    Events
+                </span>
+                    </div>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ members_tab }} text-white" href="{% url 'player list' %}">
+                <i class="bi bi-person-fill"></i>
+                <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
+                Players
+                </span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ opponents_tab }} text-white" href="{% url 'team list' %}">
+                <i class="bi bi-people-fill"></i>
+                <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
+                Teams
+                </span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {{ venues_tab }} text-white" href="{% url 'venue list' %}">
+                <i class="bi bi-geo"></i>
+                <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
+                Venues
+                </span>
+            </a>
+        </li>
+    </ul>
+</div>

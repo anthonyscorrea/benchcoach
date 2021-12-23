@@ -14,6 +14,7 @@ Events
     <ul class="list-group">
         {% for event in events %}
             <li class="list-group-item">
+            <h6>{{ event.away_team|default_if_none:"" }} vs. {{ event.home_team|default_if_none:"" }}</h6>
                 {{ event.start.date }}<br>{{ event.start.time }}<br>
             <a href="{% url 'edit lineup' event_id=event.id %}">Edit Lineup...</a>
             </li>

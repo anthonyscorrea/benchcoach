@@ -5,11 +5,11 @@ from django.contrib.auth.decorators import login_required
 
 @login_required()
 def welcome(request):
-  pages = ['event list', 'team list', 'venue list', 'player list', 'teamsnap home', 'login']
+  pages = ['event list', 'team list', 'venue list', 'player list', 'teamsnap home', 'login_view']
   return render(request,'home.html',{'pages':pages})
 
 
-def login(request):
+def login_view(request):
   if request.method == 'POST':
     username = request.POST.get('username')
     password = request.POST.get('password')
@@ -17,11 +17,10 @@ def login(request):
     try:
       user = authenticate(request, username=username, password=password)
       if user is not None:
-        print('Login')
-        login(request,user)
+        login(request, user)
         return redirect(reverse('home'))
       else:
-        print("Someone tried to login and failed.")
+        print("Someone tried to login_view and failed.")
         print("They used username: {} and password: {}".format(username, password))
 
         return redirect('/')

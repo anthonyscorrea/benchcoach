@@ -12,7 +12,7 @@
 
 {% block content %}
     <ul class="list-group">
-        {% for object in object_list %}
+        {% for object in object_list|dictsort:"name.lower" %}
             <li class="list-group-item">{{ object }}</li>
         {% endfor %}
     </ul>

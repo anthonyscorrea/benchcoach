@@ -18,12 +18,13 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
-from .views import welcome, login
+from .views import welcome, login_view
 
 urlpatterns = [
     path("", welcome, name="home"),
     path("", include("benchcoach.urls")),
     path("admin/", admin.site.urls),
     path("teamsnap/", include("teamsnap.urls")),
-    path("login", login, name="login"),
+    path("login", login_view, name="login_view"),
+    path("welcome", welcome, name="welcome")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
