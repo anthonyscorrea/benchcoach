@@ -18,19 +18,22 @@
 
 </header>
 
-<div class="d-inline-flex min-vw-100">
+<div class="d-inline-flex min-vw-100 min-vh-100">
     <div class="">
         {% block sidebar %}
             {% include 'sidebar.html' %}
         {% endblock %}
     </div>
-    <div class="container m-2">
-        <div>
+    <div class="w-100 m-0">
+        <div class="bg-white border border-bottom">
+            <h1 class="m-2">{% block page_heading %}{% endblock %}</h1>
+            <h6 class="m-2 text-muted">{% block page_subheading %}{% endblock %}</h6>
             {% block header %}
             {% endblock %}
         </div>
-        <h1>{% block page_heading %}{% endblock %}</h1>
-        {% block content %}{% endblock %}
+        <div class="container-fluid m-2">
+            {% block content %}{% endblock %}
+        </div>
     </div>
 </div>
 
