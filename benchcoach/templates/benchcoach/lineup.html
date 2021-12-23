@@ -2,16 +2,16 @@
 {% with events_active="active" %}
     {% block page_heading %}
         <span class="d-none d-md-block">
-            <img src="{{ event.away_team.image.url }}" height=64>
+            {% if event.away_team.image %} <img src="{{ event.away_team.image.url }}" height=64>{% endif %}
             {{ event.away_team.name }} vs. {{ event.home_team.name }}
-            <img src="{{ event.home_team.image.url }}" height=64>
+            {% if event.home_team.image %}<img src="{{ event.home_team.image.url }}" height=64>{% endif %}
         </span>
         <span class="d-md-none">
             {% if event.home_team.name == "Hounds" %}
-                <img src="{{ event.away_team.image.url }}" height=32>
+                {% if event.away_team.image %} <img src="{{ event.away_team.image.url }}" height=32>{% endif %}
                 vs. {{ event.away_team }}
             {% elif event.away_team.name == "Hounds" %}
-                <img src="{{ event.home_team.image.url }}" height=32>
+                {% if event.home_team.image %}<img src="{{ event.home_team.image.url }}" height=32>{% endif %}
                 at {{ event.home_team }}
             {% else %}
                 Event

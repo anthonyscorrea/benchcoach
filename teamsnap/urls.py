@@ -13,5 +13,7 @@ urlpatterns = [
     path('edit/event/<int:id>', views.edit_event, name='teamsnap edit event'),
     path('sync_teamsnap_db', views.sync_teamsnapdb_with_teamsnapapi, name="sync with teamsnapapi"),
     path('sync_benchcoach_db', views.sync_teamsnapdb_to_benchcoachdb, name="sync benchcoach"),
+    path('update/<str:object_name>', views.update_teamsnapdb_from_teamsnapapi, name="update"),
+    path('send/<str:object_name>', views.send_to_benchcoach, name="send")
     # path('import_teamsnap', views.import_teamsnap, name="import teamsnap"),
 ]
