@@ -1,43 +1,57 @@
 {% extends 'base.html' %}{% block title %} {{ title }} {% endblock %}{% load static %}
 {% with events_active="active" %}
+    {% block page_heading %}
+        <span class="d-none d-md-block">
+            <img src="{{ event.away_team.image.url }}" height=64>
+            {{ event.away_team.name }} vs. {{ event.home_team.name }}
+            <img src="{{ event.home_team.image.url }}" height=64>
+        </span>
+        <span class="d-md-none">
+            {% if event.home_team.name == "Hounds" %}
+                <img src="{{ event.away_team.image.url }}" height=32>
+                vs. {{ event.away_team }}
+            {% elif event.away_team.name == "Hounds" %}
+                <img src="{{ event.home_team.image.url }}" height=32>
+                at {{ event.home_team }}
+            {% else %}
+                Event
+            {% endif %}
+        </span>
+       {% endblock %}
+    {% block page_subheading %}
+        <p class="d-none d-md-block">{{ event.start|date:"l, F j, Y g:i A" }}, {{ event.venue.name }}</p>
+        <p class="d-md-none">{{ event.start|date:"D" }}&nbsp;{{ event.start|date:"n/j" }} {{ event.start|date:"g:i" }}, <span class="text-truncate">{{ event.venue.name }}</span></p>
+    {% endblock %}
+
     {% block header %}
-        <div class="d-flex justify-content-center justify-content-md-center border-bottom bg-white">
+
+        <ul class="nav nav-tabs nav-fill bg-white" role="tablist">
             {% if previous_event %}
-                <a class="btn btn-outline-secondary btn-sm d-md-flex my-auto align-items-md-center my-3 mx-3" href="{% url 'edit lineup' event_id=previous_event.id %}" role="button">
+            <li class="nav-item m-1">
+                <a href="{% url 'edit lineup' event_id=previous_event.id active_tab=active_tab %}">
                     <i class="bi bi-chevron-left"></i>{{ previous_event.start|date:"D" }}&nbsp;{{ previous_event.start|date:"n/j" }}
                 </a>
+            </li>
             {% endif %}
-            <div>
-                <h5 class="text-center m-1 d-none d-md-block">{{ event.away_team.name }} vs. {{ event.home_team.name }}</h5>
-                <h5 class="text-center my-0 d-md-none">
-                    {% if event.home_team.name == "Hounds" %}
-                        v{{ event.away_team }}
-                    {% endif %}
-                    {% if event.away_team.name == "Hounds" %}
-                        @{{ event.home_team }}
-                    {% endif %}
-                </h5>
-                <p class="text-center text-muted m-1 d-none d-md-block">{{ event.start|date:"l, F j, Y g:i A" }}<br>{{ event.venue.name }}</p>
-                <p class="text-center text-muted my-0 d-md-none">{{ event.start|date:"D" }}&nbsp;{{ event.start|date:"n/j" }}, {{ event.start|date:"g:i" }}<br><span class="text-truncate">{{ event.venue.name }}</span></p>
-                <h6 class="text-muted m-1"></h6>
-            </div>
+
+            <li class="nav-item m-1" role="presentation">
+                <a id="event-details-tab" class="nav-link {% if active_tab == "details" %}active{% endif %}  px-2 py-0" href="{% url 'edit lineup' event_id=event.id active_tab='details'%}">Details</a></li>
+            <li class="nav-item m-1" role="presentation"><a id="event-lineup-tab" class="nav-link {% if active_tab == "lineup" %}active{% endif %} px-2 py-0" href="{% url 'edit lineup' event_id=event.id active_tab='lineup'%}">Lineup</a></li>
             {% if next_event %}
-                <a class="btn btn-outline-secondary btn-sm align-items-center my-auto my-3 mx-3" href="{% url 'edit lineup' event_id=next_event.id %}" role="button">
+                <li class="nav-item m-1">
+                <a href="{% url 'edit lineup' event_id=next_event.id active_tab=active_tab%}" role="button">
                     {{ next_event.start|date:"D" }}&nbsp;{{ next_event.start|date:"n/j" }}<i class="bi bi-chevron-right"></i>
                 </a>
+                </li>
             {% endif %}
-        </div>
 
-        <ul class="nav nav-pills nav-fill bg-white" role="tablist">
-            <li class="nav-item m-1" role="presentation"><a id="event-details-tab" class="nav-link active px-2 py-0" data-bs-toggle="pill" data-bs-target="#event-details" role="tab" aria-controls="event-details" aria-selected="true">Details</a></li>
-            <li class="nav-item m-1" role="presentation"><a id="event-lineup-tab" class="nav-link px-2 py-0" data-bs-toggle="pill" data-bs-target="#event-lineup" role="tab" aria-controls="event-lineup" aria-selected="false">Lineup</a></li>
         </ul>
 
     {% endblock %}{% endwith %}
 {% block content %}
     {% include 'messages.html' %}
     <div id="pills-tabContent" class="container-fluid tab-content my-1" data-toggle="tab">
-        <div id="event-details" class="tab-pane show active" role="tabpanel" aria-labelledby="event-details-tab">
+        <div id="event-details" class="tab-pane {% if active_tab == "details" %}show active{% endif %} " role="tabpanel" aria-labelledby="event-details-tab">
             <form method="post" action="#">{% csrf_token %}
                 <input type="hidden" name="event_id" value={{ event.id }}>
             <div>
@@ -60,8 +74,8 @@
             </div>
             </form>
         </div>
-        <div id="event-lineup" class="tab-pane" role="tabpanel" aria-labelledby="event-lineup-tab">
-            <form action="{%  url 'edit lineup' event_id=event.id%}" method="post">
+        <div id="event-lineup" class="tab-pane {% if active_tab == "lineup" %}show active{% endif %} " role="tabpanel" aria-labelledby="event-lineup-tab">
+            <form action="{%  url 'edit lineup' event_id=event.id active_tab=active_tab%}" method="post">
                 {% csrf_token %}
                 {{ formset.management_form }}
                 <div class="row">

@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.db.models import F
 from django.views.generic import ListView, DetailView
 
+
 class BenchCoachListView(ListView):
     title = None
 
@@ -48,7 +49,7 @@ class VenueListView(ListView):
         context['venues_tab_active'] ='active'
         return context
 
-def lineup_edit(request, event_id):
+def lineup_edit(request, event_id, active_tab='details'):
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -124,6 +125,7 @@ def lineup_edit(request, event_id):
         "benchcoach/lineup.html",
         {
             "title": "Lineup",
+            "active_tab":active_tab,
             "event": event,
             "details": details,
             "previous_event": previous_event,
