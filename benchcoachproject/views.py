@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render,redirect, reverse, HttpResponseRedirect
-from django.contrib.auth import login,authenticate
+from django.contrib.auth import login,authenticate,logout
 from django.contrib.auth.decorators import login_required
 
 @login_required()
@@ -8,6 +8,10 @@ def welcome(request):
   pages = ['event list', 'team list', 'venue list', 'player list', 'teamsnap home', 'login_view']
   return render(request,'home.html',{'pages':pages})
 
+def logout_benchcoachproject(request):
+  if request.method == "POST":
+    logout(request)
+  return redirect('home')
 
 def login_view(request):
   if request.method == 'POST':
