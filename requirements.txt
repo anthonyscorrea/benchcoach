@@ -18,3 +18,4 @@ psycopg2
 api-client
 gunicorn
 whitenoise
+django-heroku
