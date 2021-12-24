@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-qib_j&47o$5l3*gi7y#8#3pjh_88sfdqn@dmp&gx+2)&1nzmor
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["smithers-ii.local", "127.0.0.1", "10.0.1.4", "benchcoach.ascorrea.com"]
+ALLOWED_HOSTS = ["smithers-ii.local", "127.0.0.1", "10.0.1.4", "benchcoach.ascorrea.com", "fast-wildwood-43711.herokuapp.com"]
 
 # Application definition
 
