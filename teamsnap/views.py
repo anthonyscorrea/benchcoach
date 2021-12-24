@@ -32,14 +32,27 @@ def edit_event(request, id):
     event = Event.objects.get(id = id)
     return redirect(event.edit_url)
 
+@login_required()
 def home(request):
     current_benchcoach_user = request.user
     current_teamsnap_user = request.user.profile.teamsnap_user
     current_teamsnap_team = request.user.profile.teamsnapsettings.managed_team
     teamsnap_objects = {}
-    for obj in [Availability, Event, LineupEntry, Location, Member, Opponent, Team, User]:
-        teamsnap_objects[obj.__name__.lower()] = {}
-        teamsnap_objects[obj.__name__.lower()]['object_count']=obj.objects.count()
+    for teamsnap_obj, benchcoach_object in [
+        (Availability, benchcoach.models.Availability),
+        (Event, benchcoach.models.Event),
+        (LineupEntry, benchcoach.models.Positioning),
+        (Location, benchcoach.models.Venue),
+        (Member, benchcoach.models.Player),
+        (Opponent, benchcoach.models.Team),
+        (Team, benchcoach.models.Team),
+        (User, None)
+    ]:
+        teamsnap_objects[teamsnap_obj.__name__.lower()] = {}
+        teamsnap_objects[teamsnap_obj.__name__.lower()]['object_count'] = teamsnap_obj.objects.count()
+        if benchcoach_object:
+            teamsnap_objects[teamsnap_obj.__name__.lower()]['counterpart'] = {'name':benchcoach_object.__name__.lower()}
+            teamsnap_objects[teamsnap_obj.__name__.lower()]['counterpart']['object_count'] = benchcoach_object.objects.count()
 
     context= {
         'benchcoach_user': current_benchcoach_user,
@@ -104,13 +117,18 @@ def update_teamsnapdb_from_teamsnapapi(request, object_name, object_id=None):
 
     for Obj in [Object]:
         r[Obj.__name__.lower()] = []
-        a = Obj.ApiObject.search(CLIENT, team_id=TEAM_ID)
-        for _a in a:
-            obj, created = Obj.update_or_create_from_teamsnap_api(_a.data)
+        if not object_id:
+            a = Obj.ApiObject.search(CLIENT, team_id=TEAM_ID)
+            for _a in a:
+                obj, created = Obj.update_or_create_from_teamsnap_api(_a.data)
+                r[Obj.__name__.lower()].append((obj, created))
+        else:
+            a = Obj.ApiObject.search(CLIENT, id=object_id)[0]
+            obj, created = Obj.update_or_create_from_teamsnap_api(a.data)
             r[Obj.__name__.lower()].append((obj, created))
 
     for object_name, results in r.items():
-        if len(r) == 0:
+        if len(results) == 0:
             messages.error(request, f"Error! No {object_name} objects created or updated")
         else:
             result = [created for obj, created in results]

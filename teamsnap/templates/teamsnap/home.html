@@ -9,21 +9,24 @@
 
     {% include 'messages.html' %}
 
+    <table class="table">
         <ul class="list-group">
-    {% for obj_name, obj_data in teamsnap_objects.items %}
-        <li class="list-group-item">
-            <span class="fw-bold">{{ obj_name }}:</span> {{ obj_data.object_count }} objects
-            <a class="btn btn-primary btn-sm" href="{% url 'update' object_name=obj_name %}" role="button">
-                <i class="bi bi-arrow-clockwise"></i>
-                TeamSnap.com
-            </a>
-            <a class="btn btn-primary btn-sm" href="{% url 'send' object_name=obj_name %}" role="button">
-                <i class="bi bi-arrow-clockwise"></i>
-                BenchCoach
-            </a>
-        </li>
-    {% endfor %}
+            {% for obj_name, obj_data in teamsnap_objects.items %}
+                <tr class="">
+                    <th>{{ obj_name }}</th>
+                        <td>{{ obj_data.object_count }}</td>
+                    <th>{{ obj_data.counterpart.name }} </th>
+                    <td>{{ obj_data.counterpart.object_count }}</td>
+                    <td><a class="btn btn-primary" href="{% url 'update' object_name=obj_name %}" role="button">
+                        <i class="bi bi-cloud-fill"></i><i class="bi bi-arrow-right"></i><i class="bi bi-asterisk"></i>
+                    </a></td>
+                    <td><a class="btn btn-primary" href="{% url 'send' object_name=obj_name %}" role="button">
+                        <i class="bi bi-asterisk"/><i class="bi bi-arrow-right"/><i class="bi bi-clipboard"/>
+                    </a></td>
+                </tr>
+            {% endfor %}
         </ul>
+    </table>
 
 
 {% endblock %}
