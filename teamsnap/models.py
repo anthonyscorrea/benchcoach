@@ -32,14 +32,6 @@ class Team(TeamsnapBaseModel):
    )
    ApiObject = teamsnap.teamsnap.api.Team
 
-   @classmethod
-   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
-      fields = ['id', 'name', 'created_at', 'updated_at']
-      data = {k: teamsnap_data[k] for k in fields}
-      id = data.pop('id')
-      team, created = cls.objects.update_or_create(id=id, defaults=data)
-      return (team, created)
-
 class User(TeamsnapBaseModel):
    type = 'user'
    first_name = models.CharField(max_length=50, null=True)
@@ -89,17 +81,6 @@ class Opponent(TeamsnapManagedObjectModel):
    )
    ApiObject = teamsnap.teamsnap.api.Opponent
 
-   @classmethod
-   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
-      fields = ['id', 'name', 'created_at', 'updated_at']
-      opponent_data = {k: teamsnap_data[k] for k in fields}
-      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      id = opponent_data.pop('id')
-      opponent, created = cls.objects.update_or_create(id=id, defaults=opponent_data)
-      opponent.team = team
-      opponent.save()
-      return (opponent, created)
-
 class Location(TeamsnapManagedObjectModel):
    type = 'location'
    name = models.CharField(max_length=50, null=True)
@@ -111,17 +92,6 @@ class Location(TeamsnapManagedObjectModel):
       related_name="teamsnap_location"
    )
    ApiObject = teamsnap.teamsnap.api.Location
-
-   @classmethod
-   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
-      fields = ['id', 'name', 'created_at', 'updated_at']
-      opponent_data = {k: teamsnap_data[k] for k in fields}
-      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      id = opponent_data.pop('id')
-      location, created = cls.objects.update_or_create(id=id, defaults=opponent_data)
-      location.team = team
-      location.save()
-      return (location, created)
 
 class Member(TeamsnapManagedObjectModel):
    # url format is
@@ -141,17 +111,6 @@ class Member(TeamsnapManagedObjectModel):
    jersey_number = models.IntegerField(null=True)
    is_non_player = models.BooleanField(null=True)
    ApiObject = teamsnap.teamsnap.api.Member
-
-   @classmethod
-   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
-      fields = ['id', 'created_at', 'updated_at', 'first_name', 'last_name', 'jersey_number','is_non_player']
-      member_data = {k: teamsnap_data[k] for k in fields}
-      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      id = member_data.pop('id')
-      member, created = cls.objects.update_or_create(id=id, defaults= member_data)
-      member.team = team
-      member.save()
-      return (member, created)
 
    def __str__(self):
       return f"{self.last_name}, {self.first_name} ({self.id})"
@@ -182,33 +141,6 @@ class Event(TeamsnapManagedObjectModel):
    is_game = models.BooleanField(null=True)
    game_type = models.CharField(max_length = 50, null=True)
    ApiObject = teamsnap.teamsnap.api.Event
-
-   @classmethod
-   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
-      fields = [
-         'id',
-         'created_at',
-         'updated_at',
-         'label',
-         'start_date',
-         'formatted_title',
-         'points_for_opponent',
-         'points_for_team',
-         'is_game',
-         'game_type'
-      ]
-      event_data = {k: teamsnap_data[k] for k in fields}
-      location, created = Location.objects.get_or_create(id=teamsnap_data['location_id'])
-      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      id = event_data.pop('id')
-      event, created = cls.objects.update_or_create(id=id, defaults=event_data)
-      event.location = location
-      if teamsnap_data['opponent_id']:
-         opponent, created = Opponent.objects.get_or_create(id=teamsnap_data['opponent_id'])
-         event.opponent = opponent
-      event.team = team
-      event.save()
-      return (team, created)
 
    def __str__(self):
       return f"{self.formatted_title} ({self.id})"
@@ -241,26 +173,6 @@ class Availability(TeamsnapManagedObjectModel):
 
    class Meta:
       verbose_name_plural = "availabilities"
-
-   @classmethod
-   def update_or_create_from_teamsnap_api(cls, teamsnap_data):
-      fields = [
-         'id',
-         'created_at',
-         'updated_at',
-         'status_code'
-      ]
-      availability_data = {k: teamsnap_data[k] for k in fields}
-      member, created = Member.objects.get_or_create(id=teamsnap_data['member_id'])
-      team, created = Team.objects.get_or_create(id=teamsnap_data['team_id'])
-      event, created = Event.objects.get_or_create(id=teamsnap_data['event_id'])
-      id = availability_data.pop('id')
-      availability, created = cls.objects.update_or_create(id=id, defaults=availability_data)
-      availability.team = team
-      availability.event = event
-      availability.member = member
-      availability.save()
-      return (availability, created)
 
 class LineupEntry(TeamsnapManagedObjectModel):
    member = models.ForeignKey(Member, on_delete=models.CASCADE)
