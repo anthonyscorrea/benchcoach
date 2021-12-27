@@ -12,7 +12,6 @@ from django.http import HttpResponse
 import benchcoachproject.models
 import benchcoach.models
 from django.http import JsonResponse
-from .utils.teamsnap_object_utils import update_users, update_teams, update_events, update_members, update_locations, update_availabilities
 from django.contrib import messages
 from django.template.loader import render_to_string
 from .utils.import_teamsnap import update_team, update_event, update_member, update_location, update_opponent, update_availability, update_teamsnap_object
@@ -99,6 +98,44 @@ class TeamsnapObjTableView(View):
         qs = self.Model.objects.all()
         formset = self.Formset(queryset=qs)
         return render(request, self.template, context={'formset': formset})
+
+@login_required()
+def sync(request):
+    object_name = request.POST.get('object_name')
+    object_id = request.POST.get('object_id')
+    if request.POST and request.POST.get('object_name') and request.POST.get('object_id'):
+        TOKEN = request.user.profile.teamsnap_access_token
+        USER_ID = request.user.profile.teamsnap_user.id
+        TEAM_ID = request.user.profile.teamsnapsettings.managed_team.id
+        CLIENT = TeamSnap(token=TOKEN)
+
+        object_name = request.POST.get('object_name')
+        object_id = request.POST.get('object_id')
+        Object = {
+            obj.__name__.lower(): obj
+            for obj in
+            [Availability, Event, LineupEntry, Location, Member, Opponent, Team]
+        }.get(object_name)
+
+        r={}
+        r[Object.__name__.lower()] = []
+        a = Object.ApiObject.search(CLIENT, id=object_id)
+        if a and len(a) == 1:
+            obj, created = Object.update_or_create_from_teamsnap_api(a[0].data)
+            r[Object.__name__.lower()].append((obj, created))
+
+        for object_name, results in r.items():
+            if len(results) == 0:
+                messages.error(request, f"Error! No {object_name} objects created or updated")
+            else:
+                result = [created for obj, created in results]
+                messages.success(request,
+                                 f"Success! {sum(result)} {object_name} objects created, {len(result) - sum(result)} {object_name} objects updated.")
+
+        return redirect(request.POST.get('next'))
+
+    return HttpResponse('404')
+
 
 @login_required()
 def update_teamsnapdb_from_teamsnapapi(request, object_name, object_id=None):
