@@ -1,8 +1,13 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
 
+class BenchcoachModel(models.Model):
+    pass
 
-class Team(models.Model):
+    class Meta:
+        abstract = True
+
+class Team(BenchcoachModel):
     name = models.CharField(max_length=50)
     image = models.FileField(
         upload_to="images/",
@@ -14,14 +19,14 @@ class Team(models.Model):
         return f"{self.name}"
 
 
-class Venue(models.Model):
+class Venue(BenchcoachModel):
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.name}"
 
 
-class Event(models.Model):
+class Event(BenchcoachModel):
     start = models.DateTimeField(null=True)
     venue = models.ForeignKey(Venue, null=True, on_delete=models.CASCADE)
     home_team = models.ForeignKey(
@@ -35,11 +40,11 @@ class Event(models.Model):
         return f"{self.start:%Y-%m-%d %H:%M}"
 
 
-class Season(models.Model):
+class Season(BenchcoachModel):
     name = models.CharField(max_length=50)
 
 
-class Player(models.Model):
+class Player(BenchcoachModel):
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     jersey_number = models.IntegerField(null=True)
@@ -55,7 +60,7 @@ class Player(models.Model):
         )
 
 
-class StatLine(models.Model):
+class StatLine(BenchcoachModel):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     batting_avg = models.DecimalField(max_digits=4, decimal_places=3, default=0)
     onbase_pct = models.DecimalField(max_digits=4, decimal_places=3, default=0)
@@ -75,7 +80,7 @@ class StatLine(models.Model):
         )
 
 
-class Positioning(models.Model):
+class Positioning(BenchcoachModel):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     positions = [
@@ -106,7 +111,7 @@ class Positioning(models.Model):
         return f"{self.player}; {self.event};"
 
 
-class Availability(models.Model):
+class Availability(BenchcoachModel):
     YES = 2
     MAYBE = 1
     NO = 0
