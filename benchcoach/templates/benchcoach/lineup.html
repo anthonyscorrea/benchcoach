@@ -108,6 +108,43 @@
         </div>
     </div>
     <script src="{% static 'js/Sortable.js' %}"></script>
+    <script id="form changes">
+        function positionSelectChanged(elem) {
+            let row = elem.parentElement.parentElement
+            let original_table = elem.parentElement.parentElement.parentElement
+            let lineup_table = document.getElementById('lineup')
+            let bench_table = document.getElementById('bench')
+            let dhd_table = document.getElementById('dhd')
+            let player_order = row.querySelector('[id^="player-order"]')
+            let player_available = row.querySelector('[id^="player-availability"]')
+            console.dir(original_table)
+            console.dir(bench_table)
+            console.dir(original_table == bench_table)
+            if (elem.value == "P" && original_table == bench_table ) {
+                dhd_table.appendChild(row)
+                player_order.classList.remove('d-none')
+                player_available.classList.add('d-none')
+                refresh_lineup_order()
+            }
+            else if (elem.value && original_table == dhd_table ) {
+                dhd_table.appendChild(row)
+                player_order.classList.remove('d-none')
+                player_available.classList.add('d-none')
+                refresh_lineup_order()
+            }
+            else if (elem.value) {
+                lineup_table.appendChild(row)
+                player_order.classList.remove('d-none')
+                player_available.classList.add('d-none')
+                refresh_lineup_order()
+            }
+            else {
+                bench_table.prepend(row)
+                player_order.classList.add('d-none')
+                player_available.classList.remove('d-none')
+            }
+        }
+    </script>
     <script id="sortable">
         function refresh_lineup_order (){
             var player_rows = document.getElementById('lineup').querySelectorAll('tr')

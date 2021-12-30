@@ -12,7 +12,7 @@ class PositioningForm(forms.ModelForm):
     class Meta:
         model = Positioning
         widgets = {
-            'position': forms.Select(attrs={'class': 'form-control form-control-sm'})
+            'position': forms.Select(attrs={'class': 'form-control form-control-sm', 'onchange':'positionSelectChanged(this)'})
         }
         exclude = ()
 
