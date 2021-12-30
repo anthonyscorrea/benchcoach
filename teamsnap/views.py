@@ -45,7 +45,7 @@ def home(request):
         (Member, benchcoach.models.Player),
         (Opponent, benchcoach.models.Team),
         (Team, benchcoach.models.Team),
-        (User, None)
+        # (User, {'name':})
     ]:
         teamsnap_objects[teamsnap_obj.__name__.lower()] = {}
         teamsnap_objects[teamsnap_obj.__name__.lower()]['object_count'] = teamsnap_obj.objects.count()
@@ -183,41 +183,37 @@ def send_to_benchcoach(request, object_name):
     }.get(object_name)
 
     TEAM_ID = request.user.profile.teamsnapsettings.managed_team.id
+    TOKEN = request.user.profile.teamsnap_access_token
+
+    sync_engine = TeamsnapSyncEngine(teamsnap_token=TOKEN, managed_team_teamsnap_id=TEAM_ID)
     r = {}
 
     r[object_name]=[]
 
     if object_name == 'team':
-        for team in Object.objects.filter(id=TEAM_ID):
-            r[object_name] += update_opponent(team, create_benchcoach_object=True, create_related=True)
+        r[object_name] = sync_engine.sync(qs=benchcoach.models.Team.objects.all())
 
-    if object_name == 'opponent':
-        for team in Object.objects.filter(team_id=TEAM_ID):
-            r[object_name] += update_team(team, create_benchcoach_object=True, create_related=True)
+    if object_name == 'venue':
+        r[object_name] = sync_engine.sync(qs=benchcoach.models.Venue.objects.all())
+        pass
 
-    if object_name == 'location':
-        for location in Location.objects.filter(team_id=TEAM_ID):
-            r[object_name] += update_location(location, create_benchcoach_object=True, create_related=True)
-
-    if object_name == 'member':
-        for member in Member.objects.filter(team_id=TEAM_ID, is_non_player=False):
-            r[object_name] += update_member(member, create_benchcoach_object=True, create_related=True)
+    if object_name == 'player':
+        r[object_name] = sync_engine.sync(qs=benchcoach.models.Player.objects.all())
 
     if object_name == 'event':
-        for event in Event.objects.filter(team_id=TEAM_ID):
-            r[object_name] += update_event(event, create_benchcoach_object=True, create_related=True)
+        r[object_name] = sync_engine.sync(qs=benchcoach.models.Event.objects.all())
+        pass
 
     if object_name == 'availability':
-        for availability in Availability.objects.filter(team_id=TEAM_ID, member__is_non_player=False):
-            r[object_name] += update_availability(availability, create_benchcoach_object=True, create_related=True)
+        r[object_name] = []
+        for event in benchcoach.models.Player.objects.all():
+            r[object_name] += sync_engine.sync(qs=event.availability_set.all())
 
     for object_name, results in r.items():
-        if len(r) == 0:
-            messages.error(request, f"Error! No {object_name} objects created or updated")
+        if len(results) == 0:
+            messages.error(request, f"Error! No {object_name} objects updated")
         else:
-            result = [created for obj, created in results]
-            messages.success(request,
-                             f"Success! {sum(result)} {object_name} objects created, {len(result) - sum(result)} {object_name} objects updated.")
+            messages.success(request, f"Success! {len(results)} {object_name} objects updated.")
 
     return redirect('teamsnap home')
 
@@ -304,8 +300,21 @@ def sync_teamsnapdb_to_benchcoachdb(request):
     }
     return JsonResponse(data)
 
+from .utils.teamsnap_sync_engine import TeamsnapSyncEngine
+def import_teamsnap(request):
+    TEAM_ID = request.user.profile.teamsnapsettings.managed_team.id
+    TOKEN = request.user.profile.teamsnap_access_token
 
+    sync_engine = TeamsnapSyncEngine(teamsnap_token=TOKEN, managed_team_teamsnap_id=TEAM_ID)
+    r = sync_engine.import_items()
 
+    for object_name, results in r.items():
+        if len(results) == 0:
+            messages.error(request, f"Error! No {object_name} objects created or updated")
+        else:
+            messages.success(request, f"Success! {len(results)} {object_name} objects imported")
+
+    return redirect('teamsnap home')
 
 
 

@@ -25,8 +25,6 @@ class Team(TeamsnapBaseModel):
    name = models.CharField(max_length=50, null=True)
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Team,
-      null=True,
-      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_team"
    )
@@ -74,8 +72,6 @@ class Opponent(TeamsnapManagedObjectModel):
    name = models.CharField(max_length=50, null=True)
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Team,
-      null=True,
-      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_opponent"
    )
@@ -86,8 +82,6 @@ class Location(TeamsnapManagedObjectModel):
    name = models.CharField(max_length=50, null=True)
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Venue,
-      null=True,
-      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_location"
    )
@@ -101,8 +95,6 @@ class Member(TeamsnapManagedObjectModel):
    name = models.CharField(max_length=50, null=True)
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Player,
-      null=True,
-      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_member"
    )
@@ -126,8 +118,6 @@ class Event(TeamsnapManagedObjectModel):
    type = 'event'
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Event,
-      null=True,
-      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_event"
    )
@@ -161,8 +151,6 @@ class Availability(TeamsnapManagedObjectModel):
    member = models.ForeignKey(Member, null=True, on_delete=models.CASCADE)
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Availability,
-      null=True,
-      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_availability"
    )
@@ -193,8 +181,6 @@ class LineupEntry(TeamsnapManagedObjectModel):
    ]
    benchcoach_object = models.OneToOneField(
       benchcoach.models.Positioning,
-      null=True,
-      blank=True,
       on_delete=models.CASCADE,
       related_name="teamsnap_lineupentry"
    )

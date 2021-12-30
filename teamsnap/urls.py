@@ -15,6 +15,7 @@ urlpatterns = [
     path('sync_benchcoach_db', views.sync_teamsnapdb_to_benchcoachdb, name="sync benchcoach"),
     path('update/<str:object_name>', views.update_teamsnapdb_from_teamsnapapi, name="update"),
     path('send/<str:object_name>', views.send_to_benchcoach, name="send"),
-    path('sync/', views.sync, name="sync")
+    path('sync/', views.sync, name="sync"),
+    path('import/', views.import_teamsnap, name="import")
     # path('import_teamsnap', views.import_teamsnap, name="import teamsnap"),
 ]
