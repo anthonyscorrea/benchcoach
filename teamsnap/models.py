@@ -146,6 +146,7 @@ class Event(TeamsnapManagedObjectModel):
       return f"{self.formatted_title} ({self.id})"
 
 class Availability(TeamsnapManagedObjectModel):
+   type='availability'
    YES = 1
    NO = 0
    MAYBE = 2
@@ -165,7 +166,7 @@ class Availability(TeamsnapManagedObjectModel):
       on_delete=models.CASCADE,
       related_name="teamsnap_availability"
    )
-   status_code = models.SmallIntegerField(null=True, choices=status_codes, default=None)
+   status_code = models.SmallIntegerField(choices=status_codes, null=True, blank=True, default=None)
    ApiObject = teamsnap.teamsnap.api.Availability
 
    def __str__(self):
