@@ -57,20 +57,7 @@
                     <div class="card-header d-inline-flex">
                         <div class="d-inline-flex flex-grow-1"><h5>Event</h5></div>
                         <div class="d-inline-flex">
-                            <form method="post" action="{% url 'sync' %}">{% csrf_token %}
-                                <input type="hidden" name="object_name" value="event">
-                                <input type="hidden" name="object_id" value={{ event.teamsnap_event.id }}>
-                                <input type="hidden" name="next" value="{{ request.path }}">
-                                <button type="submit" value="update_event" class="btn btn-sm btn-outline-secondary d-xl-flex align-items-xl-center mx-1">
-                                    <i class="bi bi-cloud-fill"></i><i class="bi bi-arrow-right"></i><i class="bi bi-clipboard"></i>
-                                </button>
-
-                                </input>
-                            </form>
-
-                                <button type="button" value="Submit" class="btn btn-sm btn-outline-primary d-xl-flex align-items-xl-center mx-1">
-                                    <i class="bi bi-pencil-square mx-1"></i>Edit
-                                </button>
+                            {% include 'teamsnap/update-button.html' with object_name='event' object_id=event.id next=request.path %}
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -107,11 +94,6 @@
                             <div class="card-header d-inline-flex">
                                 <div class="d-inline-flex flex-grow-1">
                                     <h5>Bench</h5>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-secondary d-xl-flex align-items-xl-center" type="button">
-                                        <i class="bi bi-arrow-clockwise"></i>TeamSnap
-                                    </button>
                                 </div>
                             </div>
 

@@ -175,47 +175,68 @@ def update_teamsnapdb_from_teamsnapapi(request, object_name, object_id=None):
     return redirect('teamsnap home')
 
 @login_required()
-def send_to_benchcoach(request, object_name):
-    Object = {
-        obj.__name__.lower(): obj
-        for obj in
-        [Availability, Event, LineupEntry, Location, Member, Opponent, Team, User]
-    }.get(object_name)
+def send_to_benchcoach(request, object_name=None, object_id=None): #TODO rename
+    if request.POST:
+        next = request.POST.get('next')
+        object_name = request.POST.get('object_name')
+        object_id = request.POST.get('object_id')
 
-    TEAM_ID = request.user.profile.teamsnapsettings.managed_team.id
-    TOKEN = request.user.profile.teamsnap_access_token
+        Object = {
+            obj.__name__.lower(): obj
+            for obj in
+            [Availability, Event, LineupEntry, Location, Member, Opponent, Team, User]
+        }.get(object_name)
 
-    sync_engine = TeamsnapSyncEngine(teamsnap_token=TOKEN, managed_team_teamsnap_id=TEAM_ID)
-    r = {}
+        TEAM_ID = request.user.profile.teamsnapsettings.managed_team.id
+        TOKEN = request.user.profile.teamsnap_access_token
 
-    r[object_name]=[]
+        sync_engine = TeamsnapSyncEngine(teamsnap_token=TOKEN, managed_team_teamsnap_id=TEAM_ID)
+        r = {}
 
-    if object_name == 'team':
-        r[object_name] = sync_engine.sync(qs=benchcoach.models.Team.objects.all())
+        r[object_name]=[]
 
-    if object_name == 'venue':
-        r[object_name] = sync_engine.sync(qs=benchcoach.models.Venue.objects.all())
-        pass
+        if object_name == 'team':
+            if object_id:
+                r[object_name] = sync_engine.sync(qs=benchcoach.models.Team.objects.filter(id=object_id))
+            else:
+                r[object_name] = sync_engine.sync(qs=benchcoach.models.Team.objects.all())
 
-    if object_name == 'player':
-        r[object_name] = sync_engine.sync(qs=benchcoach.models.Player.objects.all())
+        if object_name == 'venue':
+            if object_id:
+                r[object_name] = sync_engine.sync(qs=benchcoach.models.Venue.objects.filter(id=object_id))
+            else:
+                r[object_name] = sync_engine.sync(qs=benchcoach.models.Venue.objects.all())
 
-    if object_name == 'event':
-        r[object_name] = sync_engine.sync(qs=benchcoach.models.Event.objects.all())
-        pass
+        if object_name == 'player':
+            if object_id:
+                r[object_name] = sync_engine.sync(qs=benchcoach.models.Player.objects.filter(id=object_id))
+            else:
+                r[object_name] = sync_engine.sync(qs=benchcoach.models.Player.objects.all())
 
-    if object_name == 'availability':
-        r[object_name] = []
-        for event in benchcoach.models.Player.objects.all():
-            r[object_name] += sync_engine.sync(qs=event.availability_set.all())
+        if object_name == 'event':
+            if object_id:
+                r[object_name] = sync_engine.sync(qs=benchcoach.models.Event.objects.filter(id=object_id))
+                r['availability'] = sync_engine.sync(qs=benchcoach.models.Event.objects.get(id=object_id).availability_set.all())
+            else:
+                r[object_name] = sync_engine.sync(qs=benchcoach.models.Event.objects.all())
 
-    for object_name, results in r.items():
-        if len(results) == 0:
-            messages.error(request, f"Error! No {object_name} objects updated")
-        else:
-            messages.success(request, f"Success! {len(results)} {object_name} objects updated.")
+        if object_name == 'availability':
+            r[object_name] = []
+            if object_id:
+                r[object_name] += sync_engine.sync(qs=benchcoach.models.Availability.objects.filter(id=object_id))
+            else:
+                for event in benchcoach.models.Player.objects.all():
+                    r[object_name] += sync_engine.sync(qs=event.availability_set.all())
 
-    return redirect('teamsnap home')
+        for object_name, results in r.items():
+            if len(results) == 0:
+                messages.error(request, f"Error! No {object_name} objects updated")
+            else:
+                messages.success(request, f"Success! {len(results)} {object_name} objects updated.")
+
+        return redirect(next)
+    else:
+        return HttpResponse(404)
 
 def sync_teamsnapdb_with_teamsnapapi(request):
     '''

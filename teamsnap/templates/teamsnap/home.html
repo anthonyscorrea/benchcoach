@@ -21,9 +21,10 @@
                         <td>{{ obj_data.object_count }}</td>
                     <th>{{ obj_data.counterpart.name }} </th>
                     <td>{{ obj_data.counterpart.object_count }}</td>
-                    <td><a class="btn btn-primary" href="{% url 'send' object_name=obj_data.counterpart.name %}" role="button">
-                        <i class="bi bi-arrow-clockwise"></i><i class="bi bi-asterisk"></i> Sync
-                    </a></td>
+
+                    <td>
+                        {% include 'teamsnap/update-button.html' with object_name=obj_data.counterpart.name object_id='' next=request.path %}
+                    </td>
                 </tr>
             {% endfor %}
         </ul>

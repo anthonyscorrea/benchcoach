@@ -1,0 +1,8 @@
+<form method="post" id="formSync" action="{% url 'send' %}">{% csrf_token %}
+    <input type="hidden" name="object_name" value="{{ object_name }}">
+    <input type="hidden" name="object_id" value={{ object_id }}>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" value="update_event" class="btn btn-sm btn-outline-secondary d-xl-flex align-items-xl-center mx-1">
+        <i class="bi bi-arrow-clockwise"></i><i class="bi bi-asterisk"></i>
+    </button>
+</form>
