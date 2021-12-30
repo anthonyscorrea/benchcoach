@@ -330,9 +330,9 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         return r
 
 
-    def sync(self, qs: django.db.models.QuerySet = None, instance: django.db.models.Model = None,
+    def sync(self, qs: django.db.models.QuerySet = None, instance: benchcoach.models.BenchcoachModel = None,
              direction='download') -> List[Tuple[django.db.models.Model, bool]]:
-        if not qs and not instance:
+        if not isinstance(qs, QuerySet) and not isinstance(instance, benchcoach.models.BenchcoachModel):
             raise TypeError(f"sync requires either a QuerySet or model instance to be provided")
         if qs and instance:
             raise TypeError(f"sync requires either a QuerySet or model instance to be provided, but not both")
