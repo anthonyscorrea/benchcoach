@@ -206,7 +206,10 @@ def csv_export(request, event_id):
     rows.append(event.venue.name)  # 3
     [rows.append('') for i in range(3)] #4-6
     p = qs.filter(position='P').first()
-    rows.append(f"{p.player.last_name}, {p.player.first_name}") #7
+    if p:
+        rows.append(f"{p.player.last_name}, {p.player.first_name}") #7
+    else:
+        rows.append('')
     [rows.append('') for i in range(3)] #8-10
     for pos in ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']: #11-19
         p = qs.filter(position=pos).first()
@@ -227,7 +230,10 @@ def csv_export(request, event_id):
         rows.append('')
     rows.append('') #22
     p=qs.filter(position__isnull=False, order=0).first()
-    rows.append(f"{p.player.last_name}, {p.player.first_name}")  # 23
+    if p:
+        rows.append(f"{p.player.last_name}, {p.player.first_name}")  # 23
+    else:
+        rows.append('')
     rows.append('')
     for p in qs.filter(order__gt=0).order_by('order'):
         rows.append(f"{p.player.last_name}, {p.player.first_name}")
