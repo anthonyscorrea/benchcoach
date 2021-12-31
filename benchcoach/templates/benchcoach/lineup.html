@@ -50,7 +50,7 @@
     {% endblock %}{% endwith %}
 {% block content %}
     {% include 'messages.html' %}
-    <div id="pills-tabContent" class="container-fluid tab-content my-1" data-toggle="tab">
+    <div id="pills-tabContent" class="container-fluid tab-content w-100 p-0 m-0" data-toggle="tab">
         <div id="event-details" class="tab-pane {% if active_tab == "details" %}show active{% endif %} " role="tabpanel" aria-labelledby="event-details-tab">
             <div>
                 <div class="card my-1">
@@ -67,11 +67,11 @@
             </div>
             </form>
         </div>
-        <div id="event-lineup" class="tab-pane {% if active_tab == "lineup" %}show active{% endif %} " role="tabpanel" aria-labelledby="event-lineup-tab">
+        <div id="event-lineup" class="tab-pane {% if active_tab == "lineup" %}show active{% endif %}" role="tabpanel" aria-labelledby="event-lineup-tab">
             <form action="{%  url 'edit lineup' event_id=event.id active_tab=active_tab%}" method="post">
                 {% csrf_token %}
                 {{ formset.management_form }}
-                <div class="row">
+                <div class="row w-100">
                     <div class="col-md-6">
                         <div class="card my-1">
                             <div class="card-header d-inline-flex">
