@@ -2,6 +2,7 @@ from django.db import models
 
 import benchcoach.models
 import teamsnap.teamsnap.api
+from django.utils.timezone import localtime
 
 class TeamsnapBaseModel(models.Model):
    type = None
@@ -131,6 +132,16 @@ class Event(TeamsnapManagedObjectModel):
    is_game = models.BooleanField(null=True)
    game_type = models.CharField(max_length = 50, null=True)
    ApiObject = teamsnap.teamsnap.api.Event
+
+   @property
+   def csv_event_title(self)->str:
+      '''
+      TeamSnap has a title format that it uses for the csv export which includes the date and time
+      :return: formatted string
+      '''
+      # activate(zone)
+      start_date = localtime(self.start_date)
+      return f"{self.formatted_title} {start_date:%m/%d/%Y}" + f"{start_date:%-I:%M %p}".rjust(9)
 
    def __str__(self):
       return f"{self.formatted_title} ({self.id})"
