@@ -11,5 +11,7 @@ urlpatterns = [
     path('events/<int:pk>/lineup',  login_required(views.EventDetailView.as_view()), name="event lineup"),
     path('players/list/',  login_required(views.PlayerListView.as_view()), name="player list"),
     path('teams/list/',  login_required(views.TeamListView.as_view()), name="team list"),
-    path('venues/list/',  login_required(views.VenueListView.as_view()), name="venue list")
+    path('venues/list/',  login_required(views.VenueListView.as_view()), name="venue list"),
+    path('events/<int:event_id>/card',  login_required(views.lineupcard), name="lineup card"),
+path('events/<int:event_id>/csv',  login_required(views.csv_export), name="lineup csv")
 ]

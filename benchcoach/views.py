@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from .models import Event, Team, Player, Positioning, Venue
 from .forms import PositioningFormSet, TeamsnapEventForm
 from django.contrib import messages
 from django.db.models import F
 from django.views.generic import ListView, DetailView
+import csv
 
 
 class BenchCoachListView(ListView):
@@ -136,3 +137,102 @@ def lineup_edit(request, event_id, active_tab='details'):
             "formset_dhd": formset_dhd,
         },
     )
+
+def lineupcard(request, event_id):
+    previous_event = Event.objects.filter(id=event_id - 1).first()
+
+    event = Event.objects.get(id=event_id)
+    next_event = Event.objects.get(id=event_id + 1)
+    players = Player.objects.prefetch_related("availability_set", "positioning_set")
+
+    for player in players:
+        Positioning.objects.get_or_create(player_id=player.id, event_id=event_id)
+
+    qs = (
+        event.positioning_set.all()
+        .filter(player__availability__event=event_id, player__teamsnap_member__is_non_player=False)
+        .order_by("-player__availability__available", "player__last_name", "order")
+        .annotate(event_availability=F("player__availability__available"))
+    )
+
+    qs_starting = qs.filter(order__isnull=False).order_by("order")
+
+    details = {
+        "Away Team": event.away_team,
+        "Home Team": event.home_team,
+        "Date": event.start.date(),
+        "Time": event.start.time(),
+        "Venue": event.venue,
+    }
+
+    return render(
+        request,
+        "benchcoach/card.html",
+        {
+            "title": "Lineup",
+            "event": event,
+            "details": details,
+            "previous_event": previous_event,
+            "next_event": next_event,
+            "positionings": qs,
+            "positionings_starting": qs_starting,
+            "empty_lines": range(14)
+        },
+    )
+
+def csv_export(request, event_id):
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename=lineup-event-{event_id}.csv'},
+    )
+    previous_event = Event.objects.filter(id=event_id - 1).first()
+
+    event = Event.objects.get(id=event_id)
+    players = Player.objects.prefetch_related("availability_set", "positioning_set")
+
+    for player in players:
+        Positioning.objects.get_or_create(player_id=player.id, event_id=event_id)
+
+    qs = (
+        event.positioning_set.all()
+            .filter(player__availability__event=event_id, player__teamsnap_member__is_non_player=False)
+            .order_by("-player__availability__available", "player__last_name", "order")
+            .annotate(event_availability=F("player__availability__available"))
+    )
+
+    rows = []
+
+    rows.append(event.teamsnap_event.csv_event_title) # 2
+    rows.append(event.venue.name)  # 3
+    [rows.append('') for i in range(3)] #4-6
+    p = qs.filter(position='P').first()
+    rows.append(f"{p.player.last_name}, {p.player.first_name}") #7
+    [rows.append('') for i in range(3)] #8-10
+    for pos in ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']: #11-19
+        p = qs.filter(position=pos).first()
+        if p:
+            rows.append(f"{p.player.last_name}, {p.player.first_name}")
+        else:
+            rows.append('')
+    ehs = qs.filter(position='EH')
+    if len(ehs) > 0:
+        p=qs.filter(position='EH')[0]
+        rows.append(f"{p.player.last_name}, {p.player.first_name}")  # 20
+    else:
+        rows.append('')
+    if len(ehs) > 1:
+        p=qs.filter(position='EH')[1]
+        rows.append(f"{p.player.last_name}, {p.player.first_name}")  # 21
+    else:
+        rows.append('')
+    rows.append('') #22
+    p=qs.filter(position__isnull=False, order=0).first()
+    rows.append(f"{p.player.last_name}, {p.player.first_name}")  # 23
+    rows.append('')
+    for p in qs.filter(order__gt=0).order_by('order'):
+        rows.append(f"{p.player.last_name}, {p.player.first_name}")
+
+    writer = csv.writer(response)
+    for row in rows:
+        writer.writerow([row])
+    return response

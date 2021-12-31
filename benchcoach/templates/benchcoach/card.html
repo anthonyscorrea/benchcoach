@@ -1,0 +1,280 @@
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <title>Gamecard</title>
+    <link rel="stylesheet" href="{% static "css/base.css"%}">
+    <link rel="stylesheet" href="{% static "css/paper.css"%}">
+    <style>		@page { size: letter }
+    </style>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inconsolata">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Open+Sans">
+    <style>
+        * {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        @font-face {
+            font-family: 'Open Sans';
+            src: url("{% static 'fonts/OpenSans.ttf' %}") format("truetype-variations");
+            font-weight: 1 999;
+            font-stretch: 0% 100%
+        }
+
+        @font-face {
+            font-family: 'Inconsolata';
+            src: url("{% static 'fonts/Inconsolata.ttf' %}") format("truetype-variations");
+            font-weight: 1 999;
+            font-stretch: 0% 100%
+        }
+        .whole-card {
+            margin:0;
+            padding:0;
+            height: 12.5cm;
+            width: 17.5cm;
+            outline: .8px dashed lightgray;
+            margin: auto;
+            display: flex;
+        }
+
+        .half-card {
+            margin: auto;
+            padding: .1in;
+            height: 100%;
+            width: 50%;
+        }
+
+        card-left {
+            float: left;
+            margin: auto;
+        }
+        card-right {
+            float: right;
+        }
+
+        .content {
+            height: 100%;
+            width: 100%;
+            {#outline: solid grey;#}
+        }
+
+        table {
+            font-family: "Open Sans";
+            border-collapse: collapse;
+            empty-cells: show;
+            font-size:11px;
+            table-layout: fixed;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow-x: hidden;
+            width: 100%;
+            border: 1px solid #000;
+        }
+
+        th, td {
+            /* 	  box-sizing: content-box;  */
+            border: 0.5px solid black;
+            height: 17px;
+            text-overflow: ellipsis;
+            overflow-x: hidden;
+            padding: 0px;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+
+        .gametitle {
+            text-transform: uppercase;
+            font-stretch: condensed;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .homeaway {
+            text-transform: uppercase;
+            font-stretch: extra-expanded;
+            text-align: center;
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        .numbercell {
+            font-family: "Inconsolata";
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .statscell {
+            font-family: "Inconsolata";
+            text-align: center;
+            font-stretch: extra-condensed;
+            font-size: 9px;
+            width: 60px;
+        }
+
+        tr:nth-child(even) {background-color: #f2f2f2;}
+
+        th{
+            background: black;
+            color: white;
+            border: none;
+        }
+
+        .customcol{
+            width: 120px;
+            text-transform: uppercase;
+            font-stretch: condensed;
+        }
+
+        .condensedNameCell{
+            width: 70px;
+            text-transform: uppercase;
+            font-stretch: condensed;
+        }
+
+        .square {
+            height: 14px;
+            width: 14px;
+        }
+
+        .available{
+            background-color: #B7E1CD;
+        }
+
+        .notavailable{
+            background-color: #F4C7C3;
+        }
+
+        .maybeavailable{
+            background-color: #B7E1CD;
+        }
+
+        .starting{
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body class="letter">
+<section class="sheet padding-10mm">
+    <div class="whole-card">
+        <div id="NW" class="half-card red">
+            <div class="content card-left">
+                <table>
+                    <thead>
+                    <tr>
+                        <th colspan="9" class="gametitle">{{ event.teamsnap_event.csv_event_title }}</th>
+                        <th colspan="3" class="homeaway">
+                        {% if event.home_team.name == user.profile.teamsnapsettings.managed_team.name %}
+                            HOME
+                        {% elif event.away_team.name == user.profile.teamsnapsettings.managed_team.name %}
+                            AWAY
+                        {% else %}
+                        {% endif %}
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="numbercell"></td>
+                        <th class="customcol"></td>
+                        <th class="numbercell"></td>
+                        <th class="numbercell"></td>
+                        <th class="numbercell">1</td>
+                        <th class="numbercell">2</td>
+                        <th class="numbercell">3</td>
+                        <th class="numbercell">4</td>
+                        <th class="numbercell">5</td>
+                        <th class="numbercell">6</td>
+                        <th class="numbercell">7</td>
+                        <th class="numbercell">X</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for positioning in positionings_starting %}
+                        {% if positioning.order == 0 %}<tr style="border: 1px solid;">
+                        {% else %}<tr>{% endif %}
+                        <td class="numbercell">{{ positioning.order }}</td>
+                        <td class="customcol">{{ positioning.player.last_name }}</td>
+                        <td class="numbercell">{{ positioning.player.jersey_number }}</td>
+                        <td class="numbercell">{{ positioning.position|default_if_none:'' }}</td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            <table>
+            <tbody>
+            {% for line in empty_lines %}
+                        <tr>
+                        <td class="numbercell"></td>
+                        <td class="customcol"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        </tr>
+                    {% endfor %}
+            </tbody>
+            </table>
+            </div>
+        </div>
+        <div class="half-card">
+            <div class="content card-right">
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="numbercell"></td>
+                        <th class="numbercell"></td>
+                        <th class="customcol"></td>
+                        <th class="numbercell"></td>
+                        <th class="numbercell">1</td>
+                        <th class="numbercell">2</td>
+                        <th class="numbercell">3</td>
+                        <th class="numbercell">4</td>
+                        <th class="numbercell">5</td>
+                        <th class="numbercell">6</td>
+                        <th class="numbercell">7</td>
+                        <th class="numbercell">X</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for positioning in positionings %}
+                        <tr>
+                        <td class="numbercell"></td>
+                        <td class="numbercell">{{ positioning.player.jersey_number }}</td>
+                        <td class="customcol{% if positioning.event_availability == 2 %} available{% endif %}{% if positioning.event_availability == 0 %} notavailable{% endif %}{% if positioning.order or positioning.position %} starting{% endif %}">{{ positioning.player.last_name }}</td>
+                        <td class="numbercell"><i class="bi bi-check-lg"></i></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        <td class="numbercell"></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
