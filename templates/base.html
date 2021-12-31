@@ -18,8 +18,8 @@
 
 </header>
 
-<div class="d-inline-flex min-vw-100 min-vh-100">
-    <div class="">
+<div class="d-inline-flex min-vw-100 min-vh-100" style="padding-top:3rem;">
+    <div id="sidebar" class="">
         {% block sidebar %}
             {% include 'sidebar.html' %}
         {% endblock %}
@@ -31,7 +31,7 @@
             {% block header %}
             {% endblock %}
         </div>
-        <div class="container-fluid m-2">
+        <div class="container-fluid">
             {% block content %}{% endblock %}
         </div>
     </div>
