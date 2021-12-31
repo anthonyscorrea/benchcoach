@@ -13,5 +13,5 @@ urlpatterns = [
     path('teams/list/',  login_required(views.TeamListView.as_view()), name="team list"),
     path('venues/list/',  login_required(views.VenueListView.as_view()), name="venue list"),
     path('events/<int:event_id>/card',  login_required(views.lineupcard), name="lineup card"),
-path('events/<int:event_id>/csv',  login_required(views.csv_export), name="lineup csv")
+path('events/<int:event_id>/csv',  views.csv_export, name="lineup csv")
 ]
