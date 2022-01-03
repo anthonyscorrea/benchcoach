@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-qib_j&47o$5l3*gi7y#8#3pjh_88sfdqn@dmp&gx+2)&1nzmor
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["smithers-ii.local", "127.0.0.1", "10.0.1.4", "benchcoach.ascorrea.com"]
+ALLOWED_HOSTS = ["smithers-ii.local", "127.0.0.1", "10.0.1.4", "benchcoach.ascorrea.com", "fast-wildwood-43711.herokuapp.com"]
 
 # Application definition
 
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'benchcoachproject.urls'
@@ -121,7 +123,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'benchcoachproject/static')
 STATIC_URL = '/static/'
 
 # Default primary key field type
@@ -134,3 +136,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_URL = "/login"
 LOGIN_REDIRECT_URL = "/"
+
+django_heroku.settings(locals())
