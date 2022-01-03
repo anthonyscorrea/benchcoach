@@ -50,7 +50,15 @@ class VenueListView(ListView):
         context['venues_tab_active'] ='active'
         return context
 
-def lineup_edit(request, event_id, active_tab='details'):
+def event(request, event_id, active_tab='details'):
+    '''
+    Event is the main page for showing an event.
+    :param request: django request
+    :param event_id: The Bench Coach event ID to display
+    :param active_tab: The desired active tab, supports "lineup" and "details"
+    :return: 'details' renders a page with event information, 'lineup' with lineup information.
+    Either gives context to the template with the event information and formset for the lineup.
+    '''
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -123,7 +131,7 @@ def lineup_edit(request, event_id, active_tab='details'):
 
     return render(
         request,
-        "benchcoach/lineup.html",
+        "benchcoach/event.html",
         {
             "title": "Lineup",
             "active_tab":active_tab,
@@ -139,6 +147,13 @@ def lineup_edit(request, event_id, active_tab='details'):
     )
 
 def lineupcard(request, event_id):
+    '''
+    Lineup Card is an first attempt at replicating the "Lineup Card" from Google sheets.
+    It is incomplete.
+    :param request:
+    :param event_id: The Event ID to generate
+    :return: It generates a page layout. The context has info for event, event details, starting players and all players (both as a queryset)
+    '''
     previous_event = Event.objects.filter(id=event_id - 1).first()
 
     event = Event.objects.get(id=event_id)
@@ -181,6 +196,13 @@ def lineupcard(request, event_id):
     )
 
 def csv_export(request, event_id):
+    '''
+    Exports a CSV to interface with the Google Sheet. The idea is to bring lineup info into the sheet for backwards compatibility.
+    The row numbers follow each line as comments.
+    :param request:
+    :param event_id:
+    :return: A CSV file.
+    '''
     response = HttpResponse(
         content_type='text/csv',
         headers={'Content-Disposition': f'attachment; filename=lineup-event-{event_id}.csv'},
@@ -201,17 +223,17 @@ def csv_export(request, event_id):
     )
 
     rows = []
-
-    rows.append(event.teamsnap_event.csv_event_title) # 2
-    rows.append(event.venue.name)  # 3
-    [rows.append('') for i in range(3)] #4-6
+                                                                                    # Row number (starts at row 2)
+    rows.append(event.teamsnap_event.csv_event_title)                               # 2
+    rows.append(event.venue.name)                                                   # 3
+    [rows.append('') for i in range(3)]                                             # 4-6
     p = qs.filter(position='P').first()
     if p:
-        rows.append(f"{p.player.last_name}, {p.player.first_name}") #7
+        rows.append(f"{p.player.last_name}, {p.player.first_name}")                 # 7
     else:
         rows.append('')
-    [rows.append('') for i in range(3)] #8-10
-    for pos in ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']: #11-19
+    [rows.append('') for i in range(3)]                                             # 8-10
+    for pos in ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']:               # 11-19
         p = qs.filter(position=pos).first()
         if p:
             rows.append(f"{p.player.last_name}, {p.player.first_name}")
@@ -220,22 +242,22 @@ def csv_export(request, event_id):
     ehs = qs.filter(position='EH')
     if len(ehs) > 0:
         p=qs.filter(position='EH')[0]
-        rows.append(f"{p.player.last_name}, {p.player.first_name}")  # 20
+        rows.append(f"{p.player.last_name}, {p.player.first_name}")                 # 20
     else:
         rows.append('')
     if len(ehs) > 1:
         p=qs.filter(position='EH')[1]
-        rows.append(f"{p.player.last_name}, {p.player.first_name}")  # 21
+        rows.append(f"{p.player.last_name}, {p.player.first_name}")                 # 21
     else:
         rows.append('')
     rows.append('') #22
     p=qs.filter(position__isnull=False, order=0).first()
     if p:
-        rows.append(f"{p.player.last_name}, {p.player.first_name}")  # 23
+        rows.append(f"{p.player.last_name}, {p.player.first_name}")                 # 23
     else:
         rows.append('')
-    rows.append('')
-    for p in qs.filter(order__gt=0).order_by('order'):
+    rows.append('')                                                                 # 24
+    for p in qs.filter(order__gt=0).order_by('order'):                              # 25-34
         rows.append(f"{p.player.last_name}, {p.player.first_name}")
 
     writer = csv.writer(response)

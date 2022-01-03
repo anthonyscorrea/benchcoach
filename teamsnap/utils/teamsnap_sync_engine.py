@@ -23,13 +23,23 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         self.managed_teamsnap_team_id = managed_team_teamsnap_id
         self.client = TeamSnap(token=teamsnap_token)
 
-    def _bulk_sync_from_teamsnap(self, qs:QuerySet):
-        # -------------------------------------------------------------------------------------------
+    def _bulk_sync_from_teamsnap(self, qs:QuerySet)-> List[BenchcoachModel]:
+        '''
+        Syncs BenchCoach instances (in the form of a QuerySet) from TeamSnap.
+        This function fetches the actual information from teamsnap, then hands it off to the self._update* functions.
+        This funciton cuts down on the number of API calls and should be speedier then doing them one by one.
+        Upating of models from the data is still done one by one.
+        :param benchcoach_instance: instance to be synced
+        :return: List of BenchCoach objects that have been processed (but not necessarily changed) during sync.
+        '''
+
         # I hate having this translation. What I really want is just a property for "teamsnap_object"
         # which would simplify all this, but I couldn't figure out how to implement in the
         # teamsnap model foreign key and "related_name" that didn't cause conflicts. I don't
         # think I need to be too much smarter to figure this out, but alas I am not smart enough.
-        # -------------------------------------------------------------------------------------------
+        if qs.model not in self.models:
+            raise TypeError(f"Sync engine does not sync {qs.model} models")
+
         benchcoachmodel_to_teamsnapfield = {
             Availability:'teamsnap_availability',
             Player:'teamsnap_member',
@@ -72,14 +82,18 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
             r.append(response)
         return r
 
-    def _sync_from_teamsnap(self, benchcoach_instance:BenchcoachModel):
+    def _sync_from_teamsnap(self, benchcoach_instance:BenchcoachModel)->BenchcoachModel:
+        '''
+        Syncs BenchCoach instance from TeamSnap. This function fetches the actual information from teamsnap, then
+        hands it off to the self._update* functions.
+        :param benchcoach_instance: instance to be synced
+        :return: BenchCoach object that has been processed (but not necessarily changed) during sync.
+        '''
 
-        # -------------------------------------------------------------------------------------------
         # I hate having this translation. What I really want is just a property for "teamsnap_object"
         # which would simplify all this, but I couldn't figure out how to implement in the
         # teamsnap model foreign key and "related_name" that didn't cause conflicts. I don't
         # think I need to be too much smarter to figure this out, but alas I am not smart enough.
-        # -------------------------------------------------------------------------------------------
         benchcoachmodel_to_teamsnapfield = {
             Availability:'teamsnap_availability',
             Player:'teamsnap_member',
@@ -276,6 +290,12 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         return benchcoach_instance
 
     def _find_counterpart(self, instance):
+        '''
+        find the counterpart BenchCoach object from the TeamSnap object.
+        NOT CURRENTLY USED.
+        :param instance:
+        :return:
+        '''
         instance_type = type(instance)
         counterpart_instance = None
         if instance_type == Availability:
@@ -307,13 +327,17 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         return counterpart_instance
 
     def _sync_qs (self, qs, direction):
-        if qs.model not in self.models:
-            raise TypeError(f"Sync engine does not sync {qs.model} models")
+        if direction == 'download':
+            if qs.model not in self.models:
+                raise TypeError(f"Sync engine does not sync {qs.model} models")
 
-        r=[]
-        r = self._bulk_sync_from_teamsnap(qs)
-        # for instance in qs:
-            # r += self._sync_instance(instance, direction=direction)
+            r=[]
+            r = self._bulk_sync_from_teamsnap(qs)
+
+        elif direction == 'upload':
+            raise NotImplementedError('Uploading not supported by this sync engine yet.')
+        else:
+            raise TypeError(f"Direction {direction} not supported. 'upload' or 'download' must be specified")
 
         return r
 
@@ -329,7 +353,6 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
 
         return r
 
-
     def sync(self, qs: django.db.models.QuerySet = None, instance: benchcoach.models.BenchcoachModel = None,
              direction='download') -> List[Tuple[django.db.models.Model, bool]]:
         if not isinstance(qs, QuerySet) and not isinstance(instance, benchcoach.models.BenchcoachModel):
@@ -343,30 +366,57 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
 
         return r
 
-    def import_items(self, object_name=None, object_names=[]):
-        # order is important
+    def import_items(self):
+        '''
+        Implementation of import items from the abstract base class AbstractSyncEngine.
+        Imports objects from TeamSnap into BenchCoach, creating BenchCoach objects when necessary.
+        It runs through all supported TeamSnap Objects every execution.
+        NOTE: The number of availability objects causes this function to choke, so consider not updating
+        those on import.
+        :return:
+        '''
 
         ['team', 'opponent', 'location', 'member', 'event', 'availability']
+
+        # the common kwargs for searching the API. Most objects just need the client and currently managed team id.
         kwargs = {'client':self.client,'team_id': self.managed_teamsnap_team_id}
+
+        # r is the result dictionary, the key is the name of the benchcoach object, and the value is the list of BenchCoach objects that
+        # have been iterated (but not necessarily changed) during this import.
         r = {}
 
+        # Walking through each TeamSnap object. There is a fair amount of repetition that could use clean-up.
         # ---team---
         r['team'] = []
+
+        # Search API for objects belonging to currently managed team, and iterate
         for teamsnap_data in teamsnap.teamsnap.api.Team.search(client=self.client, id=self.managed_teamsnap_team_id):
+            # check if TeamSnap ID already exists in the Teamsnap DB.
             if teamsnap.models.Team.objects.filter(id=teamsnap_data.data['id']):
                 teamsnap_instance = teamsnap.models.Team.objects.filter(id=teamsnap_data.data['id']).first()
+                # If it does, retrieve the BenchCoach instance attached.
+                # It is enforced (by this import function) that every teamsnap instance has a related BenchCoach instance attached.
+                # No other function can create TeamSnap instances (or create related BenchCoach instances from the TeamSnap service)
                 benchcoach_instance = teamsnap_instance.benchcoach_object
             else:
+                # Otherwise create TeamSnap instance
                 teamsnap_instance = teamsnap.models.Team()
+                # and create related BenchCoach instance
                 benchcoach_instance = benchcoach.models.Team()
+                # and attach it to the BenchCoach instance
                 teamsnap_instance.benchcoach_object=benchcoach_instance
                 benchcoach_instance.save()
+            # Now, update the data from the API to the retrieved/created instances
             response = self._update_from_teamsnapdata(teamsnap_instance, teamsnap_data)
             teamsnap_instance.save()
             response = self._update_teamsnapdb_to_benchcoachdb(teamsnap_instance, benchcoach_instance)
             r['team'].append(response)
 
         # ---opponent---
+        # See first object for additional comments on the steps followed.
+        # Opponents from teamsnap go to the BenchCoach "Team" database.
+        # Dependent on Team. These objects need to be available to attach as related objects or the functions
+        # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
         for teamsnap_data in teamsnap.teamsnap.api.Opponent.search(**kwargs):
             if teamsnap.models.Opponent.objects.filter(id=teamsnap_data.data['id']):
                 teamsnap_instance = teamsnap.models.Opponent.objects.filter(id=teamsnap_data.data['id']).first()
@@ -381,6 +431,9 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
             r['team'].append(response)
 
         # ---location---
+        # See first object for additional comments on the steps followed.
+        # Dependent on Team. These objects need to be available to attach as related objects or the functions
+        # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
         r['location'] = []
         for teamsnap_data in teamsnap.teamsnap.api.Location.search(**kwargs):
             if teamsnap.models.Location.objects.filter(id=teamsnap_data.data['id']):
@@ -397,8 +450,11 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
             r['location'].append(response)
 
         # ---member---
-        # Note: Non players not included in sync.
+        # See first object for additional comments on the steps followed.
+        # Dependent on Team. These objects need to be available to attach as related objects or the functions
+        # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
         r['member'] = []
+        # Search API for members to import. Note: Non players are not included in sync.
         for teamsnap_data in teamsnap.teamsnap.api.Member.search(**kwargs,
                                                                  is_non_player = False
                                                                  ):
@@ -418,6 +474,9 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
             r['member'].append(response)
 
         # ---event---
+        # See first object for additional comments on the steps followed.
+        # Dependent on Team, Opponent, Location. These objects need to be available to attach as related objects or the functions
+        # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
         r['event'] = []
         for teamsnap_data in teamsnap.teamsnap.api.Event.search(**kwargs):
             if teamsnap.models.Event.objects.filter(id=teamsnap_data.data['id']):
@@ -434,8 +493,16 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
             r['event'].append(response)
 
         # ---availability---
-        # Note: Non players not included in sync
+        # See first object for additional comments on the steps followed.
+        # Availability was  a bit tricky to implement, because there are "not null" contstraints for the Availability object in Bench Coach
+        # Ideally, there probably should be more "not null" constraints on more of the BenchCoach models, so a generalized function should
+        # look more like this than the ones above.
+        # Dependent on Team, Member, Event. These objects need to be available to attach as related objects or the functions
+        # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
+        #TODO this import is wonky and causes errors on servers. maybe skip this import, or do it in chunks?
         r['availability'] = []
+
+        # Search API for members to import. Note: Non players are not included in sync.
         player_ids = [member.id for member in teamsnap.models.Member.objects.filter(is_non_player=False)]
         for teamsnap_data in teamsnap.teamsnap.api.Availability.search(**kwargs,
                                                                        member_id=",".join(player_ids)

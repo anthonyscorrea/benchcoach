@@ -1,4 +1,4 @@
-<form method="post" id="formSync" action="{% url 'send' %}">{% csrf_token %}
+<form method="post" id="formSync" action="{% url 'sync from teamsnap' %}">{% csrf_token %}
     <input type="hidden" name="object_name" value="{{ object_name }}">
     <input type="hidden" name="object_id" value={{ object_id }}>
     <input type="hidden" name="next" value="{{ next }}">

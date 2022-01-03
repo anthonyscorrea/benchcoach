@@ -28,18 +28,18 @@
         <ul class="nav nav-tabs nav-fill bg-white" role="tablist">
             {% if previous_event %}
             <li class="nav-item m-1">
-                <a href="{% url 'edit lineup' event_id=previous_event.id active_tab=active_tab %}">
+                <a href="{% url 'event' event_id=previous_event.id active_tab=active_tab %}">
                     <i class="bi bi-chevron-left"></i>{{ previous_event.start|date:"D" }}&nbsp;{{ previous_event.start|date:"n/j" }}
                 </a>
             </li>
             {% endif %}
 
             <li class="nav-item m-1" role="presentation">
-                <a id="event-details-tab" class="nav-link {% if active_tab == "details" %}active{% endif %}  px-2 py-0" href="{% url 'edit lineup' event_id=event.id active_tab='details'%}">Details</a></li>
-            <li class="nav-item m-1" role="presentation"><a id="event-lineup-tab" class="nav-link {% if active_tab == "lineup" %}active{% endif %} px-2 py-0" href="{% url 'edit lineup' event_id=event.id active_tab='lineup'%}">Lineup</a></li>
+                <a id="event-details-tab" class="nav-link {% if active_tab == "details" %}active{% endif %}  px-2 py-0" href="{% url 'event' event_id=event.id active_tab='details'%}">Details</a></li>
+            <li class="nav-item m-1" role="presentation"><a id="event-lineup-tab" class="nav-link {% if active_tab == "lineup" %}active{% endif %} px-2 py-0" href="{% url 'event' event_id=event.id active_tab='lineup'%}">Lineup</a></li>
             {% if next_event %}
                 <li class="nav-item m-1">
-                <a href="{% url 'edit lineup' event_id=next_event.id active_tab=active_tab%}" role="button">
+                <a href="{% url 'event' event_id=next_event.id active_tab=active_tab%}" role="button">
                     {{ next_event.start|date:"D" }}&nbsp;{{ next_event.start|date:"n/j" }}<i class="bi bi-chevron-right"></i>
                 </a>
                 </li>
@@ -68,7 +68,7 @@
             </form>
         </div>
         <div id="event-lineup" class="tab-pane {% if active_tab == "lineup" %}show active{% endif %}" role="tabpanel" aria-labelledby="event-lineup-tab">
-            <form action="{%  url 'edit lineup' event_id=event.id active_tab=active_tab%}" method="post">
+            <form action="{%  url 'event' event_id=event.id active_tab=active_tab%}" method="post">
                 {% csrf_token %}
                 {{ formset.management_form }}
                 <div class="row w-100">

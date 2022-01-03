@@ -18,7 +18,7 @@ Events
             <h6>{{ event.away_team|default_if_none:"" }} vs. {{ event.home_team|default_if_none:"" }}</h6>
             {{ event.start|date:"l, F j, Y g:i A" }} <br>
             {{ event.venue.name }} <br>
-            <a href="{% url 'edit lineup' event_id=event.id %}">Edit Lineup...</a>
+            <a href="{% url 'event' event_id=event.id %}">Edit Lineup...</a>
             </li>
             {% endif %}
         {% endfor %}
