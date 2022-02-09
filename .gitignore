@@ -92,3 +92,4 @@ venv.bak/
 scripts/
 /.idea/benchcoach.iml
 /db_back.sqlite3
+/benchcoachproject/fixtures/minimal.json
