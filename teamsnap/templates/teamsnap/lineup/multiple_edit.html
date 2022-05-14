@@ -1,0 +1,100 @@
+{% extends "base.html" %}{% load static %}
+{% block title %} Edit Lineups {% endblock %}
+{% block page_heading %}Edit Lineups{% endblock %}
+{% block page_subheading %}{% endblock %}
+
+{% block content %}
+    {#    <div class="container overflow-scroll mx-0 px-0">#}
+    {#        <div class="row flex-row flex-nowrap">#}
+    {#            {% for event_data in contexts  %}#}
+    {#                <div class="col border-start border-end">#}
+    {#                    <div class = "border-bottom">#}
+    {#                        <h4>{{ event_data.event.data.formatted_title }}</h4>#}
+    {#                        <h6 class="text-muted" >{{ event_data.data.start_date }}</h6>#}
+    {#                    </div>#}
+    {#                    {% include 'teamsnap/lineup/widgets/lineup.html' with formset_lineup=event_data.formset_lineup formset_bench=event_data.formset_bench event_id=event_data.event.data.id  %}#}
+    {#                </div>#}
+    {#            {% endfor %}#}
+    {#        </div>#}
+    {#    </div>#}
+    <div class="container overflow-scroll">
+        <div class="row flex-row flex-nowrap">
+            <table>
+                <tbody>
+                <tr>
+                    {% for event_data in contexts %}
+                        <td>
+                            <h4>{{ event_data.event.data.formatted_title }}</h4>
+                            <h6 class="text-muted" >{{ event_data.data.start_date }}</h6>
+                            {% with 'P C 1B 2B 3B SS LF CF RF EH DH' as position_list %}
+                                {% for position in position_list.split %}
+                                    <span class="position-status fw-bold small px-1" id="position-status-{{ position }}">{{ position }}</span>
+                                {% endfor %}
+                            {% endwith %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="bg-light" colspan="{{ contexts|length }}"><h4>Lineup</h4></td>
+                </tr>
+                <tr>
+                    {% for event_data in contexts %}
+                        <td class="align-top">
+                            {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=event_data.formset_lineup table_id="players-lineup" %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="bg-light" colspan="{{ contexts|length }}"><h4>Bench</h4></td>
+                </tr>
+                <tr>
+                    {% for event_data in contexts %}
+                        <td class="align-top">
+                            {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=event_data.formset_bench table_id="players-bench" %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="bg-light" colspan="{{ contexts|length }}"><h4>Out</h4></td>
+                </tr>
+                <tr>
+                    {% for event_data in contexts %}
+                        <td class="align-top">
+                            {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=event_data.formset_out table_id="players-bench" %}
+                        </td>
+                    {% endfor %}
+                </tr>
+
+                </tbody>
+            </table>
+            {#    <div class="align-content-start">#}
+            {#        <div class = "bg-light rounded-3 p-2">#}
+            {#            <div class="row">#}
+            {#                {% with 'P C 1B 2B 3B SS LF CF RF EH DH' as position_list %}#}
+            {#                    {% for position in position_list.split %}#}
+            {#                        <span class="position-status fw-bold small px-1" id="position-status-{{ position }}">{{ position }}</span>#}
+            {#                    {% endfor %}#}
+            {#                {% endwith %}#}
+            {#            </div>#}
+            {#        </div>#}
+            {#    </div>#}
+            {#    <form method="post" action="{% url 'teamsnap_submit_lineup' team_id=team_id event_id=event_id%}">#}
+            {#        {{ formset.management_form }}#}
+            {#        {% csrf_token %}#}
+
+            {#        <h4 class="border-bottom">Lineup</h4>#}
+            {#        {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_lineup table_id="players-lineup" %}#}
+            {#        <input class="btn btn-success" type="submit" value="Submit">#}
+            {##}
+            {#        <h4 class="border-bottom">Bench</h4>#}
+            {#        {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_bench table_id="players-bench" %}#}
+            {##}
+            {#        <h4 class="border-bottom">Out</h4>#}
+            {#        {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_out table_id="players-out" %}#}
+
+            {#    </form>#}
+            <script src="{% static 'js/Sortable.js' %}"></script>
+            <script src="{% static 'teamsnap/js/lineup-table.js' %}"></script>
+        </div>
+    </div>
+{% endblock %}

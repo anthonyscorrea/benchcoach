@@ -1,53 +1,14 @@
 <div class="bg-dark h-100">
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a class="nav-link {{ events_tab }} text-white" href="{% url 'event list' %}">
+            <a class="nav-link {{ events_tab }} text-white" href="{% url 'teamsnap_schedule' team_id=request.user.profile.teamsnapsettings.managed_team.id%}">
                 <div class="d-flex flex-nowrap">
                     <i class="bi bi-calendar3"></i>
                     <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
-                    Events
+                    Schedule
                 </span>
                 </div>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link {{ members_tab }} text-white" href="{% url 'player list' %}">
-                <div class="d-flex flex-nowrap">
-                    <i class="bi bi-person-fill"></i>
-                    <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
-                Players
-                </span>
-                </div>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ opponents_tab }} text-white" href="{% url 'team list' %}">
-                <div class="d-flex flex-nowrap">
-                    <i class="bi bi-people-fill"></i>
-                    <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
-                Teams
-                </span>
-                </div>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link {{ venues_tab }} text-white" href="{% url 'venue list' %}">
-                <div class="d-flex flex-nowrap"><i class="bi bi-geo"></i>
-                    <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
-                Venues
-                </span></div>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link text-white" href="{% url 'teamsnap home' %}">
-                <div class="d-flex flex-nowrap"><i class="bi bi-asterisk"></i>
-                    <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">
-                Sync
-                </span></div>
-            </a>
-        </li>
-
     </ul>
 </div>

@@ -1,9 +1,16 @@
 {% extends "base.html" %}{% load static %}
 
 {% block title %}Bench Coach Home{% endblock %}
+{% block page_heading %}
+    <div class="text-center my-2">
+    <h1><img class="mx-auto" src="{% static 'benchcoach.svg' %}" style="width: 64px;" />
+        <strong>Welcome to Bench Coach</strong>
+    </h1>
+    </div>
+{% endblock %}
 {% block content %}
     <div class="text-center my-2">
-    <h1><img class="mx-auto" src="{% static 'benchcoach.svg' %}" style="width: 64px;" /><strong>Welcome to Bench Coach</strong></h1>
+
     <div class="col-lg-6 m-auto">
         <p class="lead mb-4">Quisque at curabitur mollis ornare, malesuada maecenas. Orci elit tristique, malesuada eu pharetra. Est praesent tortor porttitor aptent, amet quisque.</p>
 {#        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mx-1">#}

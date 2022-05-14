@@ -1,6 +1,6 @@
 from django import forms
 from .models import Team, Location, Opponent, Event, Member
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, formset_factory, inlineformset_factory
 
 select_kwargs = {
     'attrs':{'class': 'form-control form-control-sm'}
@@ -73,5 +73,46 @@ class LocationForm(forms.ModelForm):
             "name":forms.TextInput(**text_input_kwargs),
             "benchcoach_object": forms.Select(**select_kwargs)
         }
+
+class LineupEntryForm(forms.Form):
+    member = None
+    availability = None
+    lineup_entry = None
+
+    event_lineup_entry_id = forms.Field(required=False)
+    event_lineup_id = forms.Field(required=False)
+    event_id = forms.Field()
+    member_id = forms.Field()
+    sequence = forms.IntegerField(required=False)
+    label = forms.ChoiceField(required=False, choices=[
+        ("--", "--"),
+        ("P","P"),
+        ("C","C"),
+        ("1B","1B"),
+        ("2B", "2B"),
+        ("3B", "3B"),
+        ("SS", "SS"),
+        ('LF','LF'),
+        ('CF','CF'),
+        ('RF','RF'),
+        ('DH','DH'),
+        ('DR','DR'),
+        ('EH','EH')
+    ],
+                              widget=forms.Select(
+                                  attrs = {'onchange' : "colorPositions();"}
+                              )
+                              )
+
+
+class EventChooseForm(forms.Form):
+    event_id = forms.ChoiceField()
+
+    # checked = forms.BooleanField(required=False)
+    # def __init__(self, events, *args, **kwargs):
+    #     super(EventChooseForm, self).__init__(*args, **kwargs)
+    #     self.fields['foo'].choices = [e.data['id'] for e in events]
+
+LineupEntryFormset = formset_factory(LineupEntryForm, can_delete=True, can_order=True, extra=0)
 
 

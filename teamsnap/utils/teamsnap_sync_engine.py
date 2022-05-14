@@ -3,7 +3,8 @@ from typing import List, Tuple
 
 import benchcoach.models
 from benchcoach.models import BenchcoachModel, Availability, Player, Team, Positioning, Event, Venue
-from teamsnap.teamsnap.api import TeamSnap
+from pyteamsnap.api import TeamSnap
+import pyteamsnap
 import teamsnap.models
 from django.db.models import QuerySet
 
@@ -50,14 +51,14 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         }
 
         teamsnapmodel_to_apiobject = {
-            teamsnap.models.Availability: teamsnap.teamsnap.api.Availability,
-            teamsnap.models.Event: teamsnap.teamsnap.api.Event,
-            # teamsnap.models.LineupEntry:teamsnap.teamsnap.api.LineupEntry, # Not implemented Yet
-            teamsnap.models.Location: teamsnap.teamsnap.api.Location,
-            teamsnap.models.Member: teamsnap.teamsnap.api.Member,
-            teamsnap.models.Opponent: teamsnap.teamsnap.api.Opponent,
-            teamsnap.models.Team: teamsnap.teamsnap.api.Team,
-            # teamsnap.models.User:teamsnap.teamsnap.api.User # Not implemented yet
+            teamsnap.models.Availability: pyteamsnap.api.Availability,
+            teamsnap.models.Event: pyteamsnap.api.Event,
+            # teamsnap.models.LineupEntry:pyteamsnap.api.LineupEntry, # Not implemented Yet
+            teamsnap.models.Location: pyteamsnap.api.Location,
+            teamsnap.models.Member: pyteamsnap.api.Member,
+            teamsnap.models.Opponent: pyteamsnap.api.Opponent,
+            teamsnap.models.Team: pyteamsnap.api.Team,
+            # teamsnap.models.User:pyteamsnap.api.User # Not implemented yet
         }
 
         apiobject_to_teamsnapmodel = {v:k for k,v in teamsnapmodel_to_apiobject.items()}
@@ -104,14 +105,14 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         }
 
         teamsnapmodel_to_apiobject = {
-            teamsnap.models.Availability: teamsnap.teamsnap.api.Availability,
-            teamsnap.models.Event: teamsnap.teamsnap.api.Event,
-            # teamsnap.models.LineupEntry:teamsnap.teamsnap.api.LineupEntry, # Not implemented Yet
-            teamsnap.models.Location: teamsnap.teamsnap.api.Location,
-            teamsnap.models.Member: teamsnap.teamsnap.api.Member,
-            teamsnap.models.Opponent: teamsnap.teamsnap.api.Opponent,
-            teamsnap.models.Team: teamsnap.teamsnap.api.Team,
-            # teamsnap.models.User:teamsnap.teamsnap.api.User # Not implemented yet
+            teamsnap.models.Availability: pyteamsnap.api.Availability,
+            teamsnap.models.Event: pyteamsnap.api.Event,
+            # teamsnap.models.LineupEntry:pyteamsnap.api.LineupEntry, # Not implemented Yet
+            teamsnap.models.Location: pyteamsnap.api.Location,
+            teamsnap.models.Member: pyteamsnap.api.Member,
+            teamsnap.models.Opponent: pyteamsnap.api.Opponent,
+            teamsnap.models.Team: pyteamsnap.api.Team,
+            # teamsnap.models.User:pyteamsnap.api.User # Not implemented yet
         }
 
         if isinstance(benchcoach_instance, benchcoach.models.Team):
@@ -128,9 +129,9 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         r = self._update_teamsnapdb_to_benchcoachdb(teamsnap_instance, benchcoach_instance)
         return r
 
-    def _update_from_teamsnapdata(self, teamsnap_instance:teamsnap.models.TeamsnapBaseModel, teamsnap_data: teamsnap.teamsnap.api.ApiObject) -> teamsnap.models.TeamsnapBaseModel:
+    def _update_from_teamsnapdata(self, teamsnap_instance:teamsnap.models.TeamsnapBaseModel, teamsnap_data: pyteamsnap.api.ApiObject) -> teamsnap.models.TeamsnapBaseModel:
         ''''''
-        if isinstance(teamsnap_data, teamsnap.teamsnap.api.ApiObject):
+        if isinstance(teamsnap_data, pyteamsnap.api.ApiObject):
             teamsnap_data = teamsnap_data.data
         else:
             raise TypeError
@@ -390,7 +391,7 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         r['team'] = []
 
         # Search API for objects belonging to currently managed team, and iterate
-        for teamsnap_data in teamsnap.teamsnap.api.Team.search(client=self.client, id=self.managed_teamsnap_team_id):
+        for teamsnap_data in pyteamsnap.api.Team.search(client=self.client, id=self.managed_teamsnap_team_id):
             # check if TeamSnap ID already exists in the Teamsnap DB.
             if teamsnap.models.Team.objects.filter(id=teamsnap_data.data['id']):
                 teamsnap_instance = teamsnap.models.Team.objects.filter(id=teamsnap_data.data['id']).first()
@@ -417,7 +418,7 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         # Opponents from teamsnap go to the BenchCoach "Team" database.
         # Dependent on Team. These objects need to be available to attach as related objects or the functions
         # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
-        for teamsnap_data in teamsnap.teamsnap.api.Opponent.search(**kwargs):
+        for teamsnap_data in pyteamsnap.api.Opponent.search(**kwargs):
             if teamsnap.models.Opponent.objects.filter(id=teamsnap_data.data['id']):
                 teamsnap_instance = teamsnap.models.Opponent.objects.filter(id=teamsnap_data.data['id']).first()
                 benchcoach_instance = teamsnap_instance.benchcoach_object
@@ -435,7 +436,7 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         # Dependent on Team. These objects need to be available to attach as related objects or the functions
         # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
         r['location'] = []
-        for teamsnap_data in teamsnap.teamsnap.api.Location.search(**kwargs):
+        for teamsnap_data in pyteamsnap.api.Location.search(**kwargs):
             if teamsnap.models.Location.objects.filter(id=teamsnap_data.data['id']):
                 teamsnap_instance = teamsnap.models.Location.objects.filter(id=teamsnap_data.data['id']).first()
                 benchcoach_instance = teamsnap_instance.benchcoach_object
@@ -455,7 +456,7 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
         r['member'] = []
         # Search API for members to import. Note: Non players are not included in sync.
-        for teamsnap_data in teamsnap.teamsnap.api.Member.search(**kwargs,
+        for teamsnap_data in pyteamsnap.api.Member.search(**kwargs,
                                                                  is_non_player = False
                                                                  ):
             if teamsnap_data.data['is_non_player'] == True:
@@ -478,7 +479,7 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
         # Dependent on Team, Opponent, Location. These objects need to be available to attach as related objects or the functions
         # self._update_from teamsnapdata and self.update_teamsnapdb_to_benchcoachdb may fail.
         r['event'] = []
-        for teamsnap_data in teamsnap.teamsnap.api.Event.search(**kwargs):
+        for teamsnap_data in pyteamsnap.api.Event.search(**kwargs):
             if teamsnap.models.Event.objects.filter(id=teamsnap_data.data['id']):
                 teamsnap_instance = teamsnap.models.Event.objects.filter(id=teamsnap_data.data['id']).first()
                 benchcoach_instance = teamsnap_instance.benchcoach_object
@@ -504,7 +505,7 @@ class TeamsnapSyncEngine(AbstractSyncEngine):
 
         # Search API for members to import. Note: Non players are not included in sync.
         player_ids = [member.id for member in teamsnap.models.Member.objects.filter(is_non_player=False)]
-        for teamsnap_data in teamsnap.teamsnap.api.Availability.search(**kwargs,
+        for teamsnap_data in pyteamsnap.api.Availability.search(**kwargs,
                                                                        member_id=",".join(player_ids)
                                                                        ):
             if teamsnap.models.Availability.objects.filter(id=teamsnap_data.data['id']):

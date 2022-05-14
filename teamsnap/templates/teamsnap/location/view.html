@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% load static %}
+{% block title %} {{ location.data.name }}{% endblock %}
+{% block page_heading %}{{ location.data.name }}{% endblock %}
+{% block content %}
+    <div class="table-responsive">
+    <table class="table table-striped table-sm">
+{#    <thead>#}
+{#    </thead>#}
+    <tbody>
+    {% for key, value in location.data.items %}
+        <tr>
+        <th scope="col">
+        {{ key }}
+        </th>
+        <td>
+        {{ value }}
+        </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.db import models
 
 import benchcoach.models
-import teamsnap.teamsnap.api
+import pyteamsnap.api
 from django.utils.timezone import localtime
 
 class TeamsnapBaseModel(models.Model):
@@ -9,7 +9,7 @@ class TeamsnapBaseModel(models.Model):
    id = models.CharField(max_length=50, unique=True, primary_key=True)
    created_at = models.DateTimeField(null=True)
    updated_at = models.DateTimeField(null=True)
-   ApiObject = teamsnap.teamsnap.api.ApiObject
+   ApiObject = pyteamsnap.api.ApiObject
 
    class Meta:
       abstract = True
@@ -29,7 +29,7 @@ class Team(TeamsnapBaseModel):
       on_delete=models.CASCADE,
       related_name="teamsnap_team"
    )
-   ApiObject = teamsnap.teamsnap.api.Team
+   ApiObject = pyteamsnap.api.Team
 
 class User(TeamsnapBaseModel):
    type = 'user'
@@ -37,7 +37,7 @@ class User(TeamsnapBaseModel):
    last_name = models.CharField(max_length = 50, null=True)
    email = models.EmailField(null=True)
    managed_teams = models.ManyToManyField(Team)
-   ApiObject = teamsnap.teamsnap.api.User
+   ApiObject = pyteamsnap.api.User
 
    @classmethod
    def update_or_create_from_teamsnap_api(cls, teamsnap_data):
@@ -76,7 +76,7 @@ class Opponent(TeamsnapManagedObjectModel):
       on_delete=models.CASCADE,
       related_name="teamsnap_opponent"
    )
-   ApiObject = teamsnap.teamsnap.api.Opponent
+   ApiObject = pyteamsnap.api.Opponent
 
 class Location(TeamsnapManagedObjectModel):
    type = 'location'
@@ -86,7 +86,7 @@ class Location(TeamsnapManagedObjectModel):
       on_delete=models.CASCADE,
       related_name="teamsnap_location"
    )
-   ApiObject = teamsnap.teamsnap.api.Location
+   ApiObject = pyteamsnap.api.Location
 
 class Member(TeamsnapManagedObjectModel):
    # url format is
@@ -103,7 +103,7 @@ class Member(TeamsnapManagedObjectModel):
    last_name = models.CharField(max_length = 50, null=True)
    jersey_number = models.IntegerField(null=True)
    is_non_player = models.BooleanField(null=True)
-   ApiObject = teamsnap.teamsnap.api.Member
+   ApiObject = pyteamsnap.api.Member
 
    def __str__(self):
       return f"{self.last_name}, {self.first_name} ({self.id})"
@@ -131,7 +131,7 @@ class Event(TeamsnapManagedObjectModel):
    points_for_team = models.PositiveSmallIntegerField(null=True)
    is_game = models.BooleanField(null=True)
    game_type = models.CharField(max_length = 50, null=True)
-   ApiObject = teamsnap.teamsnap.api.Event
+   ApiObject = pyteamsnap.api.Event
 
    @property
    def csv_event_title(self)->str:
@@ -166,7 +166,7 @@ class Availability(TeamsnapManagedObjectModel):
       related_name="teamsnap_availability"
    )
    status_code = models.SmallIntegerField(choices=status_codes, null=True, blank=True, default=None)
-   ApiObject = teamsnap.teamsnap.api.Availability
+   ApiObject = pyteamsnap.api.Availability
 
    def __str__(self):
       return f"{self.member} - {self.event} ({self.id})"
@@ -197,7 +197,7 @@ class LineupEntry(TeamsnapManagedObjectModel):
    )
    label = models.PositiveSmallIntegerField(choices=positions, default=None, null=True, blank=True)
    sequence = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
-   ApiObject = teamsnap.teamsnap.api.EventLineupEntry
+   ApiObject = pyteamsnap.api.EventLineupEntry
 
    @classmethod
    def update_or_create_from_teamsnap_api(cls, teamsnap_data):

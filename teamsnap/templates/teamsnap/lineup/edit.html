@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% load static %}
+{% block title %} {{ event.data.formatted_title }}{% endblock %}
+{% block page_heading %}{{ event.data.formatted_title }}{% endblock %}
+{% block page_subheading %}{{ event.data.start_date }}, {{ event.data.location_name }}{% endblock %}
+
+{% block content %}
+    {% include 'teamsnap/lineup/widgets/lineup.html' with formset_lineup=formset_lineup formset_bench=formset_bench%}
+
+    <script src="{% static 'js/Sortable.js' %}"></script>
+    <script src="{% static 'teamsnap/js/lineup-table.js' %}"></script>
+
+{% endblock %}

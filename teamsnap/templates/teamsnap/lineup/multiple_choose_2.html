@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% load static %}
+{% block title %} {{ title }}{% endblock %}
+
+{% csrf_token %}
+
+{% block page_heading %}
+    <div class="row d-inline-flex">
+        <div class="col">
+            Schedule
+        </div>
+    </div>
+
+{% endblock %}
+{% block content %}
+    <form method="get" action="{% url 'teamsnap_edit_multiple_lineups' team_id=team_id%}">
+    {{ formset.management_form }}
+    <input class="btn btn-sm btn-outline-primary text-nowrap" type="submit" value="Submit">
+    {% load tz %}
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            {#    <thead>#}
+            {#    </thead>#}
+            <tbody>
+            {% for form in formset %}
+                {{ form.event_id.as_hidden }}
+                <tr>
+                    <td>
+                        {{ form.checked }}
+                    </td>
+                    <td>
+                        <a href="{% url 'teamsnap_view_event' event_id=form.event.data.id team_id=request.user.profile.teamsnapsettings.managed_team.id%}">{{ form.event.data.formatted_title }}</a>
+                    </td>
+                    <td>
+                        {{ form.event.data.start_date | localtime}}
+                    </td>
+                    <td>
+                        {{ form.event.data.location_name }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </form>
+{% endblock %}

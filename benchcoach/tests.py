@@ -242,7 +242,7 @@ class TestVenueViews(TestCase):
     fixtures = ["blaseball"]
 
     def test_venue_list(self):
-        response = self.client.get(reverse("venues list"))
+        response = self.client.get(reverse("locations list"))
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             {"id": 1, "title": "Chesapeake Racetrack and Ballpark"},

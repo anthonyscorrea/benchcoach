@@ -1,11 +1,16 @@
+import operator
+import time
+
 from django.shortcuts import render, redirect
 
 from .models import User, Member, Team, Event, Location, LineupEntry, Opponent, Availability
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 import benchcoach.models
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .utils.teamsnap_sync_engine import TeamsnapSyncEngine
+from django.templatetags.static import static
+import datetime
 
 def edit_event(request, id):
     '''
@@ -112,6 +117,7 @@ def sync_from_teamsnap(request, object_name=None, object_id=None):
         return HttpResponse(404)
 
 
+
 def import_teamsnap(request):
     TEAM_ID = request.user.profile.teamsnapsettings.managed_team.id
     TOKEN = request.user.profile.teamsnap_access_token
@@ -127,5 +133,437 @@ def import_teamsnap(request):
 
     return redirect('teamsnap home')
 
+def schedule(request, team_id):
+    TEAM_ID = team_id
+    TOKEN = request.user.profile.teamsnap_access_token
+    no_past = bool(request.GET.get('no_past', 0))
+    games_only = bool(request.GET.get('games_only',0))
+    from pyteamsnap.api import TeamSnap, Event, Location, Opponent
+    client = TeamSnap(token=TOKEN)
+    time.sleep(.5)
+    ts_events = Event.search(client, team_id=TEAM_ID)
+    if no_past:
+        ts_events = [e for e in ts_events if e.data['start_date'] > datetime.datetime.now(datetime.timezone.utc)]
+    if games_only:
+        ts_events = [e for e in ts_events if e.data['is_game']]
+    ts_events = {e.data['id']:e for e in ts_events}
+    # ts_opponents = {o.data['id']:o for o in Opponent.search(client, team_id=TEAM_ID)}
+    # ts_locations = {l.data['id']:l for l in Location.search(client, team_id=TEAM_ID)}
+    # for event in ts_events:
 
 
+    pass
+    return render(request, "teamsnap/schedule.html", context={"events":ts_events.values(), "team_id":team_id})
+
+def event(request, event_id, team_id):
+    TOKEN = request.user.profile.teamsnap_access_token
+
+    from pyteamsnap.api import TeamSnap, Event, Availability, Member, EventLineupEntry, EventLineup, AvailabilitySummary
+    client = TeamSnap(token=TOKEN)
+    time.sleep(0.5)
+    ts_bulkload = client.bulk_load(team_id=team_id,
+                                   types=[Event, EventLineup, EventLineupEntry, AvailabilitySummary, Member],
+                                   event__id=event_id)
+    ts_event = [i for i in ts_bulkload if isinstance(i, Event)][0]
+    # ts_availabilities = Availability.search(client, event_id=ts_event.data['id'])
+    ts_availability_summary = \
+        [i for i in ts_bulkload if isinstance(i, AvailabilitySummary) and i.data['event_id'] == event_id][0]
+    ts_lineup_entries = [i for i in ts_bulkload if isinstance(i, EventLineupEntry) and i.data['event_id'] == event_id]
+
+    ts_members = [i for i in ts_bulkload if isinstance(i, Member)]
+    ts_member_lookup = {m.data['id']: m for m in ts_members}
+    # ts_availability_lookup = {m.data['member_id']: m for m in ts_availabilities}
+    ts_lineup_entries_lookup = {m.data['member_id']: m for m in ts_lineup_entries}
+
+    members = []
+
+    return render(request, "teamsnap/view_event.html", context={
+        "availability_summary":ts_availability_summary,
+        "event":ts_event,
+        "availablities":[],
+        "lineup_entries": ts_lineup_entries,
+    })
+
+def location(request, id, team_id):
+    TOKEN = request.user.profile.teamsnap_access_token
+
+    from pyteamsnap.api import TeamSnap, Location
+    client = TeamSnap(token=TOKEN)
+    return render(request, "teamsnap/location/view.html", context={"location": Location.get(client, id=id)})
+    pass
+
+def opponent(request, id):
+    TOKEN = request.user.profile.teamsnap_access_token
+
+    from pyteamsnap.api import TeamSnap, Opponent
+    time.sleep(0.5)
+    client = TeamSnap(token=TOKEN)
+    return render(request, "teamsnap/opponent.html", context={"opponent": Opponent.get(client, id=id)})
+    pass
+
+def edit_lineup(request, event_id, team_id):
+    TOKEN = request.user.profile.teamsnap_access_token
+
+    from pyteamsnap.api import TeamSnap, Event, Availability, Member, EventLineupEntry, EventLineup, AvailabilitySummary, Opponent
+    client = TeamSnap(token=TOKEN)
+    time.sleep(0.5)
+
+    ts_bulkload = client.bulk_load(team_id=team_id,
+                                   types=[Event, EventLineup, EventLineupEntry, AvailabilitySummary, Member],
+                                   event__id=event_id)
+    ts_event = [i for i in ts_bulkload if isinstance(i, Event)][0]
+    ts_availabilities = Availability.search(client, event_id=ts_event.data['id'])
+    ts_availability_summary = \
+    [i for i in ts_bulkload if isinstance(i, AvailabilitySummary) and i.data['event_id'] == event_id][0]
+    ts_lineup_entries = [i for i in ts_bulkload if isinstance(i, EventLineupEntry) and i.data['event_id'] == event_id]
+
+    if ts_lineup_entries:
+        ts_lineup = EventLineup.get(client, id=ts_lineup_entries[0].data['event_lineup_id'])
+    else:
+        ts_lineup = EventLineup.search(client, event_id=event_id)
+
+    ts_members = [i for i in ts_bulkload if isinstance(i, Member)]
+    ts_member_lookup = {m.data['id']: m for m in ts_members}
+    ts_availability_lookup = {m.data['member_id']: m for m in ts_availabilities}
+    ts_lineup_entries_lookup = {m.data['member_id']: m for m in ts_lineup_entries}
+
+    members=[]
+
+    for member in ts_members:
+        members.append ({
+            "member":getattr(member, 'data'),
+            "availability": getattr(ts_availability_lookup.get(member.data['id'], {}), 'data', {}),
+            "lineup_entry": getattr(ts_lineup_entries_lookup.get(member.data['id'], {}), 'data', {})
+        }
+        )
+
+    members = sorted(members, key=lambda d: (
+        {
+            None:3, # No Response
+            0:2,  # No
+            2:1, # Maybe
+            1:0 # Yes
+
+        }.get(d['availability'].get('status_code')),
+              d['member'].get('last_name'))
+                               )
+
+
+    from teamsnap.forms import LineupEntryFormset, LineupEntryForm
+
+    formset = LineupEntryFormset(
+        initial=[
+            {
+                "event_lineup_entry_id" : member['lineup_entry'].get('id'),
+                "event_lineup_id" : member['lineup_entry'].get('event_lineup_id'),
+                "event_id": event_id,
+                "member_id" : member['member']['id'],
+                "sequence" : member['lineup_entry'].get('sequence'),
+                "label" : member['lineup_entry'].get('label'),
+            }
+            for member in members
+        ]
+    )
+
+    for form in formset:
+        form.member = ts_member_lookup.get(form['member_id'].initial)
+        form.availability = ts_availability_lookup.get(form['member_id'].initial)
+
+    formset_lineup = [form for form in formset if form.initial.get('event_lineup_entry_id')]
+    formset_lineup = sorted(
+        formset_lineup,
+        key=lambda d: d.initial.get('sequence',100)
+    )
+    formset_bench = [form for form in formset if
+                     form not in formset_lineup and
+                     form.availability.data['status_code'] in [2, 1]
+                     ]
+    formset_out = [form for form in formset if
+                   form not in formset_lineup and
+                   form not in formset_bench and
+                   not form.member.data['is_non_player']
+                   ]
+
+    return render(request, "teamsnap/lineup/edit.html", context={
+        "team_id": team_id,
+        "event_id": event_id,
+        "event": ts_event,
+        "formset": formset,
+        "formset_lineup":formset_lineup,
+        "formset_bench": formset_bench,
+        "formset_out": formset_out,
+        "lineup": ts_lineup
+    })
+
+def edit_multiple_lineups(request, team_id):
+    TOKEN = request.user.profile.teamsnap_access_token
+    from django.forms import formset_factory
+    from teamsnap.forms import EventChooseForm
+    from pyteamsnap.api import TeamSnap, Event, Availability, Member, EventLineupEntry, EventLineup, AvailabilitySummary, Opponent
+    client = TeamSnap(token=TOKEN)
+    time.sleep(0.5)
+
+    ts_events = Event.search(client, team_id=team_id)
+    EventChooseFormset = formset_factory(EventChooseForm)
+    formset = EventChooseFormset(request.GET)
+    choices = [(e.data['id'], e.data['formatted_title']) for e in ts_events]
+
+    for form in formset:
+        form.fields['event_id'].choices = choices
+
+    if formset.is_valid():
+        event_ids = [f.cleaned_data['event_id'] for f in formset]
+    else:
+        event_ids = request.GET.get("event_ids").split(",")
+
+    ts_bulkload = client.bulk_load(team_id=team_id,
+                                   types=[Event, EventLineup, EventLineupEntry, AvailabilitySummary, Member],
+                                   event__id=",".join(event_ids))
+    event_ids = [int(i) for i in event_ids]
+    formsets_lineup = []
+    formsets_bench = []
+    formsets = []
+    events = []
+    contexts = []
+    for event_id in event_ids:
+        ts_event = [i for i in ts_bulkload if isinstance(i, Event) and i.data['id']==event_id][0]
+        ts_availabilities = Availability.search(client, event_id=ts_event.data['id'])
+        ts_availability_summary = \
+        [i for i in ts_bulkload if isinstance(i, AvailabilitySummary) and i.data['event_id'] == event_id][0]
+        ts_lineup_entries = [i for i in ts_bulkload if isinstance(i, EventLineupEntry) and i.data['event_id'] == event_id]
+
+        if ts_lineup_entries:
+            ts_lineup = EventLineup.get(client, id=ts_lineup_entries[0].data['event_lineup_id'])
+        else:
+            ts_lineup = EventLineup.search(client, event_id=event_id)
+
+        ts_members = [i for i in ts_bulkload if isinstance(i, Member)]
+        ts_member_lookup = {m.data['id']: m for m in ts_members}
+        ts_availability_lookup = {m.data['member_id']: m for m in ts_availabilities}
+        ts_lineup_entries_lookup = {m.data['member_id']: m for m in ts_lineup_entries}
+
+        members=[]
+
+        for member in ts_members:
+            members.append ({
+                "member":getattr(member, 'data'),
+                "availability": getattr(ts_availability_lookup.get(member.data['id'], {}), 'data', {}),
+                "lineup_entry": getattr(ts_lineup_entries_lookup.get(member.data['id'], {}), 'data', {})
+            }
+            )
+
+        members = sorted(members, key=lambda d: (
+            {
+                None:3, # No Response
+                0:2,  # No
+                2:1, # Maybe
+                1:0 # Yes
+
+            }.get(d['availability'].get('status_code')),
+                  d['member'].get('last_name'))
+                                   )
+
+
+        from teamsnap.forms import LineupEntryFormset, LineupEntryForm
+
+        formset = LineupEntryFormset(
+            initial=[
+                {
+                    "event_lineup_entry_id" : member['lineup_entry'].get('id'),
+                    "event_lineup_id" : member['lineup_entry'].get('event_lineup_id'),
+                    "event_id": event_id,
+                    "member_id" : member['member']['id'],
+                    "sequence" : member['lineup_entry'].get('sequence'),
+                    "label" : member['lineup_entry'].get('label'),
+                }
+                for member in members
+            ]
+        )
+
+        for form in formset:
+            form.member = ts_member_lookup.get(form['member_id'].initial)
+            form.availability = ts_availability_lookup.get(form['member_id'].initial)
+
+        formset_lineup = [form for form in formset if form.initial.get('event_lineup_entry_id')]
+        formset_lineup = sorted(
+            formset_lineup,
+            key=lambda d: d.initial.get('sequence',100)
+        )
+        formset_bench = [form for form in formset if
+                         form not in formset_lineup and
+                         form.availability.data['status_code'] in [2, 1]
+                         ]
+        formset_out = [form for form in formset if
+                       form not in formset_lineup and
+                       form not in formset_bench and
+                       not form.member.data['is_non_player']
+                       ]
+
+        contexts.append({
+            "event":ts_event,
+            "formset": formset,
+            "formset_bench":formset_bench,
+            "formset_lineup":formset_lineup,
+            "formset_out":formset_out
+        })
+
+    return render(request, "teamsnap/lineup/multiple_edit.html", context={
+            "team_id": team_id,
+            "contexts":contexts
+        })
+
+def submit_lineup(request, team_id, event_id):
+    from pyteamsnap.api import TeamSnap, EventLineupEntry, EventLineup
+    from teamsnap.forms import LineupEntryFormset
+    TOKEN = request.user.profile.teamsnap_access_token
+    client = TeamSnap(token=TOKEN)
+    time.sleep(0.5)
+    ts_lineup = EventLineup.search(client, event_id=event_id)
+    event_lineup_id = ts_lineup[0].data['id']
+    if request.GET:
+        return HttpResponseNotAllowed()
+    if request.POST:
+        formset = LineupEntryFormset(request.POST)
+        if formset.is_valid():
+            r = []
+            for form in formset:
+                data = form.cleaned_data
+                if data.get('event_lineup_entry_id'):
+                    event_lineup_entry = EventLineupEntry.get(client, id=data.get('event_lineup_entry_id'))
+                    event_lineup_entry.data.update(data)
+                    # breakpoint()
+                    r.append(event_lineup_entry.put())
+                    # breakpoint()
+                    pass
+                elif data.get('sequence') is not None and data.get('label'):
+                    event_lineup_entry = EventLineupEntry.new(client)
+                    event_lineup_entry.data.update(data)
+                    event_lineup_entry.data.update({"event_lineup_id":event_lineup_id})
+                    r.append(event_lineup_entry.post())
+                else:
+                    pass
+        else:
+            # breakpoint()
+            pass
+        # breakpoint()
+        pass
+        return HttpResponse(f'{team_id} {event_id}')
+        pass
+
+    return HttpResponse(f'{team_id} {event_id}')
+
+def image_generator(request, team_id, event_id):
+    TOKEN = request.user.profile.teamsnap_access_token
+
+    from pyteamsnap.api import TeamSnap, Event, Availability, Member, EventLineupEntry, EventLineup, AvailabilitySummary
+    client = TeamSnap(token=TOKEN)
+    time.sleep(0.5)
+
+    ts_event = Event.get(client, id=event_id)
+    return render(request, "teamsnap/event/instagen.html", context = {"event":ts_event})
+
+# @app.route('/get_matchup_image')
+def get_matchup_image(request, team_id, event_id, dimensions=None, background=None):
+    from pyteamsnap.api import TeamSnap, EventLineupEntry, EventLineup, Event, Team, Opponent, Location
+    from .utils.gen_image import Team as ImagegenTeam, Location as ImagegenLocation
+    from .utils.gen_image import gen_image, gen_results_image
+    import io
+    TOKEN = request.user.profile.teamsnap_access_token
+    if request.GET:
+        POSTPONED = request.GET.get('postponed', 'false') == 'true'
+        INCLUDE_WINLOSS = request.GET.get('winloss', 'false') == 'true'
+        BACKGROUND = request.GET.get('background', 'location')
+        game_id = event_id
+        dimensions = request.GET.get('dimensions')
+        width = int(dimensions.split("x")[0])
+        height = int(dimensions.split("x")[1])
+
+        teamsnap = TeamSnap(TOKEN)
+        time.sleep(0.5)
+        ts_event = Event.get(teamsnap, game_id).data
+        fave_team = Team.get(teamsnap, ts_event['team_id']).data
+        opponent_team = Opponent.get(teamsnap, ts_event['opponent_id']).data
+        location = Location.get(teamsnap, ts_event['location_id']).data
+        formatted_results = ts_event['formatted_results']
+        if formatted_results:
+            # L 4-3
+            runs_for = formatted_results.split(" ")[1].split("-")[0]
+            runs_against = formatted_results.split(" ")[1].split("-")[1]
+        else:
+            runs_for, runs_against = None, None
+
+        logo_image_directory = 'benchcoachproject/static/teamsnap/ig/logos-bw/{filename}.{ext}'
+        venue_image_directory = 'benchcoachproject/static/teamsnap/ig/locations/{filename}.{ext}'
+
+        def shortname_from_name(name):
+            return name.replace(" ", "").lower()
+
+        # date = parser.parse(ts_event['start_date'])
+        # date = date.astimezone(ZoneInfo("America/Chicago"))
+        game_info = {
+            "date": ts_event['start_date'],
+            "team_fave": ImagegenTeam(
+                name=fave_team["name"],
+                image_directory=logo_image_directory.format(filename=shortname_from_name(fave_team["name"]), ext="png")
+            ),
+            "team_opponent": ImagegenTeam(
+                name=opponent_team["name"],
+                image_directory=logo_image_directory.format(filename=shortname_from_name(opponent_team["name"]),
+                                                            ext="png")
+            ),
+            "location": ImagegenLocation(
+                name=location['name'],
+                image_directory=venue_image_directory.format(filename=shortname_from_name(location["name"]), ext="png"),
+                # address=location['address']
+            ),
+            "runs_for": runs_for,
+            "runs_against": runs_against
+        }
+
+        if not game_info['runs_for'] and not game_info['runs_against']:
+            image = gen_image(**game_info, background=BACKGROUND, width=width, height=height)
+        elif game_info['runs_for'] and game_info['runs_against']:
+            image = gen_results_image(**game_info, background=BACKGROUND, width=width, height=height)
+        else:
+            raise Exception
+
+        imgByteArr = io.BytesIO()
+        image.save(imgByteArr, format='PNG')
+        imgByteArr = imgByteArr.getvalue()
+
+        return HttpResponse(imgByteArr, content_type="image/png")
+
+def multi_lineup_choose(request, team_id):
+    from teamsnap.forms import EventChooseForm
+    from django.forms import formset_factory
+    if not request.GET.get('num'):
+        return HttpResponse(500)
+    else:
+        num = int(request.GET.get('num'))
+    TEAM_ID = team_id
+    TOKEN = request.user.profile.teamsnap_access_token
+    no_past = bool(request.GET.get('no_past', 0))
+    games_only = bool(request.GET.get('games_only', 0))
+    from pyteamsnap.api import TeamSnap, Event, Location, Opponent
+    client = TeamSnap(token=TOKEN)
+    time.sleep(.5)
+    ts_events = Event.search(client, team_id=TEAM_ID)
+    if no_past:
+        ts_events = [e for e in ts_events if e.data['start_date'] > datetime.datetime.now(datetime.timezone.utc)]
+    if games_only:
+        ts_events = [e for e in ts_events if e.data['is_game']]
+    ts_events = {e.data['id']: e for e in ts_events}
+    # ts_opponents = {o.data['id']:o for o in Opponent.search(client, team_id=TEAM_ID)}
+    # ts_locations = {l.data['id']:l for l in Location.search(client, team_id=TEAM_ID)}
+    # for event in ts_events:
+
+    EventChooseFormset = formset_factory(EventChooseForm, extra=num)
+    formset = EventChooseFormset()
+
+    choices= [(id, e.data['formatted_title']) for id, e in ts_events.items()]
+
+    for form in formset:
+        form.fields['event_id'].choices = choices
+
+    pass
+    return render(request, "teamsnap/lineup/multiple_choose.html", context={"formset": formset, "team_id": team_id})

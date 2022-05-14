@@ -1,0 +1,47 @@
+{% extends "base.html" %}{% load static %}
+{% block title %} {{ title }}{% endblock %}
+{% block page_heading %}
+    <div class="row d-inline-flex">
+        <div class="col">
+            Schedule
+        </div>
+        <div hidden class="col">
+            <div class="container m-2">
+                <div class="container m-2">
+                    <div class="btn-group">
+                        <form action="">
+                        <a class="btn btn-sm btn-outline-primary text-nowrap" href="{% url 'teamsnap_schedule' team_id=team_id%}?filters=no_past">No Past Events</a>
+                        <button class="btn btn-sm btn-outline-primary text-nowrap">Games Only</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+{% block content %}
+{% load tz %}
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            {#    <thead>#}
+            {#    </thead>#}
+            <tbody>
+            {% for event in events %}
+                <tr>
+                    <td>
+                        <a href="{% url 'teamsnap_view_event' event_id=event.data.id team_id=request.user.profile.teamsnapsettings.managed_team.id%}">{{ event.data.formatted_title }}</a>
+                    </td>
+                    <td>
+                        {{ event.data.start_date | localtime}}
+                    </td>
+                    <td>
+                        {{ event.data.location_name }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

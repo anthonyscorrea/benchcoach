@@ -1,22 +1,48 @@
 {% load static %}
-<nav class="navbar navbar-dark navbar-expand-md py-0 fixed-top" style="background: #323669;height:3rem">
-    <a class="navbar-brand d-flex text-uppercase fw-bold m-1 mx-2 text-dark" data-bs-toggle="collapse" data-bs-target="#sidebar">
+<nav class="navbar navbar-dark navbar-expand-lg" style="background: #323669">
+    <a class="navbar-brand text-uppercase fw-bold mx-2 text-dark">
         <img class="d-inline-block" width="32" height="32" src="{% static 'benchcoach.svg' %}" />
-        <span class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block mx-1 my-auto text-white">bench coach</span>
+        <span class="text-white">bench coach</span>
     </a>
-    <button class="navbar-toggler m-2 mx-4 p-0 d-none" data-bs-toggle="collapse" data-bs-target="#navcol-2">
-        <span class="visually-hidden">Toggle navigation</span>
-        <span class="navbar-toggler-icon m-1"></span></button>
-    <div id="navcol-2" class="collapse navbar-collapse">
+    <button class="navbar-toggler mx-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mx-2">
-            <li class="nav-item"><a class="nav-link {{ events_tab }}" href="{% url 'event list' %}">Events</a></li>
-            <li class="nav-item"><a class="nav-link {{ members_tab }}" href="{% url 'player list' %}">Members</a></li>
-            <li class="nav-item"><a class="nav-link {{ opponents_tab }}" href="{% url 'team list' %}">Opponents</a></li>
-            <li class="nav-item"><a class="nav-link {{ venues_tab }}" href="{% url 'venue list' %}">Venues</a></li>
+            <li class="nav-item ">
+                <a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %} text-decoration-none" href="{% url 'home'%}">
+                    <i class="bi bi-house-fill"></i>
+                    <span class="">
+                    Home
+                </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_home' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_home'%}">
+                    <i class="bi bi-asterisk"></i>
+                    <span class="">
+                    Teamsnap
+                </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_schedule' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_schedule' team_id=request.user.profile.teamsnapsettings.managed_team.id%}">
+                    <i class="bi bi-calendar-fill"></i>
+                    <span class="">
+                    Schedule
+                </span>
+                </a>
+            </li>
+        <li class="nav-item">
+                <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_choose_multiple_lineups' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_choose_multiple_lineups' team_id=request.user.profile.teamsnapsettings.managed_team.id%}?num=3">
+                    <i class="bi bi-layout-three-columns"></i>
+                    <span class="">
+                    Multi-Lineup
+                </span>
+                </a>
+            </li>
+
         </ul>
-        <span class="mx-auto"></span>
-        <span class="navbar-text"></span>
-
     </div>
-
+    </div>
 </nav>

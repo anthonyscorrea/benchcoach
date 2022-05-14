@@ -1,0 +1,76 @@
+<html lang="en">
+{% extends "base.html" %}{% load static %}
+{% block title %} {{ event.data.formatted_title }} - Instagenerator{% endblock %}
+{% block page_heading %}
+    <div class="row d-inline-flex">
+        <div class="col">
+            <img src="{% static 'teamsnap/ig/graphics/hounds-insta.jpg' %}" class="mx-auto d-block img-fluid shadow-sm" style="height:30px;border-radius: 8px;">
+        </div>
+        <div class="col text-nowrap px-0">Hounds Instagenerator</div>
+    </div>
+{% endblock %}
+{% block page_subheading %}{{ event.data.formatted_title }}, {{ event.data.start_date }}, {{ event.data.location_name }}{% endblock %}
+{% block content %}
+
+    <form method="get" action="generate">
+
+        <div class="mb-3">
+            <select hidden class="form-select" name="game_id" id="game_id">
+                <optgroup label="Events">
+                    <option value="" disabled="disabled">Select an event...</option>
+                    <option selected value="{{event.data.id}}">{{event.data.formatted_title}}</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <legend class="">Background</legend>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="background" id="backgroundLocation" checked value="location">
+                <label class="form-check-label" for="backgroundLocation">
+                    Location
+                </label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="background" id="backgroundTransparent" value="transparent">
+                <label class="form-check-label" for="backgroundTransparent">
+                    Transparent
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="background" id="badge_only" value="badge">
+                <label class="form-check-label" for="badge_only">
+                    Badge only
+                </label>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <legend class="">Layout</legend>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="dimensions" id="square" checked value="1080x1080">
+                <label class="form-check-label" for="square">
+                    Square
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="dimensions" id="portrait" value="1080x1920">
+                <label class="form-check-label" for="portrait">
+                    Portrait
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="dimensions" id="portrait" value="1920x1080">
+                <label class="form-check-label" for="portrait">
+                    Landscape
+                </label>
+            </div>
+        </div>
+
+        <div class="d-lg-flex justify-content-lg-end align-items-lg-center mb-3">
+            <button type="submit" class="btn btn-primary btn-block">Get Image</button>
+        </div>
+    </form>
+
+{% endblock %}

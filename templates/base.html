@@ -3,10 +3,8 @@
 
 <head>
     <title>{% block title %}Title{% endblock %}</title>
-    {% include 'base_layout.html' %}
+    {% include 'head.html' %}
 </head>
-
-
 
 <body class="bg-light">
 <header class="min-vw-100">
@@ -18,24 +16,12 @@
 
 </header>
 
-<div class="d-inline-flex min-vw-100 min-vh-100" style="padding-top:3rem;">
-    <div id="sidebar" class="">
-        {% block sidebar %}
-            {% include 'sidebar.html' %}
+<main class="container-sm bg-white rounded-3 shadow-sm my-2">
+    <div class="p-2">
+        <h2 class="m border-bottom">{% block page_heading %}{% endblock %}</h2>
+        <h6 class="m text-muted">{% block page_subheading %}{% endblock %}</h6>
+        {% block header %}
         {% endblock %}
+        {% block content %}{% endblock %}
     </div>
-    <div class="w-100 m-0">
-        <div class="bg-white border border-bottom">
-            <h1 class="m-2">{% block page_heading %}{% endblock %}</h1>
-            <h6 class="m-2 text-muted">{% block page_subheading %}{% endblock %}</h6>
-            {% block header %}
-            {% endblock %}
-        </div>
-        <div class="container-fluid">
-            {% block content %}{% endblock %}
-        </div>
-    </div>
-</div>
-
-</body>
-</html>
+</main>
