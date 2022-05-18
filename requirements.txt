@@ -27,7 +27,7 @@ pycodestyle==2.8.0
 pyflakes==2.4.0
 Pygments==2.10.0
 pyparsing==3.0.6
--e git+file:///Users/asc/Documents/PycharmProjects/pyteamsnap@830f27227c2edbfaf3f3833d0e4cc2d63f1dfde2#egg=pyteamsnap
+git+https://github.com/anthonyscorrea/pyteamsnap.git@37fb9d8fce9ed2966c8128309147f7eb3bb1c7b4#egg=pyteamsnap
 pytz==2021.3
 PyYAML==6.0
 requests==2.26.0
