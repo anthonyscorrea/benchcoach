@@ -17,14 +17,14 @@
                 </span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_home' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_home'%}">
-                    <i class="bi bi-asterisk"></i>
-                    <span class="">
-                    Teamsnap
-                </span>
-                </a>
-            </li>
+{#            <li class="nav-item">#}
+{#                <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_home' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_home'%}">#}
+{#                    <i class="bi bi-asterisk"></i>#}
+{#                    <span class="">#}
+{#                    Teamsnap#}
+{#                </span>#}
+{#                </a>#}
+{#            </li>#}
             <li class="nav-item">
                 <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_schedule' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_schedule' team_id=request.user.profile.teamsnapsettings.managed_team.id%}">
                     <i class="bi bi-calendar-fill"></i>

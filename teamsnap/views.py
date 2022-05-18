@@ -13,6 +13,7 @@ from django.templatetags.static import static
 import datetime
 import re
 
+@login_required()
 def edit_event(request, id):
     '''
     redirect to teamsnap.com page for editing of event.
@@ -117,8 +118,7 @@ def sync_from_teamsnap(request, object_name=None, object_id=None):
     else:
         return HttpResponse(404)
 
-
-
+@login_required()
 def import_teamsnap(request):
     TEAM_ID = request.user.profile.teamsnapsettings.managed_team.id
     TOKEN = request.user.profile.teamsnap_access_token
@@ -134,6 +134,7 @@ def import_teamsnap(request):
 
     return redirect('teamsnap home')
 
+@login_required()
 def schedule(request, team_id):
     TEAM_ID = team_id
     TOKEN = request.user.profile.teamsnap_access_token
@@ -155,6 +156,7 @@ def schedule(request, team_id):
     pass
     return render(request, "teamsnap/schedule.html", context={"events":ts_events.values(), "team_id":team_id})
 
+@login_required()
 def event(request, event_id, team_id):
     TOKEN = request.user.profile.teamsnap_access_token
 
@@ -184,6 +186,7 @@ def event(request, event_id, team_id):
         "lineup_entries": ts_lineup_entries,
     })
 
+@login_required()
 def location(request, id, team_id):
     TOKEN = request.user.profile.teamsnap_access_token
 
@@ -192,6 +195,7 @@ def location(request, id, team_id):
     return render(request, "teamsnap/location/view.html", context={"location": Location.get(client, id=id)})
     pass
 
+@login_required()
 def opponent(request, team_id, id):
     TOKEN = request.user.profile.teamsnap_access_token
 
@@ -201,6 +205,7 @@ def opponent(request, team_id, id):
     return render(request, "teamsnap/opponent.html", context={"opponent": Opponent.get(client, id=id)})
     pass
 
+@login_required()
 def edit_lineup(request, event_id, team_id):
     TOKEN = request.user.profile.teamsnap_access_token
 
@@ -295,6 +300,7 @@ def edit_lineup(request, event_id, team_id):
         "lineup": ts_lineup
     })
 
+@login_required()
 def edit_multiple_lineups(request, team_id, event_ids):
     TOKEN = request.user.profile.teamsnap_access_token
     from django.forms import formset_factory
@@ -421,6 +427,7 @@ def edit_multiple_lineups(request, team_id, event_ids):
             "contexts":contexts
         })
 
+@login_required()
 def submit_lineup(request, team_id, event_id):
     from pyteamsnap.api import TeamSnap, EventLineupEntry, EventLineup
     from teamsnap.forms import LineupEntryFormset
@@ -474,6 +481,7 @@ def submit_lineup(request, team_id, event_id):
         pass
     return HttpResponse(f'{team_id} {event_id}')
 
+@login_required()
 def image_generator(request, team_id, event_id):
     TOKEN = request.user.profile.teamsnap_access_token
 
@@ -484,7 +492,7 @@ def image_generator(request, team_id, event_id):
     ts_event = Event.get(client, id=event_id)
     return render(request, "teamsnap/event/instagen.html", context = {"event":ts_event})
 
-# @app.route('/get_matchup_image')
+@login_required()
 def get_matchup_image(request, team_id, event_id, dimensions=None, background=None):
     from pyteamsnap.api import TeamSnap, EventLineupEntry, EventLineup, Event, Team, Opponent, Location
     from .utils.gen_image import Team as ImagegenTeam, Location as ImagegenLocation
@@ -555,6 +563,7 @@ def get_matchup_image(request, team_id, event_id, dimensions=None, background=No
 
         return HttpResponse(imgByteArr, content_type="image/png")
 
+@login_required()
 def multi_lineup_choose(request, team_id):
     TOKEN = request.user.profile.teamsnap_access_token
     from teamsnap.forms import EventChooseForm
