@@ -7,6 +7,7 @@
     <button class="navbar-toggler mx-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
+{% if user.is_authenticated %}
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mx-2">
             <li class="nav-item ">
@@ -17,14 +18,14 @@
                 </span>
                 </a>
             </li>
-{#            <li class="nav-item">#}
-{#                <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_home' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_home'%}">#}
-{#                    <i class="bi bi-asterisk"></i>#}
-{#                    <span class="">#}
-{#                    Teamsnap#}
-{#                </span>#}
-{#                </a>#}
-{#            </li>#}
+            {#            <li class="nav-item">#}
+            {#                <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_home' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_home'%}">#}
+            {#                    <i class="bi bi-asterisk"></i>#}
+            {#                    <span class="">#}
+            {#                    Teamsnap#}
+            {#                </span>#}
+            {#                </a>#}
+            {#            </li>#}
             <li class="nav-item">
                 <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_schedule' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_schedule' team_id=request.user.profile.teamsnapsettings.managed_team.id%}">
                     <i class="bi bi-calendar-fill"></i>
@@ -33,7 +34,7 @@
                 </span>
                 </a>
             </li>
-        <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_choose_multiple_lineups' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_choose_multiple_lineups' team_id=request.user.profile.teamsnapsettings.managed_team.id%}?num=3">
                     <i class="bi bi-layout-three-columns"></i>
                     <span class="">
@@ -44,5 +45,6 @@
 
         </ul>
     </div>
+{% endif %}
     </div>
 </nav>
