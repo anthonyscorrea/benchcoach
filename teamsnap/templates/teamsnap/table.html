@@ -1,24 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-<form method="post">
-{{ formset.management_form }}{% csrf_token %}
-<table class="table">
-    <tr>
-        {% for _, field in formset.0.base_fields.items %}
-            <th>{{ field.label }}</th>
-        {% endfor %}
-    </tr>
+    <form method="post">
+        {{ formset.management_form }}{% csrf_token %}
+        <table class="table">
+            <tr>
+                {% for _, field in formset.0.base_fields.items %}
+                    <th>{{ field.label }}</th>
+                {% endfor %}
+            </tr>
 
-    {% for form in formset %}
-        <tr>
-            {% for field in form %}
-
-                <td>{{ field }}</td>
-
+            {% for form in formset %}
+                <tr>
+                    {% for field in form %}
+                        <td>{{ field }}</td>
+                    {% endfor %}
+                </tr>
             {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
-<input type="submit" value="Submit">
-</form>
+        </table>
+        <input type="submit" value="Submit">
+    </form>
 {% endblock %}

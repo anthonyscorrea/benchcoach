@@ -16,12 +16,12 @@
 
 </header>
 
-<main class="container-sm bg-white rounded-3 shadow-sm my-2">
-    <div class="p-2">
-        <h2 class="m border-bottom">{% block page_heading %}{% endblock %}</h2>
-        <h6 class="m text-muted">{% block page_subheading %}{% endblock %}</h6>
+{#<main class="container-sm bg-white rounded-3 shadow-sm my-2">#}
+    <div class="container d-flex">
+        {% block page_heading %}{% endblock %}
+        {% block page_subheading %}{% endblock %}
         {% block header %}
         {% endblock %}
         {% block content %}{% endblock %}
     </div>
-</main>
+{#</main>#}

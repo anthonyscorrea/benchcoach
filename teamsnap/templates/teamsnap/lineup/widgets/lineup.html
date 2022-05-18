@@ -1,28 +1,77 @@
-<div>
-    <div class="align-content-start">
-        <div class = "bg-light rounded-3 p-2">
-{#            <div class="row">#}
-                {% with 'P C 1B 2B 3B SS LF CF RF EH DH' as position_list %}
-                    {% for position in position_list.split %}
-                        <span class="position-status fw-bold small px-1" id="position-status-{{ position }}">{{ position }}</span>
-                    {% endfor %}
-                {% endwith %}
-{#            </div>#}
-        </div>
-    </div>
+<div class="card mx-auto benchcoach-lineup" style="max-width: 455px" id="benchcoach-lineup-{{ event_id }}">
     <form method="post" action="{% url 'teamsnap_submit_lineup' team_id=team_id event_id=event_id%}">
         {{ formset.management_form }}
         {% csrf_token %}
+        <div class="border-bottom p-2">
+            <h4 class="card-title text-nowrap">{{ event.data.formatted_title }}</h4>
+            <h6 class="text-muted card-subtitle text-nowrap">{{ event.data.start_date|date:"D, F j, Y g:i A" }}</h6>
 
-        <h4 class="border-bottom">Lineup</h4>
-        {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_lineup table_id="players-lineup" %}
-        <input class="btn btn-success" type="submit" value="Submit">
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary btn-sm py-0 m-1" onclick="importFromClipboard(this)" type="button"><i class="bi bi-arrow-90deg-down"></i></i><i class="bi bi-file-spreadsheet"></i>  </button>
+                </div>
+                <div class="col text-end">
+                    <button class="btn btn-primary btn-sm py-0 m-1" onclick="copyEmailTable(this, '{{ event.data.start_date|date:"D, F j, Y g:i A" }}, {{ event.data.location_name }}, ({% if event.data.game_type == 'Away' %}@{% endif %}{{ event.data.opponent_name }})', '{% for form in formset %}{{ form.member.data.email_addresses.0 }},{% endfor %}')" type="button"><i class="bi bi-arrow-right"></i><i class="bi bi-envelope"></i></button>
+                    <button class="btn btn-primary btn-sm py-0 m-1" onclick="sendToClipboard(this)" type="button"><i class="bi bi-arrow-right"></i><i class="bi bi-file-spreadsheet"></i></button>
+                    <button class="btn btn-success btn-sm py-0 m-1" type="submit"><i class="bi bi-arrow-right"></i><i class="bi bi-asterisk"></i></button>
+                </div>
+            </div>
+        </div>
 
-        <h4 class="border-bottom">Bench</h4>
-        {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_bench table_id="players-bench" %}
+        <div class="card-body p-0 m-0">
+            <div>
+                <div class="row m-0">
+                    <div class="col border-bottom bg-light">
+                        <i class="bi bi-clipboard-check me-1"></i><span class="text-uppercase fw-bold small">Starting Lineup</span>
+                    </div>
+                </div>
 
-        <h4 class="border-bottom">Out</h4>
-        {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_out table_id="players-out" %}
+                <div class = "row m-0">
+                    <div class="col border-bottom px-0">
+                        <div class="row mx-0 my-1 position-status">
+                            {% with 'P C 1B 2B 3B SS LF CF RF EH DH' as position_list %}
+                                {% for position in position_list.split %}
+                                    <div class="col fw-bold text-center small">
+                                        <span class="" id="position-status-{{ position }}">{{ position }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+                {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_startinglineup table_id="benchcoach-startinglineup" %}
+            </div>
 
+            <div>
+                <div class="row m-0">
+                    <div class="col border-bottom bg-light">
+                        <i class="bi bi-clipboard-minus me-1"></i><span class="text-uppercase fw-bold small">Starting (Positional Only)</span>
+
+                    </div>
+                </div>
+
+                {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_startingpositionalonly table_id="benchcoach-startingpositionalonly" %}
+            </div>
+
+            <div>
+                <div class="row m-0">
+                    <div class="col border-bottom bg-light">
+                        <i class="bi bi-clipboard me-1"></i><span class="text-uppercase fw-bold small">Bench</span>
+                    </div>
+                </div>
+            </div>
+            {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_bench table_id="benchcoach-bench" %}
+
+            <div>
+                <div class="row m-0">
+                    <div class="col border-bottom bg-light">
+                        <i class="bi bi-clipboard-x me-1"></i><span class="text-uppercase fw-bold small">Out</span>
+                    </div>
+                </div>
+            </div>
+            {% include 'teamsnap/lineup/widgets/lineup_table.html' with formset=formset_out table_id="benchcoach-out" %}
+
+
+        </div>
     </form>
 </div>

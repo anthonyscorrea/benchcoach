@@ -1,35 +1,37 @@
 {% extends "base.html" %}{% load static %}
 {% block title %} {{ title }}{% endblock %}
 
-{% csrf_token %}
-
 {% block page_heading %}
     <div class="row d-inline-flex">
         <div class="col">
-            Schedule
+            Multiple Lineup Edit
         </div>
     </div>
 
 {% endblock %}
 {% block content %}
-    <form method="get" action="{% url 'teamsnap_edit_multiple_lineups' team_id=team_id%}">
-        {{ formset.management_form }}
-        <input class="btn btn-sm btn-outline-primary text-nowrap" type="submit" value="Submit">
-        {% load tz %}
+    <form method="post" action="{% url 'teamsnap_choose_multiple_lineups' team_id=team_id%}">
+
         <div class="table-responsive">
             <table class="table table-striped table-sm">
+                {{ formset.management_form }}
+                {% csrf_token %}
                 {#    <thead>#}
                 {#    </thead>#}
                 <tbody>
                 {% for form in formset %}
                     <tr>
-                        {{ form.event_id }}
+                        <th>Game {{ forloop.counter }}</th>
+                        <td>{{ form.event_id }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
+
             </table>
         </div>
+    <input class="btn btn-sm btn-primary" type="submit" value="Submit">
     </form>
+
 
     <!-- create_normal.html :: part 4 -->
 

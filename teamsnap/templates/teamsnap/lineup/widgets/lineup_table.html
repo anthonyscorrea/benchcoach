@@ -1,29 +1,38 @@
-<table class="table table-sm my-0" style="min-height: 1rem" id="table-{{ table_id }}">
-    <tbody id="tbody-{{ table_id }}">
-    {% for form in formset %}
-        <tr data-player-id="{{ form.member.data.id }}"
-            data-position="{{ form.label.value }}"
-            data-order="{{ form.sequence.value }}">
-            {{ form.event_lineup_entry_id.as_hidden }}
-            {{ form.event_lineup_id.as_hidden }}
-            {{ form.event_id.as_hidden }}
-            {{ form.member_id.as_hidden }}
-            {{ form.sequence.as_hidden }}
-            {{ form.label.as_hidden }}
-            {{ form.member_name.as_hidden }}
-        <th class="col-1" id="sequence-member-{{ form.member.data.id }}">
-                {{ form.sequence.value | add:"1" }}
-            </th>
-            <td class="col-1">
-                <div class="mx-1">
-                    <span id="player-order-{{ form.member.id }}" class="lineup-sequence-value">
-                {% if form.order.value > 0 %} {{ form.order.value | add:"1" }} {% endif %}
-                </span>
+<div class="table-responsive">
+    <table class="table table-sm my-0 table-{{ table_id }}" style="min-height: 1rem">
+        <tbody class="tbody-{{ table_id }}">
+        {% for form in formset %}
+            <tr data-player-id="{{ form.member.data.id }}"
+                data-position="{{ form.label.value }}"
+                data-order="{{ form.sequence.value }}"
+                data-player-name="{{ form.member.data.last_name }}, {{ form.member.data.first_name }}"
+                data-availability-statuscode="{{ form.availability.data.status_code }}"
+            >
+                {{ form.event_lineup_entry_id.as_hidden }}
+                {{ form.event_lineup_id.as_hidden }}
+                {{ form.event_id.as_hidden }}
+                {{ form.member_id.as_hidden }}
+                {{ form.position_only.as_hidden }}
+                {{ form.label.as_hidden }}
+                {{ form.member_name.as_hidden }}
+                <th class="col-1" id="sequence-member-{{ form.member.data.id }}">
+                    {{ form.sequence.value | add:"1" }}
+                </th>
+                <td class="col-1">
+                    <div class="mx-1">
+                    <span id="player-order-form-{{ form.member.id }}" class="lineup-sequence-form">
+                {{ form.sequence.as_hidden }}
+                    </span>
 
-                    <span id="player-availability-{{ form.member.id }}" class="member-availability-status small">
+                        <span id="player-order-{{ form.member.id }}" class="lineup-sequence-value">
+                            {% if form.order.value > 0 %}{{ form.order.value | add:"1" }}{% endif %}
+                        </span>
+
+                        <span id="player-availability-{{ form.member.id }}" class="member-availability-status small">
                 {% if form.availability.data.status_code == 2 %}
                     <i class="bi bi-question-circle-fill text-info"></i>
                 {% elif form.availability.data.status_code == 1 %}
+{#                    <i class="bi bi-check-circle-fill text-success"></i>#}
                     <i class="bi bi-check-circle-fill text-success"></i>
                 {% elif form.availability.data.status_code == 0 %}
                     <i class="bi bi-x-circle-fill text-danger"></i>
@@ -31,29 +40,30 @@
                     <i class="bi bi-question-circle"></i>
                 {% endif %}
                 </span>
-                </div>
-            </td>
+                    </div>
+                </td>
 
-            <th class="">
-                <div class="text-nowrap">
+                <th class="">
+                    <div class="text-nowrap">
                 <span class="d-none d-md-inline-block">
                     {{ form.member.data.first_name }}
                 </span>
-                    {{ form.member.data.last_name }}
-                <span class="small text-muted fw-light d-none d-lg-inline-block">
+                        {{ form.member.data.last_name }}
+                        <span class="small text-muted fw-light d-none d-lg-inline-block">
                     #{{ form.member.data.jersey_number }}
                 </span>
-                </div>
-                {#        <br><code><small>{{ form.statline }}</small></code>#}
-            </th>
-            <td class="col-2">
-                {{ form.label }}
-            </td>
-            <td class="col-1 drag-handle">
-                <i class="bi bi-grip-vertical text-secondary"></i>
-            </td>
-            {#                                    <td>{{ form.instance.position }}</td>#}
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+                    </div>
+                    {#        <br><code><small>{{ form.statline }}</small></code>#}
+                </th>
+                <td class="col-2">
+                    <span class="lineup-label-form">{{ form.label }}</span>
+                </td>
+                <td class="col-1 drag-handle">
+                    <i class="bi bi-grip-vertical text-secondary"></i>
+                </td>
+                {#                                    <td>{{ form.instance.position }}</td>#}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

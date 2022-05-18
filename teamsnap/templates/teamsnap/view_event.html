@@ -1,137 +1,159 @@
 {% extends "base.html" %}{% load static %}
 {% block title %} {{ event.data.formatted_title }}{% endblock %}
-{% block page_heading %}{{ event.data.formatted_title }}{% endblock %}
-{% block page_subheading %}{{ event.data.start_date }}, {{ event.data.location_name }}{% endblock %}
+
 {% block content %}
-    <div class="table-responsive">
+    <div class="card mx-auto">
+        <div class="border-bottom p-2">
+            <h4 class="card-title text-nowrap">{{ event.data.formatted_title }}</h4>
+            <h6 class="text-muted card-subtitle text-nowrap">{{ event.data.start_date|date:"D, F j, Y g:i A" }}</h6>
+        </div>
+        <div class="card-body p-0 m-0">
+            <div>
+                <div class="row m-0">
+                    <div class="table-responsive p-0">
+                        <table class="table table-sm">
+                            {#    <thead>#}
+                            {#    </thead>#}
+                            <tbody>
+                            <tr>
+                                <th scope="col">
+                                    Date
+                                </th>
+                                <td>
+                                    {{ event.data.start_date|date:"D, F j, Y g:i A"  }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="col">
+                                    Opponent
+                                </th>
+                                <td>
+                                    <a href="{%  url 'teamsnap_opponent' team_id=request.user.profile.teamsnapsettings.managed_team.id id=event.data.opponent_id %}">{{ event.data.opponent_name }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="col">
+                                    Location
+                                </th>
+                                <td>
+                                    <a href="{%  url 'teamsnap_location' team_id=request.user.profile.teamsnapsettings.managed_team.id id=event.data.location_id %}">{{ event.data.location_name }}</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row m-0">
+                    <div class="col border-bottom">
+                        <i class="bi bi-clipboard-check me-1"></i><span class="text-uppercase fw-bold small">Availabilities</span>
+                    </div>
+                </div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-sm">
+                            {#            <thead>#}
+                            {#            <th scope="row">#}
+                            {#                <td>Status</td>#}
+                            {#            <td>Last</td>#}
+                            {#            <td>First</td>#}
+                            {#            </th>#}
+                            {#            </thead>#}
+                            <tbody>
+                            <tr>
+                                <th scope="col" class="col-1">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                </th>
+                                <td>
+                                    {{ availability_summary.data.player_going_count }}
+                                </td>
 
-        <table class="table table-striped table-sm">
-            {#    <thead>#}
-            {#    </thead>#}
-            <tbody>
-            <tr>
-                <th scope="col">
-                    Date
-                </th>
-                <td>
-                    {{ event.data.start_date }}
-                </td>
-            </tr>
-            <tr>
-                <th scope="col">
-                    Opponent
-                </th>
-                <td>
-                    <a href="{%  url 'teamsnap_opponent' team_id=request.user.profile.teamsnapsettings.managed_team.id id=event.data.opponent_id %}">{{ event.data.opponent_name }}</a>
-                </td>
-            </tr>
-            <tr>
-                <th scope="col">
-                    Location
-                </th>
-                <td>
-                    <a href="{%  url 'teamsnap_location' team_id=request.user.profile.teamsnapsettings.managed_team.id id=event.data.location_id %}">{{ event.data.location_name }}</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <h3>Availabilities</h3>
-    <div class="table-responsive">
-        <table class="table table-striped table-sm">
-            {#            <thead>#}
-            {#            <th scope="row">#}
-            {#                <td>Status</td>#}
-            {#            <td>Last</td>#}
-            {#            <td>First</td>#}
-            {#            </th>#}
-            {#            </thead>#}
-            <tbody>
-            <tr>
-                <th scope="col" class="col-1">
-                    <i class="bi bi-check-circle-fill text-success"></i>
-                </th>
-                <td>
-                    {{ availability_summary.data.player_going_count }}
-                </td>
-            </tr>
+                                <th scope="col" class="col-1">
+                                    <i class="bi bi-question-circle-fill text-info"></i>
+                                </th>
+                                <td>
+                                    {{ availability_summary.data.player_maybe_count }}
+                                </td>
 
-            <tr>
-                <th scope="col" class="col-1">
-                    <i class="bi bi-question-circle-fill text-info"></i>
-                </th>
-                <td>
-                    {{ availability_summary.data.player_maybe_count }}
-                </td>
-            </tr>
+                                <th scope="col" class="col-1">
+                                    <i class="bi bi-x-circle-fill text-danger"></i>
+                                </th>
+                                <td>
+                                    {{ availability_summary.data.player_not_going_count }}
+                                </td>
 
-            <tr>
-                <th scope="col" class="col-1">
-                    <i class="bi bi-x-circle-fill text-danger"></i>
-                </th>
-                <td>
-                    {{ availability_summary.data.player_not_going_count }}
-                </td>
-            </tr>
+                                <th scope="col" class="col-1">
+                                    <i class="bi bi-question-circle"></i>
+                                </th>
+                                <td>
+                                    {{ availability_summary.data.player_unknown_count }}
+                                </td>
+                            </tr>
 
-            <tr>
-                <th scope="col" class="col-1">
-                    <i class="bi bi-question-circle"></i>
-                </th>
-                <td>
-                    {{ availability_summary.data.player_unknown_count }}
-                </td>
-            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row m-0">
+                    <div class="col border-bottom mb-1">
+                        <i class="bi bi-clipboard me-1"></i><span class="text-uppercase fw-bold small">Lineup</span>
+                    </div>
+                    <div class="flexrow">
+                    <a class="btn btn-primary btn-sm"
+                       href="{% url 'teamsnap_edit_lineup' event_ids=event.data.id team_id=request.user.profile.teamsnapsettings.managed_team.id %}"
+                       role="button">Edit</a>
+                    </div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-striped table-sm">
+                            {#            <thead>#}
+                            {#            <th scope="row">#}
+                            {#                <td>Status</td>#}
+                            {#            <td>Last</td>#}
+                            {#            <td>First</td>#}
+                            {#            </th>#}
+                            {#            </thead>#}
+                            <tbody>
+                            {% for lineup_entry in lineup_entries %}
+                                <tr>
 
-            </tbody>
-        </table>
-    </div>
-    <div class="">
-        <h3>Lineup Entries</h3>
-        <a class="btn btn-primary btn-sm" href="{% url 'teamsnap_edit_lineup' event_id=event.data.id team_id=request.user.profile.teamsnapsettings.managed_team.id%}" role="button">Edit</a>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-striped table-sm">
-            {#            <thead>#}
-            {#            <th scope="row">#}
-            {#                <td>Status</td>#}
-            {#            <td>Last</td>#}
-            {#            <td>First</td>#}
-            {#            </th>#}
-            {#            </thead>#}
-            <tbody>
-            {% for lineup_entry in lineup_entries %}
-                <tr>
-                    <td class="col-1">
-                        {{ lineup_entry.data.sequence }}
-                    </td>
-                    <td>
-                        {{ lineup_entry.data.member_name }}
-                    </td>
-                    <td>
-                        {{ lineup_entry.data.label }}
-                    </td>
-
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <h3>Functions</h3>
-    <div class="">
-        <form method="get" action="{% url "teamsnap_image_generator_generate" team_id=request.user.profile.teamsnapsettings.managed_team.id event_id=event.data.id %}">
-            <select hidden class="form-select" name="game_id" id="game_id">
-                <optgroup label="Events">
-                    <option value="" disabled="disabled">Select an event...</option>
-                    <option selected value="{{event.data.id}}">{{event.data.formatted_title}}</option>
-                </optgroup>
-            </select>
-            <input hidden class="form-check-input" type="radio" name="background" id="backgroundLocation" checked value="location">
-            <input hidden class="form-check-input" type="radio" name="dimensions" id="square" checked value="1080x1080">
-            <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-instagram"></i></button>
-        </form>
-        <a class="btn btn-primary" href="{% url "teamsnap_image_generator" team_id=request.user.profile.teamsnapsettings.managed_team.id event_id=event.data.id %}" role="button"><div class="d-inline-block"><i class="bi bi-instagram"></i> <i class="bi bi-three-dots"></i></div></a>
-    </div>
-    </div>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row m-0">
+                    <div class="col border-bottom mb-1">
+                        <i class="bi bi-share"></i><span class="text-uppercase fw-bold small"> Functions</span>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <form method="get"
+                                  action="{% url "teamsnap_image_generator_generate" team_id=request.user.profile.teamsnapsettings.managed_team.id event_id=event.data.id %}">
+                                <select hidden class="form-select" name="game_id" id="game_id">
+                                    <optgroup label="Events">
+                                        <option value="" disabled="disabled">Select an event...</option>
+                                        <option selected
+                                                value="{{ event.data.id }}">{{ event.data.formatted_title }}</option>
+                                    </optgroup>
+                                </select>
+                                <input hidden class="form-check-input" type="radio" name="background"
+                                       id="backgroundLocation" checked value="location">
+                                <input hidden class="form-check-input" type="radio" name="dimensions" id="square" checked
+                                       value="1080x1080">
+                                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-instagram"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col">
+                            <a class="btn btn-primary"
+                               href="{% url "teamsnap_image_generator" team_id=request.user.profile.teamsnapsettings.managed_team.id event_id=event.data.id %}"
+                               role="button">
+                                <div class="d-inline-block"><i class="bi bi-instagram"></i> <i class="bi bi-three-dots"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

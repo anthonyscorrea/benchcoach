@@ -83,9 +83,10 @@ class LineupEntryForm(forms.Form):
     event_lineup_id = forms.Field(required=False)
     event_id = forms.Field()
     member_id = forms.Field()
+    position_only = forms.BooleanField(initial=False, required=False)
     sequence = forms.IntegerField(required=False)
     label = forms.ChoiceField(required=False, choices=[
-        ("--", "--"),
+        ("", "--"),
         ("P","P"),
         ("C","C"),
         ("1B","1B"),
