@@ -242,6 +242,7 @@ for (bcLineup of document.getElementsByClassName("benchcoach-lineup")) {
 
     var positionalonlylineup = new Sortable.create(
         bcLineup.getElementsByClassName("tbody-benchcoach-startingpositionalonly")[0], {
+            handle: ".drag-handle",
             group:{
                 name:bcLineup.id,
                 put:[bcLineup.id],
