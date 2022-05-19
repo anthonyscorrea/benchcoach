@@ -1,34 +1,28 @@
-{% extends "base.html" %}{% load static %}
-{% block title %} {{ title }}{% endblock %}
-{% block page_heading %}TeamSnap Info{% endblock %}
-{% block content %}
-    <h6>Currently Logged in as</h6>
-    <p><b>BenchCoach: </b>{{ user }} ({{ user.email }})</p>
-    <p><b>TeamSnap: </b>{{ teamsnap_user.email }}</p>
-    <p><b>TeamSnap Managed Team: </b>{{ teamsnap_team.name }}</p>
+<div class="card">
+    <div class="row">
+        <div class="text-center my-2">
+            <h1><img class="mx-auto" src="{% static 'benchcoach.svg' %}" style="width: 64px;"/>
+                <strong>Welcome to <span class="text-nowrap">Bench Coach</span></strong>
+            </h1>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="text-center my-2">
+                <div class="col-lg-6 m-auto">
+                    <p class="lead mb-4">Quisque at curabitur mollis ornare, malesuada maecenas. Orci elit
+                        tristique,
+                        malesuada eu pharetra. Est praesent tortor porttitor aptent, amet quisque.</p>
+                    {#        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mx-1">#}
+                    {#            <button class="btn btn-primary" type="button">Login</button><button class="btn btn-outline-secondary" type="button">Sign Up</button>#}
+                    {#        </div>#}
+                </div>
 
-    {% include 'messages.html' %}
+                <div class="container-sm">
+                    {#        <ul class="nav nav-pills flex-column mb-auto">#}
 
-    <a class="btn btn-primary" href="{% url 'import' %}" role="button">
-        <i class="bi bi-arrow-clockwise"></i><i class="bi bi-asterisk"></i> Import
-                    </a>
-
-    <table class="table">
-        <ul class="list-group">
-            {% for obj_name, obj_data in teamsnap_objects.items %}
-                <tr class="">
-                    <th>{{ obj_name }}</th>
-                        <td>{{ obj_data.object_count }}</td>
-                    <th>{{ obj_data.counterpart.name }} </th>
-                    <td>{{ obj_data.counterpart.object_count }}</td>
-
-                    <td>
-                        {% include 'teamsnap/update-button.html' with object_name=obj_data.counterpart.name object_id='' next=request.path %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </ul>
-    </table>
-
-
-{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
