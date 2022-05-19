@@ -55,6 +55,31 @@ def home(request):
     return render(request, 'teamsnap/home.html', context)
 
 @login_required()
+def dashboard(request, team_id):
+    current_benchcoach_user = request.user
+    current_teamsnap_user = request.user.profile.teamsnap_user
+    current_teamsnap_team = request.user.profile.teamsnapsettings.managed_team
+    teamsnap_objects = {}
+
+    TEAM_ID = team_id
+    TOKEN = request.user.profile.teamsnap_access_token
+    no_past = bool(request.GET.get('no_past', 0))
+    games_only = bool(request.GET.get('games_only', 0))
+    from pyteamsnap.api import TeamSnap, Event, AvailabilitySummary
+    client = TeamSnap(token=TOKEN)
+    time.sleep(.5)
+    ts_events = Event.search(client, team_id=TEAM_ID)
+    ts_availability_summaries_d = {a.data['id']:a for a in AvailabilitySummary.search(client, team_id=team_id)}
+    ts_events_future = [e for e in ts_events if e.data['start_date'] > datetime.datetime.now(datetime.timezone.utc)]
+    ts_events_past = [e for e in reversed(ts_events) if e.data['start_date'] < datetime.datetime.now(datetime.timezone.utc)]
+
+    return render(request, 'teamsnap/teamsnap.html', {
+        'ts_events_future':ts_events_future,
+        'ts_events_past': ts_events_past,
+        'events_availabilities' : [(e, ts_availability_summaries_d[e.data['id']]) for e in ts_events_future]
+    })
+
+@login_required()
 def sync_from_teamsnap(request, object_name=None, object_id=None):
     if request.POST:
         next = request.POST.get('next')
@@ -179,7 +204,7 @@ def event(request, event_id, team_id):
 
     members = []
 
-    return render(request, "teamsnap/view_event.html", context={
+    return render(request, "teamsnap/event/view_event.html", context={
         "availability_summary":ts_availability_summary,
         "event":ts_event,
         "availablities":[],

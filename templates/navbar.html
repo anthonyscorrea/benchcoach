@@ -1,6 +1,6 @@
 {% load static %}
 <nav class="navbar navbar-dark navbar-expand-lg mb-2" style="background: #323669">
-    <a class="navbar-brand text-uppercase fw-bold mx-2 text-dark">
+    <a class="navbar-brand text-uppercase fw-bold mx-2 text-dark" href="{% url 'home'%}">
         <img class="d-inline-block" width="32" height="32" src="{% static 'benchcoach.svg' %}" />
         <span class="text-white">bench coach</span>
     </a>
@@ -11,10 +11,10 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mx-2">
             <li class="nav-item ">
-                <a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %} text-decoration-none" href="{% url 'home'%}">
-                    <i class="bi bi-house-fill"></i>
+                <a class="nav-link{% if request.resolver_match.url_name == 'teamsnap_dashboard' %} active{% endif %} text-decoration-none" href="{% url 'teamsnap_dashboard' team_id=request.user.profile.teamsnapsettings.managed_team.id %}">
+                    <i class="bi bi-speedometer2"></i>
                     <span class="">
-                    Home
+                    Dashboard
                 </span>
                 </a>
             </li>

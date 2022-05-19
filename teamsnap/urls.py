@@ -7,6 +7,7 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='teamsnap_home'),
+    path('<int:team_id>/dashboard/', views.dashboard, name='teamsnap_dashboard'),
     path('edit/event/<int:id>', views.edit_event, name='teamsnap edit event'),
     path('sync/download', views.sync_from_teamsnap, name="sync from teamsnap"),
     path('import/', views.import_teamsnap, name="import"),
