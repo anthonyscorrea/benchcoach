@@ -73,7 +73,8 @@ def dashboard(request, team_id):
     ts_events_future = [e for e in ts_events if e.data['start_date'] > datetime.datetime.now(datetime.timezone.utc)]
     ts_events_past = [e for e in reversed(ts_events) if e.data['start_date'] < datetime.datetime.now(datetime.timezone.utc)]
 
-    return render(request, 'teamsnap/teamsnap.html', {
+    return render(request, 'teamsnap/dashboard.html', {
+        'team_id':team_id,
         'ts_events_future':ts_events_future,
         'ts_events_past': ts_events_past,
         'events_availabilities' : [(e, ts_availability_summaries_d[e.data['id']]) for e in ts_events_future]
